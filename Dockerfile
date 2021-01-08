@@ -7,6 +7,7 @@ RUN echo "Asia/Shanghai" > /etc/timezone \
 #    && npm config set registry https://registry.npm.taobao.org \
     && apk add --no-cache git \
     && npm install hexo-cli -g \    
+#    && npm install hexo-deployer-git --save \
     && chmod 777 /build_and_run.sh
 EXPOSE 4000
 
