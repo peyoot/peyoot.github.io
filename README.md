@@ -11,9 +11,13 @@
 ### docker-compose
 
 1. 修改 `docker-compose.yml` 里的 `environment`;
-2. 修改_config.yml
+2. 修改 Dockerfile  url 以及注释掉国内镜像（国外服务器没法用，或是upstream已经失效） 
+3. 修改_config.yml 
 
-3. `docker-compose up --force-recreate --build`
+这里把整站源码放在项目master，而生成的主页放在gh-pages
+
+
+4. `docker-compose up --force-recreate --build`
 
 ### [docker](https://hub.docker.com/r/zeusro/hexo)
 
@@ -21,3 +25,5 @@
     docker run -p 4000:4000 zeusro/hexo:latest  \
     --env PUBLIC_HEXO_GITHUB_URL=https://github.com/peyoot/peyoot.github.io.git
 ```
+
+注意，这只是让hexo当server, build_and_run.sh中并没有hexo deploy，如果不把本地hexo当web服务器，而只是发布到github上，测试成功后要加上
