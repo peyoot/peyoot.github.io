@@ -34,6 +34,15 @@ export default defineUserConfig({
             text: 'Home',
             link: '/',
          },
+         {
+            text: 'pvpn',
+            link: '/pvpn/',
+        },
+        {
+           text: 'deyaio',
+           link: '/deyaio/',
+        },
+
         ],
       },
       '/zh/': {
@@ -42,7 +51,15 @@ export default defineUserConfig({
           {
             text: '首页',
             link: '/',
-         },
+          },
+          {
+            text: 'pvpn',
+            link: '/pvpn/',
+          },
+          {
+           text: 'deyaio',
+           link: '/deyaio',
+          },
         ],
       },
     },
