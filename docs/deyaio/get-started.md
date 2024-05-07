@@ -15,11 +15,11 @@ sudo apt install python-is-python3
 ```
 
 ## Install repo and configure git
-
+```
 sudo apt install repo
 git config --global user.name  “yourname”
 git config --global user.email "you@email.com“
-
+```
 ## Install docker and docker-compose
 
 ```
@@ -54,13 +54,13 @@ DEY AIO folder structure:
 │   ├──docker-compose.yml
 │   ├── mkproject.sh
 │   ├── publish.sh
-│   ├── sources.sh
+│   ├── sources
 │   ├── workspace
 ├── dey3.2
 │   ├──docker-compose.yml
 │   ├── mkproject.sh
 │   ├── publish.sh
-│   ├── sources.sh
+│   ├── sources
 │   ├── workspace
 | ...
 ├── release
