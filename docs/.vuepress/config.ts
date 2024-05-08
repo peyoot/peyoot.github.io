@@ -33,8 +33,8 @@ export default defineUserConfig({
 //    logo: '/images/hero.png',
     repo: 'http://github.com/peyoot',
     docsDir: 'docs',
-    lastUpdated: false
-    contributors: false
+    lastUpdated: false ,
+    contributors: false ,
     locales: {
       '/': {
 	navbar: navbarEn,
