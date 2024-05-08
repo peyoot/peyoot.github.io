@@ -6,10 +6,10 @@ heroImage: /pic/magicbook.jpg #页面图片（这里的/就是/public）
 tagline: 开源技术文档 - 魔法书等您品鉴
 actions:
   - text: 关于我
-    link: /peyoot/about-peyoot.html
+    link: /zh/about-me.md
     type: primary
   - text: 我的百宝箱
-    link: /repo/introduction.html
+    link: /zh/my-stuff.md
     type: secondary
 features:
   - title: 开源共享

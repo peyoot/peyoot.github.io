@@ -16,6 +16,7 @@ export const sidebarZh: SidebarConfig = {
       children: [
         '/zh/deyaio/introduction.md',
         '/zh/deyaio/get-started.md',
+        '/zh/deyaio/ros2.md'
       ],
     },
   ],

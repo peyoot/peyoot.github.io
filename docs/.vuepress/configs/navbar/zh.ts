@@ -10,6 +10,12 @@ export const navbarZh: NavbarConfig = [
     text: 'pvpn',
     link: '/zh/pvpn/',
     children: [
+
+      {
+      text: '简介',
+      link: '/zh/pvpn/introduction.md'
+      },
+
       {
       text: '快速开始',
       link: '/zh/pvpn/get-started.md',
@@ -20,14 +26,22 @@ export const navbarZh: NavbarConfig = [
     text: 'deyaio',
     link: '/zh/deyaio/',
     children: [
-      {
-      text: '快速开始',
-      link: '/zh/deyaio/get-started.md'
-      },
+
       {
       text: '简介',
       link: '/zh/deyaio/introduction.md'
       },
+
+      {
+      text: '快速开始',
+      link: '/zh/deyaio/get-started.md'
+      },
+
+      {
+      text: 'ROS2支持',
+      link: '/zh/deyaio/ros2.md'
+      },
+
     ],
   },
 ]

@@ -11,6 +11,10 @@ export const navbarEn: NavbarConfig = [
     link: '/pvpn/',
     children: [
       {
+      text: 'Introduction',
+      link: '/pvpn/introduction',
+      },
+      {
       text: 'Get Started',
       link: '/pvpn/get-started.md',
       },
@@ -20,14 +24,22 @@ export const navbarEn: NavbarConfig = [
     text: 'deyaio',
     link: '/deyaio/',
     children: [
-      {
-      text: 'Get Started',
-      link: '/deyaio/get-started.md'
-      },
+
       {
       text: 'Introduction',
       link: '/deyaio/introduction.md'
       },
+
+      {
+      text: 'Get Started',
+      link: '/deyaio/get-started.md'
+      },
+
+      {
+      text: 'ROS2 Support',
+      link: '/deyaio/ros2.md'
+      },
+
     ],
   },
 ]

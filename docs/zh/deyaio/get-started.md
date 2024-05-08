@@ -1,4 +1,4 @@
-#安装
+# 安装
 ---
 
 为了正确安装和使用dey-aio，您需要安装yocto开发环境所需的依赖包，如果您要使用docker进行开发，则还需要安装docker和docker-compose。下面安装过程以Ubuntu 22.04为例，同样也适用于Ubuntu 20.04，请使用普通用户来执行这些命令。
@@ -11,7 +11,7 @@ sudo apt install python-is-python3
 ```
 
 
-##安装repo并配置好git
+## 安装repo并配置好git
 
 ```
 sudo apt install repo
@@ -30,7 +30,7 @@ docker ps    #测试docker命令是否可以使用sudo正常使用
 docker network create pvpn --subnet 172.100.100.0/24    #创建配合科学上网使用自定义网络
 ```
 
-##用repo安装dey-aio工具集
+## 用repo安装dey-aio工具集
 
 ```
 cd
@@ -43,7 +43,7 @@ repo sync
 这样，dey-aio的工具集就安装好了。  
  
 
-#DEY系统开发
+# DEY系统开发
 ---
 
 关于科学上网：考虑到国内对github的访问并不顺畅，由于墙对境外IP的阻断方式是间歇式的断开TCP连接，在使用本工具集首次编译时需要科学上网。如果您从未实践过科学上网，可以在位于境外IP的任意云服务器上使用[peyoot/pvpn](https://www.github.com/peyoot/pvpn.git)的开源工具快速架设科学上网环境所需的vpn服务器（[文档](https://www.eccee.com/soft-platform/224.html)），然后在本地开发机器上使用相同的工具自动部署vpn客户端，从而实现编译时所需的科学上网环境。（注：上述的安装过程，不论是否需要科学上网，均可正常使用）
@@ -82,7 +82,7 @@ dey-aio的目录结构如下：
 
 要进行项目开发，您需要进入项目所需的DEY版本，然后创建项目。您可以使用docker-compose的方式来创建项目，也可以直接使用官方原生的方法来创建项目。两种方式可共用workspace作为项目目录 。
 
-##使用docker-compose的开发方式
+## 使用docker-compose的开发方式
 
 docker-compose可以快速创建一个与主机隔离的dey的开发环境容器，要创建一个新的docker容器来进行开发，可以用：docker-compose run dey<版本号>，这里的版本号可以是3.2或4.0，容器默认使用peyoot/dey作为DEY的镜像，您也可以修改docker-compose.yml，使用官方的digidotcom/dey镜像。  
 例：`docker-compose run dey4.0`  
@@ -109,7 +109,7 @@ docker-compose可以快速创建一个与主机隔离的dey的开发环境容器
 
 您可以使用exit退出 docker环境，并用docker-compose down来关闭容器。更多用法请参考[dey-aio项目](https://github.com/peyoot/dey-aio.git)。
 
-##使用官方原生的Digi Embedded Yocto开发方式
+## 使用官方原生的Digi Embedded Yocto开发方式
 
 dey-aio工具集在安装时就已经自动拉取DEY源码到sources，您可以在workspace中创建项目，直接编译。开发方式和官方并没有区别，只是我们把DEY安装在当前目录下，我们需要进入workspace创建新项目的名称，然后和官方一样，用mkproject.sh来创建项目。本项目对下载目录和sstate缓存做了一些优化处理，它们都存放于父级目录下的project\_shared，以方便不同项目使用。以创建cc93项目为例：
 
@@ -122,12 +122,12 @@ source ../../mkproject.sh -p ccimx93-dvk
 bitbake dey-image-qt
 ```
 
-#关于meta-custom
+# 关于meta-custom
 ---
 meta-custom作为一个Yocto的示例layer，用于用户将自定义的程序或配置文件，自启动服务或脚本，驱动程序等文件编译到系统镜像中。用户可以根据项目需要自行更改源码和维护自己的版本库。
 为了更方便编排ros，把meta-custom单独作为一个git库，从dey4.0 kirkstone最新版开始，meta-custom不在是dey-aio的一部分
 
-#发布工具
+# 发布工具
 编译结束后，您可以到对应的DEY版本目录下，使用publish.sh来将编译结果发布到release目录下，并打包成卡刷包，也可以选择发布到TFTP或NFS路径上，方便快速开发测试。
 
 
