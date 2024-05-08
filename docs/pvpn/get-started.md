@@ -1,4 +1,4 @@
-#Get Started
+# Get Started
 It's very simple as you can finish it in several minutes without any PC skills. Basically, You'll need to set up a VPN server first. Scripts will help you generate CA/Key/Certifications in the VPN server and also generate a temporary webpage for you to download the client certifications for your devices.
 
 Follow the instruction to select server/client mode and VPN type. You'll need to input public IP of VPN server. And then choose if you're installing VPN server (VPN Responder) or VPN client(VPN Initiator).
@@ -65,7 +65,7 @@ Please input the server Public IP: []
 The rest you can simply press Enter each time till script finish the installation.
 Now you've got a VPN server installed.
 
-##### 2. Install and configure VPN CLient
+## Install and configure VPN CLient
 This vary from different platform on your devices:
 
 Linux
@@ -104,7 +104,7 @@ iPad
 
 
 
-#### Reference for those install VPN server on your own geer:
+## Reference for those install VPN server on your own geer:
 
 PVPN scripts will help you generated every thing serer needed and also generated a client certification for the use in home or office PC/laptop. You can download client certs directly from server via web browser.
 All necessary certs,config files,scripts in Ubuntu server/client will be generated in server and download & extract in client automatically.
