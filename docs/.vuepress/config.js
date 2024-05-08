@@ -58,7 +58,7 @@ export default defineUserConfig({
           },
           {
            text: 'deyaio',
-           link: '/deyaio',
+           link: '/deyaio/',
           },
         ],
       },

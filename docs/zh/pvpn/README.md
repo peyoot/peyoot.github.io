@@ -5,7 +5,7 @@ heroText: PVPN文档
 heroImage: pic/magicbook.jpg #页面图片（这里的/就是/public）
 tagline: 一个工程师用的VPN工具
 actions:
-  - text: Get Started
+  - text: 快速开始
     link: /pvpn/get-started.html
     type: primary
 features:
@@ -15,5 +15,6 @@ features:
     details: 自动安装和配置，包括证书的生成和防火墙配置等
   - title: 平台无关
     details: 支持Linux, Android, IOS客户端使用并设置VPN隧道到远端服务器
+
 footer: Licensed under CC-BY-SA 4.0 | Copyleft © 2023-present peyoot
 ---
