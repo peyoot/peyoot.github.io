@@ -1,7 +1,7 @@
 # ROS2 Getting Started
 
 ::: warning
-Currently only RPS2 Humble support were tested and it only verified with DEY4.0  kirkstone. Other version may of DEY may work but you need to modify dey-aio-manifest repo and try by your own effort.
+Currently only ROS2 Humble support were tested and it was only verified with DEY4.0  kirkstone. Other version may of DEY may work but you need to modify dey-aio-manifest repo and try by your own effort.
 :::
 ## Preparation  
 Ubuntu 22.04 as example
