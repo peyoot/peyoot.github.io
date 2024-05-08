@@ -19,4 +19,3 @@ features:
 
 footer: Licensed under CC-BY-SA 4.0 | Copyleft © 2023-present peyoot
 ---
-# Welcome to the chamber of Peyoot
