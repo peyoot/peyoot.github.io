@@ -17,7 +17,9 @@ git config --global user.email you@email.com
 ```
 
 ## 安装带ros支持的deyaio
-如果您已经安装了 deyaio，现在您需要 ros 支持版本。建议您安装到另一个文件夹，例如 deyaio-ros```bash
+如果您已经安装了 deyaio，现在您需要 ros 支持版本。建议您安装到另一个文件夹，例如 deyaio-ros 
+
+```
 cd
 mkdir deyaio-ros
 cd deyaio-ros
