@@ -76,6 +76,8 @@ DEY AIO folder structure:
 
 To do project development, you need to go into the desired DEY version of the project and then create the project . You can use docker-compose to create a project, or you can create a project directly using the official native method under workspace sub-folder. Both ways can share workspace as the project directory.
 
+To better manage multiple projects, please use tmux to create a new terminal session for every project. 
+
 ### Native DEY development method
 
 The dey-aio toolset automatically pulls the DEY source code when it is being installed. And you can create a project in the workspace folder and compile it directly. This method is no different from the official one, except that it install DEY in the sources folder of currentdirectory.  we need to enter the corresponding workspace folder to create the new project.  dey-aio has made some optimizations for different projects to share the download folder and sstate cache, which are stored in the project_shared under workspace. Take the creation of the cc93 project as an example:
@@ -122,6 +124,8 @@ This automatically opens the container and prompts you to create a project or co
 
  when you input “Y”, it will let you choose which som platform you're working with can create the project based on your choice. And then you can start to build the firmwares.
 
-To continue with previous project, simply input "N".
+To continue with previous project, simply input "N". Please source dey-setup-environment first when you need to continue your previous work.
 
-You can type "exit" in the dey docker container to quit. and use "docker-compose down" to close the container. More usage please refer to [dey-aio]([https://github.vom/peyoot/dey-aio）](https://github.vom/peyoot/dey-aio%EF%BC%89)
+You can type "exit" in the dey docker container to quit. Use "docker-compose down" to close the container. 
+
+
