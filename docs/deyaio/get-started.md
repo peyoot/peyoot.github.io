@@ -46,12 +46,13 @@ Now DEY AIO toolset is ready to work!
 
 DEY AIO folder structure:
 
+```
 /
 ├── aio
-│   ├──gatesgarth
+│   ├── gatesgarth
 │   ├── kirkstone
 ├── dey4.0
-│   ├──docker-compose.yml
+│   ├── docker-compose.yml
 │   ├── mkproject.sh
 │   ├── publish.sh
 │   ├── sources
@@ -71,6 +72,7 @@ DEY AIO folder structure:
 │        ├── ...
 │   └ …
 └── README.md
+```
 
 To do project development, you need to go into the desired DEY version of the project and then create the project . You can use docker-compose to create a project, or you can create a project directly using the official native method under workspace sub-folder. Both ways can share workspace as the project directory.
 
