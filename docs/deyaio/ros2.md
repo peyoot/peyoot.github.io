@@ -35,6 +35,10 @@ source ../../mkproject.sh -p ccimx93-dvk
 ## configure and build a ros support image
 Edit conf/local.conf and add packages you need. For example, use following in local.conf:
 ```
+IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim"
+
+or
+
 IMAGE_INSTALL:append = " packagegroup-imx-ml packagegroup-core-buildessential python3-colcon-common-extensions python3-lark-parser python3-pip python3-vcstool cmake ament-cmake ament-cmake-ros libtinyxml2"
 ```
 Now compile image

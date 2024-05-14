@@ -36,6 +36,11 @@ source ../../mkproject.sh -p ccimx93-dvk
 ## 编译并生成镜像
 编辑conf/local.conf 并添加您所需的软件包，以下仅供参考:
 ```
+
+IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim"
+
+或
+
 IMAGE_INSTALL:append = " packagegroup-imx-ml packagegroup-core-buildessential python3-colcon-common-extensions python3-lark-parser python3-pip python3-vcstool cmake ament-cmake ament-cmake-ros libtinyxml2"
 ```
 现在可以编译带ros支持的镜像了
