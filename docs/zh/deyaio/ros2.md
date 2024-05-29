@@ -37,7 +37,7 @@ source ../../mkproject.sh -p ccimx93-dvk
 编辑conf/local.conf 并添加您所需的软件包，以下仅供参考:
 ```
 
-IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim glibc-utils localedef tmux"
+IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim glibc-utils localedef tmux homeaddons"
 
 或
 

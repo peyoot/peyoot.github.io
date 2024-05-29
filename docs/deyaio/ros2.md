@@ -35,7 +35,7 @@ source ../../mkproject.sh -p ccimx93-dvk
 ## configure and build a ros support image
 Edit conf/local.conf and add packages you need. For example, use following in local.conf:
 ```
-IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim glibc-utils localedef tmux"
+IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim glibc-utils localedef tmux homeaddons"
 
 or
 
