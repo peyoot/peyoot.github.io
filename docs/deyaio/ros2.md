@@ -35,11 +35,12 @@ source ../../mkproject.sh -p ccimx93-dvk
 ## configure and build a ros support image
 Edit conf/local.conf and add packages you need. For example, use following in local.conf:
 ```
+GLIBC_GENERATE_LOCALES = "en_GB.UTF-8 en_US.UTF-8"
+IMAGE_LINGUAS = "zh-cn"
+LOCALE_UTF8_ONLY="1"
+
 IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim glibc-utils localedef tmux homeaddons"
 
-or
-
-IMAGE_INSTALL:append = " packagegroup-imx-ml packagegroup-core-buildessential python3-colcon-common-extensions python3-lark-parser python3-pip python3-vcstool cmake ament-cmake ament-cmake-ros libtinyxml2"
 ```
 Now compile image
 ```
@@ -51,8 +52,9 @@ bitbake dey-image-qtros
 cd ../..
 ./publish
 ```
-Follow the prompts and select correct items. For image type, you still need to choose dey-imag-qt as ros image (dey-image-qtros) is based on qt image.
+Follow the prompts and select correct items. 
+For image type, you still need to choose dey-imag-qt as ros image (dey-image-qtros) is based on qt image.
 when prompt ask if it's a ros project, input "yes".
 
-You can choose to move out compiled output to release folder and pack it into installer or publish to TFTP/NFS path.
+You can choose to copy compile outputs to release directory and pack it into installer or publish to TFTP/NFS server.
 

@@ -36,12 +36,12 @@ source ../../mkproject.sh -p ccimx93-dvk
 ## 编译并生成镜像
 编辑conf/local.conf 并添加您所需的软件包，以下仅供参考:
 ```
+GLIBC_GENERATE_LOCALES = "zh_CN.UTF-8 en_GB.UTF-8 en_US.UTF-8"
+IMAGE_LINGUAS = "zh-cn"
+LOCALE_UTF8_ONLY="1"
 
 IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicexperience-rhi-tools turtlesim glibc-utils localedef tmux homeaddons"
 
-或
-
-IMAGE_INSTALL:append = " packagegroup-imx-ml packagegroup-core-buildessential python3-colcon-common-extensions python3-lark-parser python3-pip python3-vcstool cmake ament-cmake ament-cmake-ros libtinyxml2"
 ```
 现在可以编译带ros支持的镜像了
 ```
@@ -53,8 +53,9 @@ bitbake dey-image-qtros
 cd ../..
 ./publish
 ```
-按照提示操作并选择正确的项目。对于镜像类型，您仍然需要选择 dey-imag-qt，因为 ros 镜像 （dey-image-qtros） 是基于 qt 镜像的。
+按照提示操作并选择正确的项目。
+对于镜像类型，您仍然需要选择 dey-imag-qt，因为 ros 镜像 （dey-image-qtros） 是基于 qt 镜像的。
 当提示询问它是否是 ROS 项目时，输入“yes”。
 
-您可以选择将编译后的输出移出到发布文件夹并将其打包到安装程序中或发布到 TFTP/NFS 路径。
+您可以选择将编译后的输出拷贝到发布文件夹并将其打包成卡刷包或发布到 TFTP/NFS 路径或服务器上。
 
