@@ -35,7 +35,7 @@ Note: you'll also need to modify kernel option:
 Enable Device Drivers → Network device support → Universal TUN/TAP device driver support
 
 ## recipes-qt
+some platform only support qt5 or qt6 by default. When switch to different version it may need to patch or hack. Recipes here can help in a seamless way.
+For example, ros2 with qt5 support will need a custom qt5.sh placed on /etc/profile.d. Depending the content it can recognize right display backend and user can run ros2 directory after booting into system without the need to manually source environmental script.
 
-ros2 with qt5 support will need a custom qt5.sh placed on /etc/profile.d. Depending the content user can run ros2 directory after booting into system without the need to manually source environmental script.
-
-To enable ros2 in the image, just checkout the kirkstone-ros branch in dey-aio-manifest.
+To enable ros2 in the image, just checkout the ros branch in dey-aio-manifest.
