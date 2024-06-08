@@ -15,9 +15,10 @@ This recipe provide a reference to override original base-files with your own .p
 This recipe provide a reference to run your own systemd service
 
 ## recipes-core
+Only available in some specific branches.
 
 ### images
-recipes in this directory provide some feature images like dey-image-qtros
+recipes in this directory provide some feature images like dey-image-qtros.
 
 
 ## recipes-vpn
