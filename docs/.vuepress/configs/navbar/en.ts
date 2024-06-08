@@ -36,6 +36,11 @@ export const navbarEn: NavbarConfig = [
       },
 
       {
+      text: 'meta-custom',
+      link: '/deyaio/meta-custom.md'
+      },
+
+      {
       text: 'ROS2 Support',
       link: '/deyaio/ros2.md'
       },

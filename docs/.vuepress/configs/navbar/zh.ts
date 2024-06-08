@@ -38,6 +38,11 @@ export const navbarZh: NavbarConfig = [
       },
 
       {
+      text: 'meta-custom',
+      link: '/zh/deyaio/meta-custom.md'
+      },
+
+      {
       text: 'ROS2支持',
       link: '/zh/deyaio/ros2.md'
       },

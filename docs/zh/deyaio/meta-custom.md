@@ -8,11 +8,15 @@
 ### homeaddons
 此配方提供将文件安装到用户主目录的参考。它可以是文本文件或预编译的用户应用程序。
 
-### base-files
-此配方提供了一个参考，以使用您自己的 .profile 和 .bashrc 覆盖原始基本文件
+## recipes-core
+### images
+该目录下提供一系列自定义的配方
 
-### 虚拟服务
-此配方提供了运行您自己的 systemd 服务的参考
+### base-files
+此目录下配方提供了一个参考，以使用您自己的 .profile 和 .bashrc 覆盖原始基本文件
+
+### systemd
+dummy-service配方提供了运行您自己的 systemd 服务的参考
 
 ## recipes-VPN
 

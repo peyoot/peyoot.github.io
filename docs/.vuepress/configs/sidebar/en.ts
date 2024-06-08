@@ -16,6 +16,7 @@ export const sidebarEn: SidebarConfig = {
       children: [
         '/deyaio/introduction.md',
         '/deyaio/get-started.md',
+	'/deyaio/meta-custom.md',
 	'/deyaio/ros2.md'
       ],
     },
