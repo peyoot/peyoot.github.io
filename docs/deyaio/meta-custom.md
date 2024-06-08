@@ -8,16 +8,17 @@ It's a yocto layer that enable many custom recipes. DEYAIO use meta-custom to co
 ### homeaddons
 This recipe provide a reference to install files to user's home directory. It can be text files or a pre-compiled user application.
 
+### base-files
+This recipe provide a reference to override original base-files with your own .profile and .bashrc 
+
+### dummy-service
+This recipe provide a reference to run your own systemd service
+
 ## recipes-core
 
 ### images
 recipes in this directory provide some feature images like dey-image-qtros
 
-### base-files
-The recipe here provide a reference to override original base-files with your own .profile and .bashrc 
-
-### systemd
-The recipe here provide a reference to run your own systemd service
 
 ## recipes-vpn
 
