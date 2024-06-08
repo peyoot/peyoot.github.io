@@ -16,6 +16,8 @@ dummy-service配方提供了运行您自己的 systemd 服务的参考
 
 
 ## recipes-core
+仅特定分支有此目录来提供特定的镜像配方
+
 ### images
 该目录下提供一系列自定义的目标镜像配方
 
@@ -32,7 +34,7 @@ IMAGE_INSTALL:append = “ gawk unzip pvpn openvpn openvpndns stunnel”
 Enable Device Drivers → Network device support → Universal TUN/TAP device driver support
 
 
-##recipes-qt
+## recipes-qt
 
 ROS2需要QT5的支持，它需要一个自定义的配置放在 /etc/profile.d/qt5.sh。根据其内容用户可以免运行环境配置脚本直接运行ros2命令。
 要启用ros2支持，请在dey-aio-manifest中检出kirkstone-ros分支。
