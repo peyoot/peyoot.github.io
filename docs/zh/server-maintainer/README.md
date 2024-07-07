@@ -9,6 +9,8 @@ actions:
     link: /pvpn/get-started.html
     type: primary
 features:
+  - title: 服务器健康状态监控
+    details: 生成包括硬盘和内存、CPU 利用率等健康状态的电子邮件报告
   - title: 容器、网站和应用数据的自动异地备份
     details: 帮助您每天自动将站点和应用程序数据备份或同步到远程服务器
   - title: 支持Portainer和DNMP

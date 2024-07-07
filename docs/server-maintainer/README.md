@@ -9,8 +9,10 @@ actions:
     link: /pvpn/get-started.html
     type: primary
 features:
-  - title: Automatic offsite backup of containers,websites and apps data
-    details: Help you backup sites & apps data to remote server automatically every day
+  - title: Server health monitoring
+    details: Generate email report of the health status of the server: including hard disk and memory, CPU utilization,etc.
+  - title: Automatic offsite backups
+    details: Help you backup containers,websites & apps to remote server automatically 
   - title: Portainer & DNMP support
     details: It support Portainer and DNMP in portainer, can backup/sync whole container volumes and backup websites & database of dnmp as well.
   - title: Easy restore in diffrent server
