@@ -10,7 +10,7 @@ actions:
     type: primary
 features:
   - title: Server health monitoring
-    details: Generate email report of the health status of the server: including hard disk and memory, CPU utilization,etc.
+    details: Generate email report of the health status of the server.Including hard disk and memory, CPU utilization,etc.
   - title: Automatic offsite backups
     details: Help you backup containers,websites & apps to remote server automatically 
   - title: Portainer & DNMP support
