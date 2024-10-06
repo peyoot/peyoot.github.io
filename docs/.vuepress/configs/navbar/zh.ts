@@ -47,6 +47,11 @@ export const navbarZh: NavbarConfig = [
       link: '/zh/deyaio/ros2.md'
       },
 
+      {
+        text: 'Mono支持',
+        link: '/zh/deyaio/mono.md'
+        },
+
     ],
   },
 ]

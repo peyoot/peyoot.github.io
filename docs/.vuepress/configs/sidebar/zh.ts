@@ -17,7 +17,8 @@ export const sidebarZh: SidebarConfig = {
         '/zh/deyaio/introduction.md',
         '/zh/deyaio/get-started.md',
         '/zh/deyaio/meta-custom.md',
-        '/zh/deyaio/ros2.md'
+        '/zh/deyaio/ros2.md',
+         '/zh/deyaio/mono.md'
       ],
     },
   ],

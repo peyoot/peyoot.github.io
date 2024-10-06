@@ -45,6 +45,11 @@ export const navbarEn: NavbarConfig = [
       link: '/deyaio/ros2.md'
       },
 
+      {
+        text: 'Mono Support',
+        link: '/deyaio/mono.md'
+        },
+
     ],
   },
 ]
