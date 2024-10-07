@@ -45,6 +45,8 @@ IMAGE_INSTALL:append = " glibc-utils localedef tmux homeaddons"
 Now compile image
 ```
 bitbake core-image-mono
+or
+bitbake dey-image-mono
 ```
 
 ## Publish and pack installer

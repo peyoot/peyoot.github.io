@@ -47,6 +47,8 @@ IMAGE_INSTALL:append = " glibc-utils localedef tmux homeaddons"
 现在可以编译带mono支持的镜像了
 ```
 bitbake core-image-mono
+或
+bitbake dey-image-mono
 ```
 
 ## 发布并打包
