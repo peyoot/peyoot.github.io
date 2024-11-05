@@ -84,7 +84,9 @@ dey-aio的目录结构如下：
 ├── README.md  
 └── README-cn.md
 
-要进行项目开发，您需要进入项目所需的DEY版本，然后创建项目。您可以使用docker-compose的方式来创建项目，也可以直接使用官方原生的方法来创建项目。两种方式可共用workspace作为项目目录 。
+要进行项目开发，您需要进入项目所需的DEY版本，然后创建项目。您可以使用docker-compose的方式来创建项目，也可以直接使用官方原生的方法来创建项目。两种方式可共用workspace作为项目目录。
+
+第一次使用，一般建议直接用官方原生的办法来创建项目并编译系统镜像。
 
 ## 使用docker-compose的开发方式
 
@@ -115,15 +117,23 @@ docker-compose可以快速创建一个与主机隔离的dey的开发环境容器
 
 ## 使用官方原生的Digi Embedded Yocto开发方式
 
-dey-aio工具集在安装时就已经自动拉取DEY源码到sources，您可以在workspace中创建项目，直接编译。开发方式和官方并没有区别，只是我们把DEY安装在当前目录下，我们需要进入workspace创建新项目的名称，然后和官方一样，用mkproject.sh来创建项目。本项目对下载目录和sstate缓存做了一些优化处理，它们都存放于父级目录下的project\_shared，以方便不同项目使用。以创建cc93项目为例：
+dey-aio工具集在安装时就已经自动拉取DEY源码到sources，您可以在workspace中创建项目，直接编译。开发方式和官方并没有区别，只是我们把DEY安装在当前目录下，我们需要进入workspace创建新项目的名称，然后和官方一样，用mkproject.sh来创建项目。本项目对下载目录和sstate缓存做了一些优化处理，它们都存放于父级目录下的project\_shared，以方便不同项目使用。以创建cc93项目和ccmp25项目为例：
 
 ```text-plain
+#ConnectCore 93可参考如下：
 cd workspace
 mkdir cc93
 cd cc93
 source ../../mkproject.sh -l
 source ../../mkproject.sh -p ccimx93-dvk
 bitbake dey-image-qt
+
+#ConnectCore MP2系列核心模块或其它模块类似，请选择对应的平台来source项目，并编译目标镜像：
+cd workspace
+mkdir ccmp25
+source ../../mkproject.sh -l
+source ../../mkproject.sh -p ccmp25-dvk
+bitbake core-image-base
 ```
 
 # 关于meta-custom
@@ -134,4 +144,7 @@ meta-custom作为一个Yocto的示例layer，用于用户将自定义的程序�
 # 发布工具
 编译结束后，您可以到对应的DEY版本目录下，使用publish.sh来将编译结果发布到release目录下，并打包成卡刷包，也可以选择发布到TFTP或NFS路径上，方便快速开发测试。
 
-
+```text-plain
+./publish.sh
+按提示选择并发布相关的镜像
+```
