@@ -52,6 +52,19 @@ bitbake -c cleanall core-image-base
 bitbake tf-a-stm32mp
 bitbake core-image-base
 ```
-
+## 使用配方自动拉取自定义设备树
+我们可以在meta-custom的指定分支上放置相关设备树的配方，通过deyaio-manifest项目指定的xml来拉取包括自定义设备树在内的deyaio工具链，以ccmp25-plc项目为例，它在meta-custom的kirkstone-ccmp25plc上
+```
+mkdir ~/deyaio-ccmp25plc
+cd ~/deyaio-ccmp25plc
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b kirkstone -m ccmp25plc.xml
+cd dey4.0/workspace/
+mkdir ccmp25plc
+cd ccmp25plc
+source ../../mkproject.sh -p ccmp25-dvk
+nano conf/local.conf
+加上 KERNEL_DEVICETREE += "ccmp25-plc.dtb"
+然后就可以编译了 bitbake core-image-base
+```
 
 
