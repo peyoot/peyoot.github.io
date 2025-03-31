@@ -1,7 +1,15 @@
 # What is meta-custom
-It's a yocto layer that enable many custom recipes. DEYAIO use meta-custom to compile a variety of feature-rich firmware images. 
+This is a Yocto layer that enables numerous custom recipes. DEY-AIO utilizes meta-custom to compile feature-rich firmware images. By consolidating validated feature sets into a meta-custom branch and using the corresponding XML file in dey-aio-manifest, users can compile DEY functional firmware with one-click compilation.
+
+# Branches
+In dey-aio-manifest, different functional firmware compilations are achieved by specifying various meta-custom branches in XML files.
+
+The master branch integrates common recipes while removing board-specific configurations. The dev branch strives to include recipes for multiple boards, as hardware distinctions mainly manifest in kernel device trees. In the dev branch, the default board device tree remains Digi's development board ccmp25-dvk, while specific boards like ccmp25plc will automatically load their dedicated kernel device tree.
 
 # Recipes
+Different recipe combinations are organized as various branches in meta-custom. You may also reference individual recipes to implement specific functionalities. Depending on the DEY version, meta-custom maintains corresponding main branches where feature sets are typically reflected in branch name suffixes. Taking "scarthgap-ccmp25plc" as an example, this branch represents DEY 5.0 (scarthgap) firmware implementation for CCMP25-based PLC reference boards.
+
+This section only contains several recipes explanation. For more recipes, please refer to the branch instructions.
 
 ## recipes-mine
 

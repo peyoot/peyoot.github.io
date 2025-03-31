@@ -1,7 +1,15 @@
 # meta-custom是什么
-这是一个 yocto 层，可以启用许多自定义食谱。DEYAIO使用元自定义来编译各种功能丰富的固件镜像。
+这是一个 yocto 层，可以启用许多自定义配方。DEYAIO使用meta-custom来编译各种功能丰富的固件镜像。通过将验证过的功能集作为一个meta-custom分支，使用dey-aio-manifest对应的xml文件，能够一键编译出dey的功能固件。
+
+# 分支
+在dey-aio-manifest中，通过在xml文件中指定meta-custom的不同分支，来编译不同的功能固件。
+
+master分支将常见的配方整合起来，并移除为特定板卡指定的配方。而dev则尽可能也涵盖不同的板卡配方，因为不同板卡的区别主要在内核设备树上，因此dev分支中，默认的板卡设备树仍为Digi开发板ccmp25-dvk，而特定板卡如ccmp25plc，其默认加载的内核设备树将变为ccmp25-plc.dtb。
 
 # 配方
+不同的配方集合在meta-custom中以不同分支的方式组合起来。您也可以参考单独的配方以实现特定的功能。根据DEY的版本，meta-custom也对应有相关的主分支，而功能集通常体现在主分支后缀中，以scarthgap-ccmp25plc为例，它表示实现基于ccmp25的PLC参考板的DEY 5.0(scarthgap)固件。
+
+本章节仅包含少量的配方说明，更多配方用途，请参考分支说明。
 
 ## recipes-mine
 
