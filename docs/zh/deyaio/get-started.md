@@ -47,7 +47,7 @@ repo init -u https://github.com/peyoot/dey-aio-manifest.git -b main
 repo sync
 ```
 
-这样，dey-aio的工具集就安装好了。  使用repo命令来切换不同的特性支持。
+这样，dey-aio的工具集就安装好了，可以新建项目进行DEY系统开发。如果项目有需要，您也可以使用repo命令来在不同的manifest仓库间切换，以使用不同的特性支持。
 
 您也可以在安装DEY时就指定好功能特性支持。比如开发基于ccmp25的PLC系列DEY 5.0镜像，参考如下：
 ```
