@@ -21,6 +21,7 @@ git config --global user.name  “yourname”
 git config --global user.email "you@email.com“
 ```
 ## Install docker and docker-compose
+This is an option. Install this part if you would like to have multiple version of DEY in one host PC. You can ignore this section if you're new to DEY.
 
 ```
 sudo apt install docker.io docker-compose  
@@ -32,15 +33,25 @@ docker ps    #after reboot, you can test if docker can work with this command
 
 ## Install DEY AIO toolset with repo
 
+Install a general DEY AIO toolset
 ```
 cd
 mkdir dey-aio
 cd dey-aio
 repo init -u https://github.com/peyoot/dey-aio-manifest.git -b main
-repo sync -j8
+repo sync
 ```
 
-Now DEY AIO toolset is ready to work!
+Now DEY AIO toolset is ready to work! you can switch featured function set by repo command.  
+
+or you can specify the featured function set at the begining of installation. Take ccmp25plc as an example:
+```
+cd 
+mkdir deyaio-ccmp25plc
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b main -m ccmp25plc.xml
+repo sync
+
+```
 
 # Usage
 
