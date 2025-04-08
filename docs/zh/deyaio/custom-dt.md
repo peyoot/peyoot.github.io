@@ -14,12 +14,73 @@ Linux加载的设备树位于于内核linux分区，而设备树的源码则位�
 ### devshell
 
 进入devshell的方式如下，此时会来到
+```
 bitbake -c devshell linux-dey
+```
 
-确保源码已经应用了变更并复制到相应的目录下，直接make dtbs
+确保源码已经应用了变更并复制到相应的目录下，如果要临时测试，可以用链接文件，以ccmp25-plc.dts为例
+```
+mkdir -p ~/github
+cd ~/github
+git https://github.com/peyoot/ccmp25_dt.git
+git checkout scarthgap-allgpio
+cd ~/deyaio/dey5.0/workspace/ccmp25
+cd tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/git/arch/arm64/boot/dts/digi/
+ln -s ~/github/ccmp25_dt/ccmp25-plc.dts
+cd ~/deyaio/dey5.0/workspace/ccmp25
+ls tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/build/arch/arm64/boot/dts/digi/
+
+
+
+```
+
+直接make dtbs
 
 ### 直接bitbake
 这种方式需要先bitbake -c cleanall <镜像名>，
 然后再bitbake -C compile linux-dey  
 相关的设备树也会编译出来，再bitbake <镜像名> 来打包镜像，最终的镜像的linux中带有相关的设备树，不过首次开机启动后，仍要更改fdt_file参数，以便加载自定义的设备树。
 
+## 修改optee的设备树
+optee的设备树定义了哪些接口需要通过可信固件来操作的安全模式，如果发现一些GPIO引脚被内核占用，很有可能是在optee的设备树时定义了该引脚为安全模式。比如在OP- TEE里PH4和PZ2被配置为安全的GPIOS:
+
+https://github.com/digi-embedded/optee_os/blob/4.0.0/stm/maint/core/arch/arm/dts/ccmp25-dvk-rif.dtsi#L487
+
+https://github.com/digi-embedded/optee_os/blob/4.0.0/stm/maint/core/arch/arm/dts/ccmp25-dvk-rif.dtsi#L559
+
+下面介绍如何用bbappend来修改这类optee的设备树：
+
+### 找到optee的源码树
+通常，以CCMP25为例，通常它位于：tmp/work/ccmp25_dvk-dey-linux/optee-os-stm32mp/4.0.0-stm32mp-r1/git下，到这个目录后，我们可以直接修改源码，在未提交更改时，用
+```
+git diff --relative core/arch/arm/dts/ccmp25-dvk-rif.dtsi core/arch/arm/dts/ccmp25-dvk.dts > 0001-ccmp25-dvk-adjust-dts-configuration.patch
+```
+来生成patch文件。
+在meta-custom中，创建optee的bbaapend和patch文件目录：
+```
+mkdir -p recipes-security/optee/optee-os-stm32mp/files
+cp 0001-ccmp25-dvk-adjust-dts-configuration.patch recipes-security/optee/optee-os-stm32mp/files/
+nano recipes-security/optee/optee-os-stm32mp_4.0.0.bbappend
+```
+下面是参考的bbappend文件内容：
+```
+# ~/your-meta-custom/recipes-security/optee/optee-os-stm32mp_4.0.0.bbappend
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+SRC_URI += "file://0001-ccmp25-dvk-adjust-dts-configuration.patch"
+```
+然后可以触发重新编译
+```
+bitbake optee-os-stm32mp -c clean
+bitbake optee-os-stm32mp
+```
+重新编译 tf-a-stm32mp 以生成包含最新 OP-TEE 修改的 FIP 镜像
+```
+# 清理 tf-a-stm32mp 的旧构建（确保重新打包 FIP）
+bitbake tf-a-stm32mp -c clean
+
+# 重新编译 tf-a-stm32mp（会自动触发 optee-os-stm32mp 的重新编译）
+bitbake tf-a-stm32mp
+
+# 检查生成的 FIP 镜像路径
+ls tmp/deploy/images/ccmp25-dvk/fip-ccmp25-dvk-optee-emmc.bin
+```
