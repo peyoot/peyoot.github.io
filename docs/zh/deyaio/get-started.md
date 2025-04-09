@@ -84,14 +84,14 @@ dey-aio的目录结构如下，：
 │   ├── workspace            项目目录   
 | ...  
 ├── release                    发布文件夹 (可选发布到这里或服务器上)  
-│   ├── dey4.0                     
+│   ├── dey5.0                     
 │        ├── cc6ul  
 │        ├── ccmp15  
 │        ├── cc8mn  
 │        ├── cc8mm  
 │        ├── cc8x  
 │        ├── ...  
-│   ├── dey3.2                     
+│   ├── dey4.0                     
 │        ├── ...  
 │   └ …  
 ├── README.md  
@@ -139,6 +139,7 @@ mkdir cc93
 cd cc93
 source ../../mkproject.sh -l
 source ../../mkproject.sh -p ccimx93-dvk
+
 bitbake dey-image-qt
 
 #ConnectCore MP2系列核心模块或其它模块类似，请选择对应的平台来source项目，并编译目标镜像：
@@ -146,6 +147,8 @@ cd workspace
 mkdir ccmp25
 source ../../mkproject.sh -l
 source ../../mkproject.sh -p ccmp25-dvk
+bitbake tf-a-stm32mp
+bitbake fip-stm32mp
 bitbake core-image-base
 ```
 
