@@ -89,6 +89,7 @@ bitbake -c cleanall u-boot-dey
 ```
 bitbake -C compile u-boot-dey
 bitbake tf-a-stm32mp
+bitbake fip-stm32mp
 ```
 这样会在tmp/deploy/images/ccmp25-dvk中生成两个文件：
 ```
