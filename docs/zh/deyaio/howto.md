@@ -76,7 +76,16 @@ cp ccmp25-plc.dtb /mnt/linux/ccmp25-plc.dtb
 ```
 
 ## 如何只修改uboot并编译更新
-有时我们需要修改uboot的源码或设备树，可以参考meta-custom的ccmp25plc分支为例，在配方中引入变更。如果我们需要临时性的更改，可在当前项目的源码中变更后，用：
+有时我们需要修改uboot的源码或设备树，可以参考meta-custom的ccmp25plc分支为例，在配方中引入变更。
+可以先清理缓存：
+```
+bitbake -c cleansstate u-boot-dey
+bitbake -c cleansstate fip-stm32mp
+bitbake -c cleansstate tf-a-stm32mp
+bitbake -c cleanall u-boot-dey
+```
+
+如果我们需要临时性的更改，可在当前项目的源码中变更后，用：
 ```
 bitbake -C compile u-boot-dey
 bitbake tf-a-stm32mp
