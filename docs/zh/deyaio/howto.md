@@ -53,3 +53,43 @@ repo init -m rtsp.xml
 repo init -b some-branch -m rtsp.xml
 repo sync
 ```
+
+## 如何只修改内核设备树并编译更新
+当我们需要修改linux内核所用的设备树时，参考meta-custom的ccmp25plc分支，在配方中引入变更。如果我们需要临时性的更改，则可以用devshell来编译出dtb文件，并在内核中替换并测试
+```
+bitbake -c devshell linux-dey
+修改后，用
+```
+make clean dtbs
+make dtbs
+```
+生成的设备树在：
+tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/build/arch/arm64/boot/dts/digi/下，拷贝后可以在uboot下单独更新该设备树：
+```
+usb start
+updatefile linux_a usb 0:1 ccmp25-plc.dtb ccmp25-plc.dtb
+```
+或者，也可在linux中重载/mnt/linux分区为可读写，然后替换设备树
+```
+mount -o remount,rw /mnt/linux 
+cp ccmp25-plc.dtb /mnt/linux/ccmp25-plc.dtb
+```
+
+## 如何只修改uboot并编译更新
+有时我们需要修改uboot的源码或设备树，可以参考meta-custom的ccmp25plc分支为例，在配方中引入变更。如果我们需要临时性的更改，可在当前项目的源码中变更后，用：
+```
+bitbake -C compile u-boot-dey
+bitbake tf-a-stm32mp
+```
+这样会在tmp/deploy/images/ccmp25-dvk中生成两个文件：
+```
+tf-a-ccmp25-dvk-emmc.stm32 (这个一般和uboot无关，无需更新)
+fip-ccmp25-dvk-optee.bin (这个镜像包含U-Boot和相关的设备树变更)
+```
+只需要更新fip镜像到板子上：
+```
+update fip-a tftp fip-ccmp25-dvk-optee.bin
+或用u盘等
+usb start
+update fip-a usb 0:1 fip-ccmp25-dvk-optee.bin
+```
