@@ -14,9 +14,8 @@
 
 ## **功能特性**
 ### 1. 自主组网能力
-- ConnectCore MP25 作为无线AP，集成有Murata WiFi 生成独立WiFi 热点（SSID:
-ccmp25-ap）
-- 支持wifi6 和WPA3 企业级加密，确保传输安全性
+- ConnectCore MP25 作为无线AP，集成有Murata WiFi模块，支持AP热点或WiFi Direct访问
+- 支持wifi6 和WPA3 企业级加密，信道自动选择，确保传输安全性
 - 双频段自动切换（2.4GHz/5GHz），抗干扰能力强
 ### 2. 实时视频监控系统
 - 通过USB3.0 接口接入UVC 兼容摄像头（支持1080P@60fps）
