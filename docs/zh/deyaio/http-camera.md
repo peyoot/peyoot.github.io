@@ -23,3 +23,26 @@
 - 本地视频流和远程Web 访问同时展示
 - 浏览器无插件播放
 - 实测端到端延迟<150ms（现场网络环境）
+
+## 使用方法
+
+本演示程序实现自动侦测摄像头，自动按优先级别设置最佳的分辨率，一般无需用户手动操作。
+
+#### 调试
+不同的摄像头厂家，所支持的格式不尽相同，在调试时，可以停止服务，改用手动的命令方式运行程序 
+
+先停止服务
+```
+systemctl stop mjpg_streamer
+```
+手动指定分辨率等：
+
+```
+mjpg_streamer -i "input_uvc.so -d /dev/video2 -r 800x800 -f 15" -o "output_http.so -p 80 -w /srv/mjpg_streamer/www"
+```
+如果需要在支持web访问的同时，将视频流也一并输出到本地显示屏，可以用
+
+```
+mjpg_streamer -i "input_uvc.so -d /dev/video2 -r 800x800 -f 15" -o "output_viewer.so -i0 -w800 -h800 -f15" -o "output_http.so -p 80 -w /srv/mjpg_streamer/www"
+
+```
