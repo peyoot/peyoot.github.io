@@ -8,10 +8,11 @@ lsmod | grep brcm
 wl ver
 ```
 
-## 查看当前的国家或区域配置
+## 查看当前的国家区域配置和信道
 
 ```
-wl country list
+wl country
+wl channels
 ```
 这会返回当前的区域代码（country code）及其对应的国家/地区。如US (US/0)
 
