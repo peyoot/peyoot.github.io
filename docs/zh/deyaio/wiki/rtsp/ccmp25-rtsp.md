@@ -23,12 +23,17 @@
 
 <h2>TF卡刷固件</h2>
 <div id="sdcard" class="tab-content">
-    <p>setenv image-name dey-image-lvgl <br>run install_linux_fw_sd</p>
+    <pre>setenv image-name dey-image-lvgl 
+    run install_linux_fw_sd
+    </pre>
 </div>
 
 <h2>U盘刷固件</h2>
 <div id="udisk" class="tab-content">
-    <p>usb start <br> setenv image-name dey-image-lvgl <br> run install_linux_fw_usb</p>
+    <pre>usb start
+     setenv image-name dey-image-lvgl
+     run install_linux_fw_usb
+     </pre>
 </div>
 
 </body>
