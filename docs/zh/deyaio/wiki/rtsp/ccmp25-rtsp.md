@@ -4,9 +4,6 @@
 ## 安装
 演示程序集成在嵌入式Linux固件中，使用前请准备好一套Digi ConnectCore MP25固件，或是基于ConnectCore MP25的单板机或自定义板卡，通过TF卡或U盘，将固件刷入到核心板中。
 
-<!DOCTYPE html>
-<html>
-<head>
     <style>
         .tab-content {
             display: none;
@@ -18,8 +15,6 @@
             display: block;
         }
     </style>
-</head>
-<body>
 
 <h2>TF卡刷固件</h2>
 <div id="sdcard" class="tab-content">
@@ -35,6 +30,3 @@
      run install_linux_fw_usb
      </pre>
 </div>
-
-</body>
-</html>
