@@ -52,6 +52,11 @@ export const navbarZh: NavbarConfig = [
         link: '/zh/deyaio/mono.md'
         },
 
+        {
+          text: '无线摄像头解决方案 ',
+          link: '/zh/deyaio/wireless-camera.md'
+          },
+
     ],
   },
 ]

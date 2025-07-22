@@ -50,6 +50,11 @@ export const navbarEn: NavbarConfig = [
         link: '/deyaio/mono.md'
         },
 
+        {
+          text: 'Wireless Camera Solution',
+          link: '/deyaio/wireless-camera.md'
+          },
+  
     ],
   },
 ]
