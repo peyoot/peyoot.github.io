@@ -28,6 +28,22 @@ The wireless video surveillance system, based on Digi ConnectCore MP25 developme
 ## **Usage**
 This demo automatically detects cameras and configures optimal resolutions by priority, typically requiring no manual user intervention.
 
+Users can utilize pre-compiled firmware images or compile the firmware themselves (compilation methods are detailed in later sections). After flashing the `dey-image-lvgl` firmware with the integrated demo program, connect a USB camera and power on the device. Upon system startup, the demo application will detect the connected camera and activates a WiFi hotspot on the board with:  
+**SSID: digi-ap-mac**  
+**Password: digiconnectcore**  
+
+After connecting to the hotspot, open the board's IP address in a browser:  
+**http://192.168.46.30**  
+to view the video stream.  
+
+To modify resolution or frame rate:  
+1. Open the script file:  
+   `/usr/bin/http_camera_demo.sh`  
+2. Adjust the following configurable parameters:  
+   - `WIDTH_PRIORITY`  
+   - `FRAMERATE`  
+3. Restart the mjpg_streamer service or reboot the system.
+
 #### Debugging
 Different camera manufacturers support varying formats. For debugging, stop the service and run the program manually with custom commands.
 
