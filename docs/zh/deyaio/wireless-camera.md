@@ -65,6 +65,13 @@ cd dey5.0
 mkdir ccmp25rtsp
 cd ccmp25rtsp
 source ../../mkproject.sh -p ccmp25-dvk
+```
+在conf/local.conf中添加这一行:
+```
+IMAGE_INSTALL:append = " mjpg-streamer-service"
+```
+直接编译固件:
+```
 bitbake tf-a-stm32mp
 bitbake fip-stm32mp
 bitbake dey-image-lvgl

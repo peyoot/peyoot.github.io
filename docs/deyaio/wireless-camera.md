@@ -72,6 +72,14 @@ cd dey5.0
 mkdir ccmp25rtsp
 cd ccmp25rtsp
 source ../../mkproject.sh -p ccmp25-dvk
+```
+add demo daemon in conf/local.conf with just one line:
+```
+IMAGE_INSTALL:append = " mjpg-streamer-service"
+```
+other packages are by default with image recipes. So built the firmware now:
+
+```
 bitbake tf-a-stm32mp
 bitbake fip-stm32mp
 bitbake dey-image-lvgl
