@@ -4,4 +4,22 @@
 
 ### 家中
 ### 公司
+| PVE主机 | VM主机 | 名称 | 用途 | 登陆 |
+|---------|---------|---------|---------|---------|
+| 10.70.1.20 |  | pvehpdesk | 挂载web虚拟机 | r@.k系列1刀hill |
+|  | 10.70.1.80 | ecceeweb1 | eccee web服务器 | rob*@.k系列 |
+|  | 10.70.1.81| storage.eccee.com | filebrowser网盘 | 单元格 3 |
+| 10.70.1.21 |  | pve-meeetingroom-table | dey编译机 | r@.k系列1刀hill |
+|  | 10.70.1.40 | ubuntu2204-dey | 备份机 | r@.k系列1刀hill |
+| 10.70.1.22 |  | hp850ip67 | backup machine | r@.k系列1刀hill |
+|  | 10.70.1.90 | ecceewebbk | 备份机 | r@.k系列1刀hill |
+
+
 ### 云端 
+| 服务商 | 控制台登陆或备注 | 服务器IP | 用途 | 登陆 |
+|---------|---------|---------|---------|---------|
+| Aliyun.com | alipay扫码 | |  | sales@ec*e.com |
+|  | *.153.205.*0 | *是车牌末位 | webportal | ubu*@.Ak系列1刀hill |
+|  | |  |  |  |
+| Qcloud | 微信扫码 |  |  | 晓* |
+|  |  |  | | 弃用 |
