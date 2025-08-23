@@ -4,14 +4,14 @@
 
 ### 家中
 ### 公司
-| PVE主机 | VM主机 | 名称 | 用途 | 登陆 |
+| PVE主机 | PVE MAC/VM主机 | 名称 | 用途 | 登陆 |
 |---------|---------|---------|---------|---------|
-| 10.70.1.20 |  | pvehpdesk | 挂载web虚拟机 | r@.k系列1刀hill |
+| 10.70.1.20 | 50:65:f3:40:23:e0 | pvehpdesk | 挂载web虚拟机 | r@.k系列1刀hill |
 |  | 10.70.1.80 | ecceeweb1 | eccee web服务器 | rob*@.k系列 |
 |  | 10.70.1.81| storage.eccee.com | filebrowser网盘 | 单元格 3 |
-| 10.70.1.21 |  | pve-meeetingroom-table | 开发测试pve主机 | r@.k系列1刀hill |
+| 10.70.1.21 | 64:51:06:a0:36:3a | pve-meeetingroom-table | 开发测试pve主机 | r@.k系列1刀hill |
 |  | 10.70.1.40 | ubuntu2204-dey | dey编译机 | r@.k系列1刀hill |
-| 10.70.1.22 |  | hp850ip67 | 备份机pve主机 | r@.k系列1刀hill |
+| 10.70.1.22 | 8c:dc:d4:d4:59:05 | hp850ip67 | 备份机pve主机 | r@.k系列1刀hill |
 |  | 10.70.1.90 | ecceewebbk | 备份机 | r@.k系列1刀hill |
 
 
