@@ -26,7 +26,7 @@ send_magic_packet('00:11:22:33:44:d2')
 |  | 10.70.1.90 | ecceewebbk | 备份机 | r@.k系列1刀hill |
 | 10.70.1.16 | 1c:69:7a:01:3f:1d | nuc8pve | 备份机pve主机 | r@.k系列1刀hill |
 |  | 10.70.1.60 | nuc8vm1ip60 | 杂项 | r@.k系列 |
-| 10.70.1.23 |  | hp850ip67 | nuc11pve | r@.k系列1刀hill |
+| 10.70.1.23 | 1c:69:7a:ab:20:f0 | hp850ip67 | nuc11pve | r@.k系列1刀hill |
 
 ### 云端 
 | 服务商 | 控制台登陆或备注 | 服务器IP | 用途 | 登陆 |
