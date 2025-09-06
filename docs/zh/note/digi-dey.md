@@ -61,3 +61,24 @@ iface uap0 inet static
 ```
 
 3、使用ACS时，可用 iw dev wlan0 info查看信道
+
+# DEY实时linux配置
+
+实时涉及内核配置和拉取PREEMPT_RT补丁包，这些都会在编译配置设置好后自动完成，修改conf/local.conf，添加如下配置即可：
+```
+DISTRO_FEATURES:append = " rt"
+```
+
+
+# locales报错解决
+
+在ubuntu 22.04下执行命令时报错，提示“Please make sure locale 'en_US.UTF-8' is available on your system”
+
+Ubuntu 22.04 默认把所有 locale 都编译成二进制放在 /usr/lib/locale/ 下，只有显式生成过才会出现
+```
+1. 重新生成 locale（确保 en_US.UTF-8 在列表里被选中）
+sudo locale-gen en_US.UTF-8
+
+2. 立即生效
+sudo update-locale LANG=en_US.UTF-8
+```
