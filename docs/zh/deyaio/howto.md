@@ -1,3 +1,14 @@
+## 如何使用DEY AIO项目定制固件
+DEY AIO项目使用Digi原生的DEY编译方式配合meta-custom的配方来实现自定义固件的一键式编译。在dey-aio-manifest项目中有一些xml文件指定使用不同的meta-custom分支来实现不同的固件功能。在创建DEY AIO项目开发环境时，我们可以指定相应的manifest仓库（检出对应的xml）来为目标预编译镜像设置好相应的开发环境，也可以在使用DEY AIO过程中，切换到不同的manifest仓库以编译相应的功能集镜像。
+
+以编译不带demo的实时Linux固件为例，新建一个DEY AIO项目目录，并取一个容易记住的名字，然后使用rt-nodemo这个manifest仓库：
+```
+mkdir -p ~/deyaio-rt-nodemo
+cd ~/deyaio-rt-nodemo
+repo init https://github.com/peyoot/dey-aio-manifest.git -b main -m rt-nodemo.xml
+```
+这样默认检出的meta-custom分支就是scarthgap-rt-nodemo，相应的dey-image-qt镜像配方已经适配并移除Connectcore demo例程和云服务等软件包，并且内核实时也默认开启，直接编译出支持实时特性的Linux固件。
+
 ## 如何查询当前DEY AIO项目所用的manifest仓库
 可以在deyaio项目中，用不同的manifest仓库来实现编译出不同的镜像。
 要查询当前项目的dey-aio-manifest所用的分支或版本，可以用命令：
