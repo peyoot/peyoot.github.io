@@ -32,11 +32,60 @@ repo init -b scarthgap -m my_frozen_ccmp25plc.xml
 
 ## 设置downloads目录在内网共享
 DEY AIO项目默认会把下载的构件放在workspace/project_shared/downloads下，我们需要设置HTTP服务器共享，以便内网其它机器可以访问。
+这实际上是要配置一个web服务器，并且可以访问文件系统目录，有很多实现方法，建议以nginx来搭建，不过如果寻求快速，也可以用python。
+方法一：用python命令快速搭建web服务器：
 以python为例，进入downloads目录后，执行：
 ```
 python3 -m http.server 8000
 ```
 记下此服务器的IP和上面设置的端口，比如：192.168.1.100:8000
+
+方法二：Nignx作为web服务器（推荐）
+
+1、安装 Nginx
+```
+# Ubuntu/Debian
+sudo apt-get update && sudo apt-get install nginx
+```
+2、配置Nginx
+创建或编辑配置文件 /etc/nginx/sites-available/yocto-mirror：
+```
+server {
+    listen 8000;
+    server_name localhost;
+    
+    # 设置downloads目录路径
+    root ~/deyaio-ccmp25plc/dey5.0/workspace/project-shared/downloads;
+    autoindex on;  # 启用目录列表
+    
+    # 性能优化设置
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    
+    # 设置正确的MIME类型
+    types {
+        application/x-sharedlib so;
+        application/x-archive a;
+        text/plain patch diff;
+        application/gzip gz tgz;
+        application/x-tar tar;
+        application/zip zip;
+    }
+    
+    # 大文件下载支持
+    client_max_body_size 0;
+    
+    location / {
+        # 允许内网所有IP访问
+        allow 192.168.0.0/16;
+        allow 10.0.0.0/8;
+        allow 172.16.0.0/12;
+        deny all;
+    }
+}
+```
 
 ### 配置本机或内网机器
 
