@@ -45,10 +45,12 @@ python3 -m http.server 8000
 ```
 # 指定源码镜像的URL，请替换为您的实际IP和端口
 SOURCE_MIRROR_URL = "http://192.168.1.100:8000/"
+# 本机也可使用SOURCE_MIRROR_URL = file://path_to_your_downloads
 # 继承own-mirrors类以启用镜像设置
 INHERIT += "own-mirrors"
 # 强制禁止网络访问，确保完全离线构建
 BB_NO_NETWORK = "1"
 ```
+
 这样，你的内网其它机器也就可以实用这些下载好的源码进行内网编译。
 
