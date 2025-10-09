@@ -65,6 +65,15 @@ repo init -b some-branch -m rtsp.xml
 repo sync
 ```
 
+## 如何生成锁定版本的manifest文件
+
+使用下面命令生成一个新的manifest文件，并用提交的hash值作为revision版本，然后切换到这个manifest仓库：
+```
+repo manifest -o .repo/manifests/my_frozen_ccmp25plc.xml -r --suppress-upstream-revision --suppress-dest-branch
+repo init -b scarthgap -m my_frozen_ccmp25plc.xml
+```
+值得注意的是，这只是layer对应的git版本锁定，而里面的配方用到的git源不一定是锁定版本的，如果需要，就要记录相关的配方中用到的源的git版本harsh，然后在配方中把AUTOREV改为固定hash版本。
+
 ## 如何只修改内核设备树并编译更新
 当我们需要修改linux内核所用的设备树时，参考meta-custom的ccmp25plc分支，在配方中引入变更。如果我们需要临时性的更改，则可以用devshell来编译出dtb文件，并在内核中替换并测试
 ```

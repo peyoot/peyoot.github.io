@@ -24,10 +24,33 @@ $ cat .repo/manifest.xml
 ```
 注意这里的revision，这是一个分支名称，而非具体的某次提交，也就是它总是拉取最新的版本，如果上游发生变化，重新repo sync后，编译出来的版本也会相应有所变化。为了离线编译，我们首先需要锁定版本。
 
-使用下面命令生成一个新的manifest文件，并用提交的hash值作为revision版本，然后切换到这个manifest仓库：
+DEY的发行版，每隔一段时间，就会release一个版本号的tag，在这个特定的release版本中，不仅各层对应的git版本是锁定的提交版本，其内部的配方中如果有从github拉取源码，相应的SRCREV也会锁定，这样的版本，只要编译或下载过，就可以本地编译，而不依赖网络。
+
+下面我们以DEY5.0-r2.2为例，在官方的源码库中，它对应的tag就是5.0-r2.2，在dey-aio-manifest中，对应这个版本的是一个叫dey5.0-r2.2分支，
+
+在创建deyaio项目时，我们可以检出这个分支，在联网状态下先编译出这个版本的镜像。然后再利用这个下载好的源，作本机或内网其它机器的编译时所需的镜像源，即可实现内部网或或离线编译。
+
 ```
-repo manifest -o .repo/manifests/my_frozen_ccmp25plc.xml -r --suppress-upstream-revision --suppress-dest-branch
-repo init -b scarthgap -m my_frozen_ccmp25plc.xml
+repo sync
+repo init -b dey5.0-r2.2 -m ccmp25plc.xml
+```
+如果当前有一个dey-aio项目，不想重新建立deyaio项目时，也可以这样操作（不推荐）
+```
+repo sync
+cd .repo/manifests
+git checkout dey5.0-r2.2
+cd ../..
+repo init -b dey5.0-r2.2 -m ccmp25plc.xml
+```
+
+## 联网状态下完成一次完整的编译
+上面操作后，我们检出了dey5.0-r2.2的ccmp25plc.xml，这是一个各配方均有锁定版本的manifest仓库，我们需要在联网状态下完成一次编译，以便在编译过程中下载相应的源码，作为后续内网编译或本机编译时使用。这一步骤和正常的的DEY项目完全一样，比如：
+```
+cd dey5.0/workspace
+mkdir -p myccmp25plc
+cd myccmp25plc
+source ../../mkproject.sh -p ccmp25-dvk
+bitbake core-image-base
 ```
 
 ## 设置downloads目录在内网共享
@@ -97,8 +120,10 @@ SOURCE_MIRROR_URL = "http://192.168.1.100:8000/"
 # 本机也可使用SOURCE_MIRROR_URL = file://path_to_your_downloads
 # 继承own-mirrors类以启用镜像设置
 INHERIT += "own-mirrors"
+# 只允许用本地缓存
+BB_FETCH_PREMIRRORONLY = "1"
 # 强制禁止网络访问，确保完全离线构建
-BB_NO_NETWORK = "1"
+# BB_NO_NETWORK = "1"
 ```
 
 这样，你的内网其它机器也就可以实用这些下载好的源码进行内网编译。
