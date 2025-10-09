@@ -115,16 +115,18 @@ server {
 在内网中其他无法访问外网的开发机器上，您需要修改Yocto构建目录中的conf/local.conf配置文件，添加以下关键设置：
 
 ```
-# 指定源码镜像的URL，请替换为您的实际IP和端口
-SOURCE_MIRROR_URL = "http://192.168.1.100:8000/"
-# 本机也可使用SOURCE_MIRROR_URL = file://path_to_your_downloads
+# 指定源码镜像的URL，请替换为您的实际IP和端口和本机downloads目录
+SOURCE_MIRROR_URL ?= "\
+http://192.168.1.100:8000 \
+file://.* file:///home/rtu/deyaio-ccmp25plc/dey5.0/workspace/project_shared/downloads"
+
 # 继承own-mirrors类以启用镜像设置
 INHERIT += "own-mirrors"
 # 只允许用本地缓存
 BB_FETCH_PREMIRRORONLY = "1"
-# 强制禁止网络访问，确保完全离线构建
+# 如果要强制禁止网络访问，仅本机编译，可以取消下面注释，确保完全离线构建
 # BB_NO_NETWORK = "1"
-```
 
+```
 这样，你的内网其它机器也就可以实用这些下载好的源码进行内网编译。
 
