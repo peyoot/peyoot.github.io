@@ -112,20 +112,41 @@ server {
 
 ### 配置本机或内网机器
 
-在内网中其他无法访问外网的开发机器上，您需要修改Yocto构建目录中的conf/local.conf配置文件，添加以下关键设置：
-
+1、本机离线编译
+在conf/local.conf中添加下面关键设置：
 ```
-# 指定源码镜像的URL，请替换为您的实际IP和端口和本机downloads目录
+# 指定源码URL镜像，请替换为您的实际IP和端口和本机downloads目录
 SOURCE_MIRROR_URL ?= "\
-http://192.168.1.100:8000 \
+# http://192.168.1.100:8000 \
 file://.* file:///home/rtu/deyaio-ccmp25plc/dey5.0/workspace/project_shared/downloads"
 
 # 继承own-mirrors类以启用镜像设置
 INHERIT += "own-mirrors"
 # 只允许用本地缓存
 BB_FETCH_PREMIRRORONLY = "1"
-# 如果要强制禁止网络访问，仅本机编译，可以取消下面注释，确保完全离线构建
+# 如果禁掉外网，仅本机编译，可以取消下面注释，确保完全离线构建
 # BB_NO_NETWORK = "1"
+
+```
+
+在内网中其他无法访问外网的开发机器上，您需要修改Yocto构建目录中的conf/local.conf配置文件，添加以下关键设置：
+
+```
+# 禁止任何外网访问
+BB_NO_NETWORK = "1"
+BB_FETCH_PREMIRRORONLY = "1"
+
+# 启用镜像类
+INHERIT += "own-mirrors"
+
+# tarball / 普通文件镜像
+SOURCE_MIRROR_URL = "http://192.168.1.100:8000"
+
+# Git 镜像——一条正则通吃
+PREMIRROR_SRC_URI = "\
+    git://.*/.*          git://192.168.1.100:8000/git2/ \
+    https://.*/.*\.git   git://192.168.1.100:8000/git2/ \
+"
 
 ```
 这样，你的内网其它机器也就可以实用这些下载好的源码进行内网编译。
