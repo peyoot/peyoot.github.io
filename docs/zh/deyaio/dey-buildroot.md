@@ -32,7 +32,7 @@ DEY的发行版，每隔一段时间，就会release一个版本号的tag，在�
 
 ```
 repo sync
-repo init -b dey5.0-r2.2 -m ccmp25plc.xml
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b dey5.0-r2.2 -m ccmp25plc.xml
 ```
 如果当前有一个dey-aio项目，不想重新建立deyaio项目时，也可以这样操作（不推荐）
 ```
@@ -53,11 +53,27 @@ source ../../mkproject.sh -p ccmp25-dvk
 bitbake core-image-base
 ```
 
-## 设置downloads目录在内网共享
-DEY AIO项目默认会把下载的构件放在workspace/project_shared/downloads下，我们需要设置HTTP服务器共享，以便内网其它机器可以访问。
+## 本机离线编译配置
+
+在conf/local.conf中添加下面关键设置：
+```
+# 指定源码URL镜像，请替换为您的实际IP和端口和本机downloads目录
+SOURCE_MIRROR_URL ?= "\
+file://.* file:///home/rtu/deyaio-ccmp25plc/dey5.0/workspace/project_shared/downloads"
+
+# 继承own-mirrors类以启用镜像设置
+INHERIT += "own-mirrors"
+# 只允许用本地缓存
+BB_FETCH_PREMIRRORONLY = "1"
+# 如果禁掉外网，仅本机编译，可以取消下面注释，确保完全离线构建
+BB_NO_NETWORK = "1"
+```
+
+## 设置downloads和sstate-cache目录在内网共享
+DEY AIO项目默认会把下载的构件和缓存放在workspace/project_shared的相应目录下，我们需要设置HTTP服务器共享，以便内网其它机器可以访问。
 这实际上是要配置一个web服务器，并且可以访问文件系统目录，有很多实现方法，建议以nginx来搭建，不过如果寻求快速，也可以用python。
 方法一：用python命令快速搭建web服务器：
-以python为例，进入downloads目录后，执行：
+以python为例，进入workspace/project_shared目录后，执行：
 ```
 python3 -m http.server 8000
 ```
@@ -78,7 +94,7 @@ server {
     server_name localhost;
     
     # 设置downloads目录路径
-    root ~/deyaio-ccmp25plc/dey5.0/workspace/project-shared/downloads;
+    root ~/deyaio-ccmp25plc/dey5.0/workspace/project-shared;
     autoindex on;  # 启用目录列表
     
     # 性能优化设置
@@ -110,44 +126,31 @@ server {
 }
 ```
 
-### 配置本机或内网机器
-
-1、本机离线编译
-在conf/local.conf中添加下面关键设置：
-```
-# 指定源码URL镜像，请替换为您的实际IP和端口和本机downloads目录
-SOURCE_MIRROR_URL ?= "\
-# http://192.168.1.100:8000 \
-file://.* file:///home/rtu/deyaio-ccmp25plc/dey5.0/workspace/project_shared/downloads"
-
-# 继承own-mirrors类以启用镜像设置
-INHERIT += "own-mirrors"
-# 只允许用本地缓存
-BB_FETCH_PREMIRRORONLY = "1"
-# 如果禁掉外网，仅本机编译，可以取消下面注释，确保完全离线构建
-# BB_NO_NETWORK = "1"
-
-```
+### 配置内网其它机器
 
 在内网中其他无法访问外网的开发机器上，您需要修改Yocto构建目录中的conf/local.conf配置文件，添加以下关键设置：
 
 ```
 # 禁止任何外网访问
-BB_NO_NETWORK = "1"
+# BB_NO_NETWORK = "1"
 BB_FETCH_PREMIRRORONLY = "1"
 
 # 启用镜像类
 INHERIT += "own-mirrors"
 
-# tarball / 普通文件镜像
-SOURCE_MIRROR_URL = "http://192.168.1.100:8000"
+# 下载镜像
+SOURCE_MIRROR_URL = "http://10.10.8.129:8000/downloads"
 
-# Git 镜像——一条正则通吃
 PREMIRROR_SRC_URI = "\
-    git://.*/.*          git://192.168.1.100:8000/git2/ \
-    https://.*/.*\.git   git://192.168.1.100:8000/git2/ \
+    git://.*/.*          git://10.10.8.129:8000/downloads/git2/ \
+    https://.*/.*\.git   git://10.10.8.129:8000/downloads/git2/ \
 "
 
+# sstate 镜像
+SSTATE_MIRRORS = "\
+    file://.* http://10.10.8.129:8000/sstate-cache/PATH \
+"
+# 注意：PATH 是字面量，不要改，Yocto 会自动替换为实际路径。
 ```
 这样，你的内网其它机器也就可以实用这些下载好的源码进行内网编译。
 
