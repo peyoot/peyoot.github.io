@@ -139,26 +139,23 @@ server {
 在内网中其他无法访问外网的开发机器上，您需要修改Yocto构建目录中的conf/local.conf配置文件，添加以下关键设置：
 
 ```
-# 禁止任何外网访问
-# BB_NO_NETWORK = "1"
-BB_FETCH_PREMIRRORONLY = "1"
 
-# 启用镜像类
+# 禁用网络访问
+BB_NO_NETWORK = "1"
+
+# 继承镜像功能
 INHERIT += "own-mirrors"
 
-# 下载镜像
+# 设置源码镜像URL
 SOURCE_MIRROR_URL = "http://10.10.8.129:8000/downloads"
 
-PREMIRROR_SRC_URI = "\
-    git://.*/.*          git://10.10.8.129:8000/downloads/git2/ \
-    https://.*/.*\.git   git://10.10.8.129:8000/downloads/git2/ \
-"
-
-# sstate 镜像
-SSTATE_MIRRORS = "\
-    file://.* http://10.10.8.129:8000/sstate-cache/PATH \
-"
+# 设置SSTATE镜像
+SSTATE_MIRRORS = "file://.* http://10.10.8.129:8000/sstate-cache/PATH"
 # 注意：PATH 是字面量，不要改，Yocto 会自动替换为实际路径。
+
+# 可选：确保优先从预镜像获取
+BB_FETCH_PREMIRRORONLY = "1"
+
 ```
 这样，你的内网其它机器也就可以实用这些下载好的源码进行内网编译。
 
