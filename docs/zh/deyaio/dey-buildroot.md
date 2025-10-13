@@ -89,41 +89,49 @@ sudo apt-get update && sudo apt-get install nginx
 2、配置Nginx
 创建或编辑配置文件 /etc/nginx/sites-available/yocto-mirror：
 ```
+
 server {
     listen 8000;
-    server_name localhost;
-    
-    # 设置downloads目录路径
-    root ~/deyaio-ccmp25plc/dey5.0/workspace/project-shared;
-    autoindex on;  # 启用目录列表
-    
+    server_name 10.10.8.129;
+
+    # 设置web目录路径，注意所有父目录都要有755权限，以防止访问限制问题，请替换自己的路径
+    root /home/rtu/deyaio-ccmp25plc/dey5.0/workspace/project_shared;
+    # 启用自动索引，方便浏览文件
+    autoindex on;
+    autoindex_exact_size off;
+    autoindex_localtime on;
+
     # 性能优化设置
     sendfile on;
     tcp_nopush on;
     tcp_nodelay on;
     keepalive_timeout 65;
-    
-    # 设置正确的MIME类型
-    types {
-        application/x-sharedlib so;
-        application/x-archive a;
-        text/plain patch diff;
-        application/gzip gz tgz;
-        application/x-tar tar;
-        application/zip zip;
-    }
-    
-    # 大文件下载支持
-    client_max_body_size 0;
-    
+
+    # 文件下载相关设置
     location / {
-        # 允许内网所有IP访问
-        allow 192.168.0.0/16;
-        allow 10.0.0.0/8;
-        allow 172.16.0.0/12;
-        deny all;
+        # 允许大文件下载
+        client_max_body_size 0;
+        # 允许跨目录访问（如果需要）
+        disable_symlinks off;
+
+        # 设置缓存时间
+        location ~* \.(tar|gz|bz2|xz|zip|tgz|tbz2|txz)$ {
+            expires 30d;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # 设置日志格式
+        access_log /var/log/nginx/yocto-access.log;
+        error_log /var/log/nginx/yocto-error.log;
     }
+
+
+    # 设置正确的MIME类型
+    include       mime.types;
+    default_type  application/octet-stream;
+
 }
+
 ```
 
 ### 配置内网其它机器
