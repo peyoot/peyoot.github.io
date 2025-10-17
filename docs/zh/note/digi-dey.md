@@ -82,3 +82,17 @@ sudo locale-gen en_US.UTF-8
 2. 立即生效
 sudo update-locale LANG=en_US.UTF-8
 ```
+
+# 内网编译如何为downloads下的git2下的裸仓库生成yocto所需的tar包
+
+Yocto首先尝试将git URL映射为HTTP tar包，而不是直接使用git协议。对于祼仓库，我们也可以编写一个脚本，自动将git2目录下的所有仓库打包。
+这个办法最简单，可以不用在原目录跑git daemon，但是如果有新版本编译或新增量的包，需要再运行一次或是手动打包。
+```
+cd /home/rtu/deyaio-ccmp25plc/dey5.0/workspace/project_shared/downloads
+for repo in git2/*.git; do
+    # 获取仓库目录名
+    repo_dir=$(basename "$repo")
+    # 打包，排除.git目录下的临时文件
+    tar -czf "git2_${repo_dir}.tar.gz" -C git2/ "$repo_dir"
+done
+```

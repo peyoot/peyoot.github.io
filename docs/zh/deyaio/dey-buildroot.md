@@ -44,12 +44,15 @@ repo init -b dey5.0-r2.2 -m ccmp25plc.xml
 ```
 
 ## 联网状态下完成一次完整的编译
-上面操作后，我们检出了dey5.0-r2.2的ccmp25plc.xml，这是一个各配方均有锁定版本的manifest仓库，我们需要在联网状态下完成一次编译，以便在编译过程中下载相应的源码，作为后续内网编译或本机编译时使用。这一步骤和正常的的DEY项目完全一样，比如：
+上面操作后，我们检出了dey5.0-r2.2的ccmp25plc.xml，这是一个各配方均有锁定版本的manifest仓库，我们需要在联网状态下完成一次编译，以便在编译过程中下载相应的源码，作为后续内网编译或本机编译时使用。这一步骤和正常的的DEY项目完全一样，不过为了方便后续内部机器通过内网编译，需要在创建好项目后，修改conf/local.conf，添加一句：BB_GENERATE_MIRROR_TARBALLS = "1"
+完整过程
 ```
 cd dey5.0/workspace
 mkdir -p myccmp25plc
 cd myccmp25plc
 source ../../mkproject.sh -p ccmp25-dvk
+nano conf/local.conf  
+请添加上面所说的那句配置，以便生成镜像所需的tar包，再编译：
 bitbake core-image-base
 ```
 
@@ -77,14 +80,16 @@ DEY AIO项目默认会把下载的构件和缓存放在workspace/project_shared�
 ```
 python3 -m http.server 8000
 ```
-记下此服务器的IP和上面设置的端口，比如：192.168.1.100:8000
+记下此服务器的IP和上面设置的端口，比如：192.168.1.100:8000 
 
 方法二：Nignx作为web服务器（推荐）
 
 1、安装 Nginx
 ```
 # Ubuntu/Debian
-sudo apt-get update && sudo apt-get install nginx
+sudo apt update && sudo apt install nginx
+#安装智能http的必要组件
+
 ```
 2、配置Nginx
 创建或编辑配置文件 /etc/nginx/sites-available/yocto-mirror：
@@ -134,6 +139,26 @@ server {
 
 ```
 
+### 打包downloads目录下的git裸仓库
+默认地，yocto会去查找指定格式的压缩包，并通过http协议来下载。但有些源码仍以裸仓库的形式存放在downloadds/git2目录下，我们需要把这部分git裸仓库也一并以正确的方法打包，以方便用web的方式在内网访问到。
+```
+# 进入 downloads 目录
+cd ~/deyaio-ccmp25plc/dey5.0/workspace/project_shared/downloads
+
+# 为所有 Git 仓库创建 tar 包
+for item in git2/*; do
+    if [[ -d "$item" && "$item" != *.done ]]; then
+        base_name=$(basename "$item")
+        echo "打包 Git 裸仓库: $base_name"
+        tar -czf "git2_${base_name}.tar.gz" -C git2 "$base_name"
+    fi
+done
+
+# 检查创建的文件
+ls -la git2_*.tar.gz | head -5
+
+```
+
 ### 配置内网其它机器
 
 在内网中其他无法访问外网的开发机器上，您需要修改Yocto构建目录中的conf/local.conf配置文件，添加以下关键设置：
@@ -143,19 +168,21 @@ server {
 BB_FETCH_PREMIRRORONLY = "1"
 
 INHERIT += "own-mirrors"
-SOURCE_MIRROR_URL = "http://192.168.1.100:8000/do.wnloads"
 
-# 明确的预镜像配置
+SOURCE_MIRROR_URL = "http://192.168.1.100:8000/downloads"
+
 PREMIRRORS = " \
-    http://.*/.*     http://192.168.1.100:8000/downloads/ \n \
-    https://.*/.*    http://192.168.1.100:8000/downloads/ \n \
-    ftp://.*/.*      http://192.168.1.100:8000/downloads/ \n \
-    git://.*/.*      http://192.168.1.100:8000/downloads/git2/ \n \
+    git://.*/.*     http://192.168.1.100:8000/downloads/ \n \
+    gitsm://.*/.*   http://192.168.1.100:8000/downloads/ \n \
+    http://.*/.*    http://192.168.1.100:8000/downloads/ \n \
+    https://.*/.*   http://192.168.1.100:8000/downloads/ \n \
 "
 
 SSTATE_MIRRORS = " \
     file://.* http://192.168.1.100:8000/sstate-cache/PATH \
 "
+
+# 注意：PATH 是字面量，不要改，Yocto 会自动替换为实际路径
 
 ```
 这样，你的内网其它机器也就可以实用这些下载好的源码进行内网编译。
