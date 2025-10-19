@@ -123,3 +123,10 @@ update fip-a tftp fip-ccmp25-dvk-optee.bin
 usb start
 update fip-a usb 0:1 fip-ccmp25-dvk-optee.bin
 ```
+
+## 为何DISTRO_FEATURES变量不能放在meta-custom当中？
+DISTRO_FEATURES 是定义整个发行版（distro）特性的变量，它在 Yocto 的构建系统中属于 全局配置变量。
+这类变量通常在 conf/distro/*.conf 或 local.conf 中设置，而不是在配方（recipe）或 .bbappend 文件中。DISTRO_FEATURES 的作用是在构建系统初始化阶段决定哪些功能被启用，比如 systemd、x11、bluetooth 等。在 .bbappend 中修改 DISTRO_FEATURES 太晚了，构建系统在解析配方之前就已经决定了哪些特性被启用。
+
+## append操作符追加内容是，需要空格么？
+在 Yocto 5.0 中，使用 :append 操作符时，在追加的内容前加一个空格仍然是必须的。这是因为 :append 操作本身不会自动添加空格分隔符，如果你不加空格，追加的内容会直接拼接在原有值的末尾，导致语法错误或功能无法生效。虽然有时原变量末尾已经有空格，但增加空格显然更能确保拼接后有正确的分隔
