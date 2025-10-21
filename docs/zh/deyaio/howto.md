@@ -53,12 +53,13 @@ repo init https://github.com/peyoot/dey-aio-manifest.git -b main -m ccmp25plc.xm
 repo init 拉取的 manifest 仓库会被克隆到 .repo/manifests 中：
 ```
 cd .repo/manifests
-#先更新manifest仓库
+#先更新manifest仓库,当然也可以在原deyaio目录里repo sync是一样的
 git fetch origin
 git checkout main  # 假设 manifest 文件在 main 分支，根据实际情况调整分支名
 git pull
-ls rtsp.xml #检查所需的xml
 #使用 repo init 的 -m 参数重新初始化，比如指定 rtsp.xml
+ls rtsp.xml #检查所需的xml
+cd ../..
 repo init -m rtsp.xml
 如果 rtsp.xml 不在默认分支的根目录，你需要确保分支和路径正确，用-b指定分支
 repo init -b some-branch -m rtsp.xml
