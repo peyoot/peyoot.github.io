@@ -1,6 +1,32 @@
-# 在QT镜像下的实时效果优化
-为了在QT镜像下能有较好的实时效果，需要对镜像做一些
+# 支持实时的QT镜像编译
+为了在QT镜像下能有较好的实时效果，需要对镜像做一些裁减优化，可用repo检出下面仓库：
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m qtfb-rtnodemo.xml
+并在conf/local.conf中配置：
+```
+DISTRO_FEATURES:append = " rt"
 
+# 添加Qt基础包（仅核心功能）
+IMAGE_INSTALL:append = " \
+    qtbase \
+    qtbase-plugins \
+    qtbase-examples \
+    qt5everywheredemo \
+"
+
+# 显式禁用Wayland和OpenGL
+DISTRO_FEATURES:remove = "wayland opengl x11"
+
+# 确保framebuffer支持
+DISTRO_FEATURES:append = " fbdev "
+
+# 精简qtbase配置，只启用framebuffer和基础功能
+PACKAGECONFIG:remove:pn-qtbase = "glib gles2 egl x11 xcb"
+PACKAGECONFIG:append:pn-qtbase = " linuxfb gif png jpeg fontconfig"
+
+# 基础字体支持（可选，但推荐）
+IMAGE_INSTALL:append = " ttf-dejavu-sans "
+
+```
 
 # QT例程
 时钟例程，需要先设置环境变量
