@@ -2,16 +2,85 @@
 
 ### STM32MP25 定时器分类与功能总览
 
-|       定时器类型      | 定时器实例 |    计数器分辨率    | 核心功能与特点 | 适用场景 | 是否支持编码器接口 | 是否支持互补输出 |
-|      :---      | :--- |    :---    | :--- | :--- | :--- | :--- |
-| **高级控制定时器** | TIM1, TIM8, TIM20 | 16位 | **高级PWM生成**（边沿/中心对齐）、**带死区控制的互补输出**、刹车功能、定时器联动 | **电机驱动**、数字电源、逆变器 | **是** | **是** |
-| **通用定时器 (全功能)** | TIM2, TIM3, TIM4, TIM5 | **32位** | 输入捕获、输出比较、PWM、**编码器接口**、定时器联动 | **通用高频计数**、**编码器测量**、PWM生成 | **是** | 否 |
-| **通用定时器 (标准)** | TIM10, TIM11, TIM13, TIM14 | 16位 | 输入捕获、输出比较、PWM | 简单输入捕获/输出比较 | 否 | 否 |
-| **通用定时器 (增强)** | TIM12, TIM15, TIM16, TIM17 | 16位 | 输入捕获、输出比较、PWM（部分通道有互补输出） | 通用PWM生成 | 否 | TIM15/16/17**支持** |
-| **基本定时器** | TIM6, TIM7 | 16位 | 基础计时、触发DMA | 系统时基、触发ADC/DAC | 否 | 否 |
-| **低功耗定时器** | LPTIM1, LPTIM2, LPTIM3, LPTIM4, LPTIM5 | 16位 | 在低功耗模式下运行、外部时钟、**编码器模式(LPTIM1/2)** | 低功耗场景下的计数与监控 | LPTIM1/2**支持** | 否 |
+<table style="width: 100%; table-layout: fixed;">
+  <colgroup>
+    <col style="width: 15%;">
+    <col style="width: 15%;">
+    <col style="width: 10%;">
+    <col style="width: 25%;">
+    <col style="width: 15%;">
+    <col style="width: 10%;">
+    <col style="width: 10%;">
+  </colgroup>
+  <thead>
+    <tr>
+      <th>定时器类型</th>
+      <th>定时器实例</th>
+      <th>计数器分辨率</th>
+      <th>核心功能与特点</th>
+      <th>适用场景</th>
+      <th>编码器接口</th>
+      <th>互补输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>高级控制定时器</strong></td>
+      <td>TIM1, TIM8, TIM20</td>
+      <td>16位</td>
+      <td><strong>高级PWM生成</strong>（边沿/中心对齐）、<strong>带死区控制的互补输出</strong>、刹车功能、定时器联动</td>
+      <td><strong>电机驱动</strong>、数字电源、逆变器</td>
+      <td><strong>是</strong></td>
+      <td><strong>是</strong></td>
+    </tr>
+    <tr>
+      <td><strong>通用定时器 (全功能)</strong></td>
+      <td>TIM2, TIM3, TIM4, TIM5</td>
+      <td><strong>32位</strong></td>
+      <td>输入捕获、输出比较、PWM、<strong>编码器接口</strong>、定时器联动</td>
+      <td><strong>通用高频计数</strong>、<strong>编码器测量</strong>、PWM生成</td>
+      <td><strong>是</strong></td>
+      <td>否</td>
+    </tr>
+    <tr>
+      <td><strong>通用定时器 (标准)</strong></td>
+      <td>TIM10, TIM11, TIM13, TIM14</td>
+      <td>16位</td>
+      <td>输入捕获、输出比较、PWM</td>
+      <td>简单输入捕获/输出比较</td>
+      <td>否</td>
+      <td>否</td>
+    </tr>
+    <tr>
+      <td><strong>通用定时器 (增强)</strong></td>
+      <td>TIM12, TIM15, TIM16, TIM17</td>
+      <td>16位</td>
+      <td>输入捕获、输出比较、PWM（部分通道有互补输出）</td>
+      <td>通用PWM生成</td>
+      <td>否</td>
+      <td>TIM15/16/17<strong>支持</strong></td>
+    </tr>
+    <tr>
+      <td><strong>基本定时器</strong></td>
+      <td>TIM6, TIM7</td>
+      <td>16位</td>
+      <td>基础计时、触发DMA</td>
+      <td>系统时基、触发ADC/DAC</td>
+      <td>否</td>
+      <td>否</td>
+    </tr>
+    <tr>
+      <td><strong>低功耗定时器</strong></td>
+      <td>LPTIM1, LPTIM2, LPTIM3, LPTIM4, LPTIM5</td>
+      <td>16位</td>
+      <td>在低功耗模式下运行、外部时钟、<strong>编码器模式(LPTIM1/2)</strong></td>
+      <td>低功耗场景下的计数与监控</td>
+      <td>LPTIM1/2<strong>支持</strong></td>
+      <td>否</td>
+    </tr>
+  </tbody>
+</table>
 
----
 
 ### 高速电机控制需求的选型建议
 
