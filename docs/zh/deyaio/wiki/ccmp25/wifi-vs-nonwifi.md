@@ -160,4 +160,4 @@ CCMP25带Wifi型号，在设计文件中的区别包括：
         </component>
 ```
 
-上面资源表明，蓝牙用了usart1四线，BT_REG_EN用了PZ5,WL_REG_EN用了PI7，如果有用到冲突资源，又希望不同型号模块可混用，最好避开这些资源。
+上面资源表明，SDMCC1用了：PE3，PE2，PE4，PE5，PE0，PE1这几个处理器引脚，而蓝牙用了usart1四线：PG14,PG15,PB9,PB11，另有开关信号：BT_REG_EN用了PZ5,WL_REG_EN用了PI7，如果有用到冲突资源，又希望不同型号模块可混用，最好避开这些资源。
