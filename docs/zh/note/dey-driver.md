@@ -1,4 +1,10 @@
 # DEY AIO驱动开发示例
+
+Linux源码树在~/deyaio-rtnodemo/dey5.0/workspace/ccmp25dvkrt/tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/git
+而内核自带的设备驱动目录是~/deyaio-rtnodemo/dey5.0/workspace/ccmp25dvkrt/tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/git/drivers/，每个目录下有相应的Makefile和Kconfig。
+
+## USB扩展串口的驱动集成
+
 本文以CH343的驱动开发为例，其它的驱动可以参考实现。CH343可以支持系统内置的ACM驱动，默认该内核选项已经打开：
 ```
 bitbake -c menuconfig virtual/kernel
@@ -9,8 +15,7 @@ Device Drivers → USB support → USB Modem (CDC ACM) support
 
 如果需要用到流控功能，需要使用厂商驱动：https://github.com/WCHSoftGroup/ch343ser_linux
 
-Linux源码树在~/deyaio-rtnodemo/dey5.0/workspace/ccmp25dvkrt/tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/git
-而内核自带的设备驱动目录是~/deyaio-rtnodemo/dey5.0/workspace/ccmp25dvkrt/tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/git/drivers/，每个目录下有相应的Makefile和Kconfig。
+
 最后在~/deyaio-rtnodemo/dey5.0/workspace/ccmp25dvkrt/tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/git/drivers/usb/serial/下有Makefile和Kconfig,以及不同USB转串口芯片厂家的驱动源码。
 
 为了生成可以直接用于配方的补丁，我们应该将CH343的驱动源码（ch343.c和ch343.h）放在drivers/usb/serial/目录下，并修改该目录下的Kconfig和Makefile，以添加CH343的配置和编译选项。
@@ -126,4 +131,66 @@ SRC_URI += " \
     file://ch343-config.cfg \
     file://0001-add-ch343-usb-serial-driver.patch \
 "
+```
+
+## 电阻屏的支持
+
+电阻屏需要专用的驱动芯片，这个芯片内部集成了模拟开关、ADC、逻辑控制和驱动。对外一般是SPI接口和一个中断GPIO来连接处理器。
+Linux内核的驱动也是与这些控制器芯片对接的，内核配置选项的路径如下，以ADS7843/TSC2046系列兼容芯片为例：
+
+```
+Device Drivers  --->
+    Input device support  --->
+        Touchscreens  --->
+		<*> ADS7846/TSC2046/AD7873 and AD7843 based touchscreen 
+```
+硬件连接：
+
+```
+四线电阻屏引脚 → ADS7843引脚：
+X+ → VIN1
+Y+ → VIN2
+X- → VIN3  
+Y- → VIN4
+
+ADS7843 → ARM处理器：
+DOUT → SPI_MISO
+DIN  → SPI_MOSI
+CS   → SPI_CS
+CLK  → SPI_CLK
+PENIRQ → GPIO（任意可用GPIO，配置为中断）
+```
+SPI是一种总线，添加SPI接口时，我们可添加NSS就是硬件片选信号（NSS = Negative Slave Select），这是供主设备去控制选中外部SPI设备的，但如果你想连接多个SPI设备，可以使用任意GPIO作为额外的片选信号。
+
+设备树示例:
+
+```
+&spi2 {
+    pinctrl-names = "default", "sleep";
+    pinctrl-0 = <&ccmp25_spi2_pins>;
+    pinctrl-1 = <&ccmp25_spi2_sleep_pins>;
+    status = "okay";
+    
+    /* USER CODE BEGIN spi2 */
+    // 使用硬件NSS，不需要cs-gpios
+	// cs-gpios = <&gpiob 1 GPIO_ACTIVE_LOW>; // 取消注释，并使用PB1作为片选
+    
+    touchscreen@0 {
+        compatible = "ti,ads7846";  // 或 "xpt2046" 如果驱动支持
+        reg = <0>;                  // 使用硬件NSS 或使用cs-gpios中的第一个片选，即PB1，都是（片选0）
+        spi-max-frequency = <1000000>;
+        interrupts = <&gpioc 13 IRQ_TYPE_EDGE_FALLING>;  // 假设使用PC13作为中断
+        interrupt-parent = <&gpioc>;
+        
+        /* 触摸屏参数 */
+        ti,x-min = /bits/ 16 <0>;
+        ti,x-max = /bits/ 16 <4095>;
+        ti,y-min = /bits/ 16 <0>;
+        ti,y-max = /bits/ 16 <4095>;
+        ti,pressure-min = /bits/ 16 <0>;
+        ti,pressure-max = /bits/ 16 <255>;
+        ti,x-plate-ohms = /bits/ 16 <400>;
+    };
+    /* USER CODE END spi2 */
+};
 ```
