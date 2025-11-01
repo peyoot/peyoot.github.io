@@ -137,7 +137,7 @@ git apply /path/to/0001-add-ch343-usb-serial-driver.patch
 
 ```
 mkdir -p meta-custom/recipes-kernel/linux/linux-dey/
-
+echo 'CONFIG_USB_SERIAL_CH343=m' > meta-custom/recipes-kernel/linux/linux-dey/ch343-config.cfg
 cp 0001-add-ch343-usb-serial-driver.patch meta-custom/recipes-kernel/linux/linux-dey/
 ```
 创建或修改 linux-dey_%.bbappend 文件
@@ -149,7 +149,27 @@ SRC_URI += " \
     file://ch343-config.cfg \
     file://0001-add-ch343-usb-serial-driver.patch \
 "
+
+# 确保配置片段被应用
+do_configure_append() {
+    if [ -f ${WORKDIR}/ch343-config.cfg ]; then
+        cat ${WORKDIR}/ch343-config.cfg >> ${B}/.config
+    fi
+}
 ```
+
+7、补丁维护
+
+当上游Linux内核源码树更新后，你为特定版本（比如基于dd850e7ac587）生成的补丁有可能无法直接应用。建议为补丁文件的提交说明中加入特定版本hash，
+在新源码树中使用git apply --check <patchfile>命令来预检补丁是否能直接应用。如果没有错误，则说明补丁很可能仍然有效。
+
+如果预检失败，意味着出现了冲突，你需要手动解决。使用git am或git apply命令应用补丁，Git会在冲突文件中标记出冲突的地方。
+
+逐一检查这些冲突，手动编辑文件，将你的更改与新的代码上下文进行整合。
+
+完成整合后，使用git add和git commit提交更改。
+
+最后，基于这个新的提交生成一个新的补丁。这个过程就是在“重定基”（rebasing）你的补丁。
 
 ## 电阻屏的支持
 
