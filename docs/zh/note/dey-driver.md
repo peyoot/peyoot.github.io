@@ -59,7 +59,11 @@ config USB_SERIAL_CH343
 现在你可以用DEY的构建环境来编译驱动：
 ```
 # 进入内核构建目录
-cd ~/deyaio-rtnodemo/dey5.0/workspace/ccmp25dvkrt/tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/build/
+最安全的构建环境是devshell,在项目文件夹中执行
+```
+bitbake -c devshell virtual/kernel
+```
+此命令会解压内核源码，配置好所有环境变量（如ARCH和CROSS_COMPILE），并打开一个新的shell终端以便手动开发调试
 
 # 配置内核，启用CH343驱动
 make menuconfig
@@ -69,8 +73,8 @@ make menuconfig
 # 或者直接修改 .config 文件
 echo 'CONFIG_USB_SERIAL_CH343=m' >> .config
 
-# 编译驱动模块
-make drivers/usb/serial/ch343.ko
+# 编译特定目录驱动模块
+make drivers/usb/serial/
 
 # 或者编译所有USB串口驱动
 make M=drivers/usb/serial/
@@ -78,15 +82,28 @@ make M=drivers/usb/serial/
 编译完成后，.ko 文件会生成在相应的位置。
 
 4、生成内核补丁
-由于是在git仓库中操作，生成补丁非常方便：
-
+由于是在git仓库中操作，生成补丁非常方便，但是由于执行手动的make，环境已经被污染，先要恢复一下，
+首先备份一下改动：
 ```
-# 回到内核源码根目录
-cd ~/deyaio-rtnodemo/dey5.0/workspace/ccmp25dvkrt/tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/git/
+cp drivers/usb/serial/Makefile ~/tempbk/
+cp drivers/usb/serial/Kconfig ~/tempbk/
+```
+然后用exit退出devshell，执行清理：
+```
+bitbake -c cleansstate virtual/kernel
+因为这会删除之前下载和编译的内核文件及源码，所以还需要再执行一次进入devshell并恢复原始的源码库：
+ 
+```
+bitbake -c devshell virtual/kernel
+git reset --hard
+```
+# 修改并生成变更到配方
 
 # 查看当前修改状态
 git status
+这里有一些untrack并没有影响，
 git diff
+此时变动为空，因为我们主要是要增加ch343相关的驱动，将备份的东西拷回来，再git diff一下，
 
 # 添加新文件到git
 git add drivers/usb/serial/ch343.c drivers/usb/serial/ch343.h
@@ -113,13 +130,14 @@ cd some-clean-kernel-source
 git apply /path/to/0001-add-ch343-usb-serial-driver.patch
 # 验证是否能正常应用
 ```
+
 6、集成到Yocto配方
 
-将生成的补丁文件放到你的Yocto层中：
+将补丁文件（如 0001-add-ch343-usb-serial-driver.patch）和可能的内核配置文件（如 ch343-config.cfg，内容为 CONFIG_USB_SERIAL_CH343=m）放在你Yocto层的 meta-custom/recipes-kernel/linux/linux-dey/ 目录下
 
 ```
-# 在你的Yocto层中
 mkdir -p meta-custom/recipes-kernel/linux/linux-dey/
+
 cp 0001-add-ch343-usb-serial-driver.patch meta-custom/recipes-kernel/linux/linux-dey/
 ```
 创建或修改 linux-dey_%.bbappend 文件
