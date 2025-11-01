@@ -95,3 +95,81 @@ cyclictest --mlockall --smp --priority=98 --interval=1000 --distance=0 -l 100000
 
 ```
 
+# 无显示接口的ccmp25plc板卡进阶配置
+有些PLC板卡没有显示接口，此时可以通过上位机来显示。包括：直接X11转发（SSH），使用VNC，和虚拟帧缓冲（Xvfb）。
+如果板子上运行完整的X11服务器（包括窗口管理器），那么它需要较多的资源，因为它提供了完整的桌面环境支持。但是，我们也可以只运行一个极简的X服务器（比如Xvfb）而不运行窗口管理器。
+Xvfb（虚拟帧缓冲X服务器）是一个不输出到物理显示器的X服务器。它只在内存中模拟一个帧缓冲区。因此，它不需要物理显示设备，也不需要图形界面。相比完整的X服务器，Xvfb省去了与物理显示设备交互的部分，因此更轻量。
+
+## xvfb方案
+ST公司的ccmp25plc板并没有显示接口，因此我们可以用Xvfb配合VNC实现远程的界面显示。
+
+### 项目配置
+在conf/local.conf中配置
+```
+# Add Qt base packages (core functionality only)
+IMAGE_INSTALL:append = " \
+    qtbase \
+    qtbase-plugins \
+    qtbase-examples \
+    qt5everywheredemo \
+    xauth \
+    xvfb \
+    x11vnc \
+    libx11 \
+    libxcb \
+    mesa \                    # 开源OpenGL实现
+    mesa-demos \              # OpenGL测试工具
+    libglu \                  # OpenGL工具库
+"
+
+# Ensure framebuffer or xvfb support
+DISTRO_FEATURES:append = " fbdev x11 opengl gles2 "
+
+
+# Streamline qtbase configuration, enable only framebuffer and basic features
+# PACKAGECONFIG:remove:pn-qtbase = "glib gles2 egl x11 xcb"
+PACKAGECONFIG:append:pn-qtbase = " linuxfb gles2 egl gif png jpeg fontconfig xcb"
+
+# Basic font support (optional but recommended)
+IMAGE_INSTALL:append = " ttf-dejavu-sans "
+```
+
+### 使用方式
+
+方式1：手动选择后端
+```
+# 使用framebuffer（如果有物理显示）
+export QT_QPA_PLATFORM=linuxfb
+./qt_app
+
+# 使用Xvfb（远程显示）
+export DISPLAY=:99
+export QT_QPA_PLATFORM=xcb
+Xvfb :99 -screen 0 1024x768x24 &
+./qt_app
+
+# 使用VNC直接显示
+export QT_QPA_PLATFORM=vnc:size=800x600
+./qt_app
+```
+方式2：自动检测脚本
+```
+# /usr/bin/start-qt-remote
+#!/bin/sh
+export DISPLAY=:99
+
+# 启动Xvfb
+Xvfb :99 -screen 0 1024x768x24 &
+
+# 启动VNC服务器（可选）
+x11vnc -display :99 -forever -shared -nopw -bg
+
+# 设置QT平台
+export QT_QPA_PLATFORM=xcb
+
+# 运行应用
+exec "$@"
+```
+## 虚拟DRM方案
+但上面有一个缺点，xvfb通常没法用集成的GPU。
+在QT中，我们通常使用eglfs（基于EGL的全屏显示）平台插件来利用GPU进行硬件加速。但是，eglfs需要实际的显示设备（即使是一个虚拟的显示设备节点）。在无显示接口的核心板上，我们可以创建一个虚拟的DRM（Direct Rendering Manager）设备，然后让eglfs使用这个虚拟设备。
