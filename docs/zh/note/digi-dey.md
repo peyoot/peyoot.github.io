@@ -96,3 +96,43 @@ for repo in git2/*.git; do
     tar -czf "git2_${repo_dir}.tar.gz" -C git2/ "$repo_dir"
 done
 ```
+
+# 找回x11相关特性
+在ccmp25-dvk的机器配置meta-digi/meta-digi-arm/conf/machine/ccmp25-dvk.conf中有这一句
+```
+    MACHINE_DISTRO_FEATURES_REMOVE = "x11"
+```
+导至在local.conf中无法添加x11，但有时我们希望添加该特性的支持，就需要在local.conf中用下面来找回：
+```
+# 覆盖机器配置中的移除设置
+MACHINE_DISTRO_FEATURES_REMOVE:remove = "x11"
+
+# 确保添加 x11 特性
+DISTRO_FEATURES:append = " x11"
+
+# 移除 wayland（如果需要）
+DISTRO_FEATURES:remove = "wayland"
+CONFLICT_DISTRO_FEATURES:remove = "wayland"
+
+# 继续从回填排除列表中移除 x11
+DISTRO_FEATURES_BACKFILL_CONSIDERED:remove = "x11"
+
+# 调整镜像安装包：移除Wayland组件
+IMAGE_INSTALL:remove = "weston"
+IMAGE_INSTALL:remove = "weston-xwayland" 
+# 清理为Wayland特制的快捷方式
+ROOTFS_POSTPROCESS_COMMAND:remove = "add_cinematicexperience_shortcut;"
+
+# 添加Xvfb及必要依赖，如果要用这个功能的话
+IMAGE_INSTALL:append = " \
+    xserver-xorg-xvfb \
+    x11vnc \
+    xdpyinfo \
+    xauth \
+    libx11 \
+    libxcb \
+    mesa-megadriver \
+"
+
+
+```
