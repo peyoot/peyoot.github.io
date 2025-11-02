@@ -113,7 +113,7 @@ IMAGE_INSTALL:append = " \
     qtbase-examples \
     qt5everywheredemo \
     xauth \
-    xvfb \
+    xserver-xorg \
     x11vnc \
     libx11 \
     libxcb \
@@ -128,10 +128,19 @@ DISTRO_FEATURES:append = " fbdev x11 opengl gles2 "
 
 # Streamline qtbase configuration, enable only framebuffer and basic features
 # PACKAGECONFIG:remove:pn-qtbase = "glib gles2 egl x11 xcb"
-PACKAGECONFIG:append:pn-qtbase = " linuxfb gles2 egl gif png jpeg fontconfig xcb"
+# PACKAGECONFIG:append:pn-qtbase = " linuxfb gles2 gif jpeg fontconfig xcb"
 
-# Basic font support (optional but recommended)
-IMAGE_INSTALL:append = " ttf-dejavu-sans "
+IMAGE_INSTALL:append = " \
+    qt5everywheredemo \
+    xauth \
+    xserver-xorg \
+    x11vnc \
+    libx11 \
+    libxcb \
+    mesa \
+    mesa-demos \
+    libglu \
+"
 ```
 
 ### 使用方式
