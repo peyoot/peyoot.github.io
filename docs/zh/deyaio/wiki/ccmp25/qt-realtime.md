@@ -133,7 +133,7 @@ DISTRO_FEATURES:append = " fbdev x11 opengl gles2 "
 IMAGE_INSTALL:append = " \
     qt5everywheredemo \
     xauth \
-    xserver-xorg \
+    xorg-xserver-xvfb \
     x11vnc \
     libx11 \
     libxcb \
