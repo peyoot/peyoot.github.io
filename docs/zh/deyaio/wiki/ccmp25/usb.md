@@ -135,7 +135,7 @@
 ```
 在PLC的板子上，usbh_ehci: usb@482f0000 这个用的是usb2_phy1,对应板子上的USB HOST接口，而usb3dr是用usb2_phy2，对应板子上的U21 type C接口。
 
-ST开发板，默认的DTS中明确禁用了OHCI (usbh_ohci: usb@482e0000 { status = "disabled"; };)，但板载了一个USB Hub芯片（compatible="usb424,2514"，如USB2514系列）。这个Hub是高速度Hub，它可以作为中介处理FS/LS设备：即使OHCI禁用，Hub会将FS/LS信号转换为HS信号，再由EHCI处理。 因此，你的USB转serial设备在EV1上能被识别，尽管DTS只启用了EHCI——这是Hub的功劳，而不是直接依赖OHCI。
+ST开发板，默认的DTS中明确禁用了OHCI (usbh_ohci: usb@482e0000 { status = "disabled"; };)，但板载了一个USB Hub芯片（compatible="usb424,2514"，如USB2514系列）。这个Hub是高速度Hub，它可以作为中介处理FS/LS设备：即使OHCI禁用，Hub会将FS/LS信号转换为HS信号，再由EHCI处理。 因此，一些像伪ch343的USB转serial低速设备在能被识别（尽管DTS只启用了EHCI）——这是Hub的功劳，而不是直接依赖OHCI。
 
 但单端USB的PLC板卡，对于FS设备如USB转serial，缺少OHCI会导致内核无法正确切换和处理低速信号。因此我们需要启用OHCI。
 
@@ -145,4 +145,7 @@ ST开发板，默认的DTS中明确禁用了OHCI (usbh_ohci: usb@482e0000 { stat
 };
 ```
 
+# USB硬件电路
+
+ST的PLC参考设计板提供了最简的USB电路，但这个电路中的type C只是下载接口，而ST官方用STUSB1600来实现OTG功能，可能是一个正常的设计。
 
