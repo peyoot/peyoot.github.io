@@ -79,6 +79,7 @@ repo init -b scarthgap -m my_frozen_ccmp25plc.xml
 当我们需要修改linux内核所用的设备树时，参考meta-custom的ccmp25plc分支，在配方中引入变更。如果我们需要临时性的更改，则可以用devshell来编译出dtb文件，并在内核中替换并测试
 ```
 bitbake -c devshell linux-dey
+```
 修改后，用
 ```
 make clean dtbs
@@ -95,6 +96,20 @@ updatefile linux_a usb 0:1 ccmp25-plc.dtb ccmp25-plc.dtb
 mount -o remount,rw /mnt/linux 
 cp ccmp25-plc.dtb /mnt/linux/ccmp25-plc.dtb
 ```
+
+## 如何检查镜像中编译的设备树
+一般而言，当镜像因设备树问题无法启动时，我们可以通过把编译出来的boot.vfat镜像mount到一个目录上进行检查，看是否缺失相关的设备树。
+比如：
+```
+mkdir ~/testvfat/
+sudo mount -o loop dey-image-lvgl-wayland-ccmp25-dvk.boot.vfat ~/testvfat/
+```
+很多时候设备树缺失，只是编译镜像之前没有cleansstate，可尝试先清理再编译
+```
+bitbake -c cleansstate dey-image-lvgl
+bitbake dey-image-lvgl
+```
+
 
 ## 如何只修改uboot并编译更新
 有时我们需要修改uboot的源码或设备树，可以参考meta-custom的ccmp25plc分支为例，在配方中引入变更。
@@ -126,6 +141,7 @@ update fip-a usb 0:1 fip-ccmp25-dvk-optee.bin
 ```
 
 ## 为何DISTRO_FEATURES变量不能放在meta-custom当中？
+
 DISTRO_FEATURES 是定义整个发行版（distro）特性的变量，它在 Yocto 的构建系统中属于 全局配置变量。
 这类变量通常在 conf/distro/*.conf 或 local.conf 中设置，而不是在配方（recipe）或 .bbappend 文件中。DISTRO_FEATURES 的作用是在构建系统初始化阶段决定哪些功能被启用，比如 systemd、x11、bluetooth 等。在 .bbappend 中修改 DISTRO_FEATURES 太晚了，构建系统在解析配方之前就已经决定了哪些特性被启用。
 
@@ -133,3 +149,5 @@ DISTRO_FEATURES 是定义整个发行版（distro）特性的变量，它在 Yoc
 在 Yocto 5.0 中，使用 :append 操作符时，在追加的内容前加一个空格仍然是必须的。这是因为 :append 操作本身不会自动添加空格分隔符，如果你不加空格，追加的内容会直接拼接在原有值的末尾，导致语法错误或功能无法生效。虽然有时原变量末尾已经有空格，但增加空格显然更能确保拼接后有正确的分隔
 
 ## qtfb 环境变量设置
+
+
