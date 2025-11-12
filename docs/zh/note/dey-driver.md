@@ -232,3 +232,47 @@ SPI是一种总线，添加SPI接口时，我们可添加NSS就是硬件片选�
     /* USER CODE END spi2 */
 };
 ```
+
+## ov2740驱动调试
+问题是如何发现的？
+```
+# 设备树compatible: "ovti,ov2740"
+cat /sys/bus/i2c/devices/0-0036/of_node/compatible
+# 输出: ovti,ov2740
+
+# 但驱动只支持ACPI设备，不支持设备树！
+modinfo ov2740 | grep alias
+# 输出: alias: acpi*:INT3474:*
+```
+到linux源码树下查看，特别是从Makefile中看到Digi的6.6.48版本前后都没啥变化，共1229行（29211B）。
+https://elixir.bootlin.com/linux/v6.6.48/source/drivers/media/i2c/ov2740.c
+这个文件和ov5640.c的4012行（104293）相比差很多！可见较少人用。
+查看源码发现：
+```
+ov5640.c里是：
+static const struct of_device_id ov5640_dt_ids[] = {
+	{ .compatible = "ovti,ov5640" },
+	{ /* sentinel */ }
+};
+
+而ov2740.c里是：
+static const struct acpi_device_id ov2740_acpi_ids[] = {
+	{"INT3474"},
+	{}
+};
+
+```
+当前内核中的ov2740驱动只支持ACPI，而没有设备树（OF）支持。这意味着它无法通过设备树匹配设备，因此无法与设备树节点（compatible="ovti,ov2740"）绑定。
+
+解决方案有两种：
+* 修改现有的ov2740驱动，添加设备树支持（模仿ov5640驱动）。
+* 从摄像头官方（OmniVision）获取最新的驱动源码，可能已经包含了设备树支持。
+* 查看其它大厂的源码，看是否支持了设备树。
+
+找其它官方,比如Intel的IPU6驱动：https://github.com/intel/ipu6-drivers/tree/master/drivers/media/i2c
+并没有什么用，因为它没有of_device_id，即设备树支持。
+
+看来除非直接找原厂要到最新的驱动源码，否则只能仿ov5640来改了。经过AI查询，发现Nvidia有。
+https://developer.nvidia.com/embedded/jetson-linux 下载源码链接：
+https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v4.4/sources/public_sources.tbz2
+
