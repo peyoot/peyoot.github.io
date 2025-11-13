@@ -18,25 +18,42 @@ source dey-setup-environment
 # 1. 提取内核（自动处理 virtual/kernel → linux-dey）
 devtool modify virtual/kernel
 
-# 2. 修改驱动
+# 2. 配置devtool下的conf/local.conf
+有一些必须设置项目，否则会出错
+```
+MACHINE = "ccmp25-dvk"
+DISTRO ?= "dey"
+DL_DIR ?= "${TOPDIR}/../project_shared/downloads"
+SSTATE_DIR ?= "${TOPDIR}/../project_shared/sstate-cache"
+SSTATE_SKIP_CREATION:pn-lua-native = "1"
+```
+
+# 3. 修改驱动
 vim workspace/sources/linux-dey/drivers/media/i2c/ov2740.c
 
-# 3. 打开内核配置
-devtool menuconfig virtual/kernel
+# 4. 打开内核配置
+devtool menuconfig linux-dey
 # → 打开 OV2740、添加自定义选项
 
-# 4. 编译测试
-devtool build virtual/kernel
+# 5. 编译测试
+devtool build linux-dey
 
-# 5. 生成补丁 + 合并到你的层
-devtool update-recipe virtual/kernel -a meta-custom
+# 6. 提交并生成补丁 + 合并到你的层
+# 进入源码目录
+cd ~/deyaio-rtsp/dey5.0/workspace/sources/linux-dey
+# 查看修改
+git status
+# 提交修改，比如
+git add drivers/media/i2c/ov2740.c
+git commit -m "ov2740: support device tree and 24MHz clock"
+# devtool update-recipe virtual/kernel -a meta-custom
 # 或者（推荐）：
 devtool finish virtual/kernel meta-custom
 
-# 6. 清理 devtool 环境
+# 7. 清理 devtool 环境
 devtool reset virtual/kernel
 
-# 7. 完整构建镜像
+# 8. 完整构建镜像
 bitbake dey-image-qt   # 你的镜像名
 
 ```
