@@ -137,7 +137,7 @@ git apply /path/to/0001-add-ch343-usb-serial-driver.patch
 
 ```
 mkdir -p meta-custom/recipes-kernel/linux/linux-dey/
-echo 'CONFIG_USB_SERIAL_CH343=m' > meta-custom/recipes-kernel/linux/linux-dey/ch343-config.cfg
+
 cp 0001-add-ch343-usb-serial-driver.patch meta-custom/recipes-kernel/linux/linux-dey/
 ```
 创建或修改 linux-dey_%.bbappend 文件
@@ -149,27 +149,7 @@ SRC_URI += " \
     file://ch343-config.cfg \
     file://0001-add-ch343-usb-serial-driver.patch \
 "
-
-# 确保配置片段被应用
-do_configure_append() {
-    if [ -f ${WORKDIR}/ch343-config.cfg ]; then
-        cat ${WORKDIR}/ch343-config.cfg >> ${B}/.config
-    fi
-}
 ```
-
-7、补丁维护
-
-当上游Linux内核源码树更新后，你为特定版本（比如基于dd850e7ac587）生成的补丁有可能无法直接应用。建议为补丁文件的提交说明中加入特定版本hash，
-在新源码树中使用git apply --check <patchfile>命令来预检补丁是否能直接应用。如果没有错误，则说明补丁很可能仍然有效。
-
-如果预检失败，意味着出现了冲突，你需要手动解决。使用git am或git apply命令应用补丁，Git会在冲突文件中标记出冲突的地方。
-
-逐一检查这些冲突，手动编辑文件，将你的更改与新的代码上下文进行整合。
-
-完成整合后，使用git add和git commit提交更改。
-
-最后，基于这个新的提交生成一个新的补丁。这个过程就是在“重定基”（rebasing）你的补丁。
 
 ## 电阻屏的支持
 
@@ -233,13 +213,15 @@ SPI是一种总线，添加SPI接口时，我们可添加NSS就是硬件片选�
 };
 ```
 
+
 ## ov2740驱动调试
+
 问题是如何发现的？
+
 ```
 # 设备树compatible: "ovti,ov2740"
 cat /sys/bus/i2c/devices/0-0036/of_node/compatible
 # 输出: ovti,ov2740
-
 # 但驱动只支持ACPI设备，不支持设备树！
 modinfo ov2740 | grep alias
 # 输出: alias: acpi*:INT3474:*
@@ -247,6 +229,7 @@ modinfo ov2740 | grep alias
 到linux源码树下查看，特别是从Makefile中看到Digi的6.6.48版本前后都没啥变化，共1229行（29211B）。
 https://elixir.bootlin.com/linux/v6.6.48/source/drivers/media/i2c/ov2740.c
 这个文件和ov5640.c的4012行（104293）相比差很多！可见较少人用。
+
 查看源码发现：
 ```
 ov5640.c里是：
@@ -261,10 +244,12 @@ static const struct acpi_device_id ov2740_acpi_ids[] = {
 	{}
 };
 
-```
+
 当前内核中的ov2740驱动只支持ACPI，而没有设备树（OF）支持。这意味着它无法通过设备树匹配设备，因此无法与设备树节点（compatible="ovti,ov2740"）绑定。
+```
 
 解决方案有两种：
+
 * 修改现有的ov2740驱动，添加设备树支持（模仿ov5640驱动）。
 * 从摄像头官方（OmniVision）获取最新的驱动源码，可能已经包含了设备树支持。
 * 查看其它大厂的源码，看是否支持了设备树。
