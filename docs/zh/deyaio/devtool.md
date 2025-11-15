@@ -57,4 +57,16 @@ devtool reset virtual/kernel
 bitbake dey-image-qt   # 你的镜像名
 
 ```
-
+# 进行回退修改
+有时，我们的patch不够完善，等到应用后才发现还有些地方要修改，这时我们需要重新用devtool回退到原来版本再次进行补丁修改。
+举例来说：
+我们在meta-custom的80c7179提交上加了补丁，而变成2c18b33，全新repo sync并编译后，如果我们要推翻这个修改重来，正确的步骤是：
+```
+1、在项目文件夹的conf/bblayer.conf中删除devtool新增的layer，一般在最后一行。如果不存在或是全新项目目录，则不需要。
+2、在meta-custom中检查版本号
+$ git status
+$ HEAD detached at 2c18b33
+$ nothing to commit, working tree clean
+$ git checkout 80c7179
+3、重复devtool开发过程，再次生成补丁即可
+```
