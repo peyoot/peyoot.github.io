@@ -23,4 +23,13 @@ i2ctransfer -y 0 w2@0x36 0x01 0x00 r1
 # 返回0x00或0x01
 ```
 
+## linux下设备树查询
+```
 
+i2croot@ccmp25-dvk:~# cat /proc/device-tree/soc\@0/bus\@42080000/i2c\@40140000/name
+root@ccmp25-dvk:~# cat /proc/device-tree/soc\@0/bus\@42080000/i2c\@40120000/ov2740_mipi\@36/status
+root@ccmp25-dvk:~# cat /proc/device-tree/soc\@0/bus\@42080000/i2c\@40120000/ov2740_mipi\@36/clocks
+root@ccmp25-dvk:~# cat /proc/device-tree/soc\@0/bus\@42080000/i2c\@40120000/ov2740_mipi\@36/compatible
+root@ccmp25-dvk:~# cat /proc/device-tree/soc\@0/bus\@42080000/i2c\@40120000/name
+i2cr
+```
