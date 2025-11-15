@@ -19,14 +19,15 @@ source dey-setup-environment
 devtool modify virtual/kernel
 
 # 2. 配置devtool下的conf/local.conf
-有一些必须设置项目，否则会出错
-```
+
+# 有一些必须设置项目，否则会出错
+
 MACHINE = "ccmp25-dvk"
 DISTRO ?= "dey"
 DL_DIR ?= "${TOPDIR}/../project_shared/downloads"
 SSTATE_DIR ?= "${TOPDIR}/../project_shared/sstate-cache"
 SSTATE_SKIP_CREATION:pn-lua-native = "1"
-```
+
 
 # 3. 修改驱动
 vim workspace/sources/linux-dey/drivers/media/i2c/ov2740.c
