@@ -47,12 +47,13 @@ git status
 # 提交修改，比如
 git add drivers/media/i2c/ov2740.c
 git commit -m "ov2740: support device tree and 24MHz clock"
-# devtool update-recipe virtual/kernel -a meta-custom
+# devtool update-recipe linux-dey -a meta-custom
 # 或者（推荐）：
-devtool finish virtual/kernel meta-custom
+devtool finish linux-dey meta-custom
+注意生成的bbappend中，SRC_URI可能会少空格，要自己改
 
-# 7. 清理 devtool 环境
-devtool reset virtual/kernel
+# 7. finish之前清理 devtool 环境
+devtool reset linux-dey
 
 # 8. 完整构建镜像
 bitbake dey-image-qt   # 你的镜像名
