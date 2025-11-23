@@ -18,17 +18,7 @@ source dey-setup-environment
 # 1. 提取内核（自动处理 virtual/kernel → linux-dey）
 devtool modify virtual/kernel
 
-# 2. 配置devtool下的conf/local.conf
-
-# 有一些必须设置项目，否则会出错
-
-MACHINE = "ccmp25-dvk"
-DISTRO ?= "dey"
-DL_DIR ?= "${TOPDIR}/../project_shared/downloads"
-SSTATE_DIR ?= "${TOPDIR}/../project_shared/sstate-cache"
-SSTATE_SKIP_CREATION:pn-lua-native = "1"
-
-
+这个命令会在项目根目录下创建workspace工作区，并它这个工作区作为一个layer加入到conf/bblayers.conf中。linux的源码树会复制一份到工作区，即workspace/sources/linux-dey。不过，需要注意的是，所有的devtool命令都需要在原来项目根目录下进行！
 # 3. 修改驱动
 vim workspace/sources/linux-dey/drivers/media/i2c/ov2740.c
 
@@ -38,6 +28,16 @@ devtool menuconfig linux-dey
 
 # 5. 编译测试
 devtool build linux-dey
+
+# 6. 内核和设备树验证
+对于内置驱动的变更，直接推 Image + dtb 到开发板就可以。如果是外挂的.ko模块，则还要把对应的.ko拷到/lib/modules/6.6*/下，也可以用rsync -avz --delete \
+  tmp/deploy/images/ccmp25_dvk-dey-linux/*-linux-dey/ \
+  root@192.168.10.100:/lib/modules/6.6*/
+登录开发板执行一次depmod -a（只在第一次推新版本模块时需要）
+ssh root@192.168.10.100 depmod -a
+重启或直接热加载
+reboot
+# 或者只重启摄像头模块：rmmod ov2740 && modprobe ov2740
 
 # 6. 提交并生成补丁 + 合并到你的层
 # 进入源码目录
@@ -70,4 +70,20 @@ $ HEAD detached at 2c18b33
 $ nothing to commit, working tree clean
 $ git checkout 80c7179
 3、重复devtool开发过程，再次生成补丁即可
+```
+
+# 仅编译设备树
+
+由于我们通过bbaapend拉取自定义设备树，因此在devtool下，如果想用make来编译，还需要先把设备树放在内核源码中，并在Makefile中添加，如果设备树有单独的源，可以参考如下：
+```
+mkdir ~/mygit
+cd ~/mygit
+git clone https://github.com/peyoot/ccmp25_dt.git
+编辑自己的板级设备树，比如ccmp25-myboard.dts
+cd workspace/sources/linux-dey/arch/arm64/boot/dts/digi
+ln -s ~/mygit/github/ccmp25_dt/ccmp25-myboard.dts 
+nano Makefile
+在相应位置加上这个设备树的编译件dtb
+cd workspace/sources/linux-dey
+make ARCH=arm64 dtbs
 ```
