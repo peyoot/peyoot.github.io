@@ -136,3 +136,11 @@ IMAGE_INSTALL:append = " \
 
 
 ```
+# Yocto项目里快速精准地查找某个变量在哪里被定义或赋值
+如 DIGI_INTERNAL_GIT、DIGI_MTK_GIT、DIGI_GITHUB_GIT
+```
+# 在 Yocto 项目根目录执行
+bitbake -e libdigiapix | grep ^DIGI_INTERNAL_GIT=
+bitbake -e libdigiapix | grep ^DIGI_MTK_GIT=
+bitbake -e libdigiapix | grep ^DIGI_GITHUB_GIT=
+```

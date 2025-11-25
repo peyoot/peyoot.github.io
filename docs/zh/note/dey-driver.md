@@ -261,3 +261,53 @@ static const struct acpi_device_id ov2740_acpi_ids[] = {
 https://developer.nvidia.com/embedded/jetson-linux 下载源码链接：
 https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v4.4/sources/public_sources.tbz2
 
+各种测试下来，也不是很好用，最终还是在AI帮助下自己修改。
+
+## 多个版本驱动同时编译测试
+由于使用devtool开发，但最终实现时大多是用卡刷的方式来测试编译出来的驱动，如果碰到驱动问题，调试和刷写会浪费很多时间，特别是有多个驱动代码片段需要测试时，如果一次性编译出多个版本的驱动，并快速定位可用版本，这可以大大减少工作量。
+原则：它们有不同的驱动名和compatible字符串，并且要让它们选择性加载以区分开来。
+### 驱动加载的原理
+在驱动程序中有of_device_id <驱动名>_of_match函数，其内有compatible定义唯一标识，并通过MODULE_DEVICE_TABLE(of, ...)生成唯一的模块别名，modprobe根据设备树的compatible字符串自动匹配。例如
+```
+// ov2740-v2.c
+static const struct of_device_id ov2740_v2_of_match[] = {
+    { .compatible = "omnivision,ov2740-v2" },  // 唯一标识
+    { }
+};
+MODULE_DEVICE_TABLE(of, ov2740_v2_of_match);  // 生成别名 of:Nov2740-v2*
+```
+驱动编译好后安装到/lib/modules/$(uname -r)/下，运行depmod生成modules.alias
+```
+sudo depmod -a
+```
+这会生成 /lib/modules/$(uname -r)/modules.alias 文件，内容类似：
+```
+alias of:Nov2740-v2T* ov2740-v2
+```
+不同设备树中节点的compatible定义会触发相应的驱动
+```
+ov2740: camera@36 {
+    compatible = "omnivision,ov2740-v2";  // 触发 ov2740-v2.ko
+    reg = <0x36>;
+    status = "okay";
+};
+```
+当内核解析设备树并发现节点时:
+1.读取compatible = "omnivision,ov2740-v2"
+2.调用modprobe of:Nov2740-v2T*
+3.modprobe查找/lib/modules/.../modules.alias
+4.找到alias of:Nov2740-v2T* ov2740-v2
+5.加载/lib/modules/.../kernel/drivers/media/i2c/ov2740-v2.ko
+
+因此，只要控制设备树有唯一对应的节点标识，就可以加载对应的设备驱动。
+
+### 同时准备多个驱动，以ov2740和ov2740v2为例
+创建ov2740.c和ov2740v2.c，并用版本控制起来
+devtool modify virtual/kernel
+复制这两个驱动，相应的修改Kconfing和Makefile到相应目录，回到workspace/sources/linux-dey/
+make menuconfig （注意因为VIDEO_DEV项已经被弃用，所有这个菜单修改没啥用，找不到相关选项）还是直接改.config
+echo "CONFIG_VIDEO_OV2740=m" >> .config
+echo "CONFIG_VIDEO_OV2740v2=m" >> .config
+回到项目目录
+cd ../../..
+devtool build linux-dey
