@@ -302,12 +302,15 @@ ov2740: camera@36 {
 因此，只要控制设备树有唯一对应的节点标识，就可以加载对应的设备驱动。
 
 ### 同时准备多个驱动，以ov2740和ov2740v2为例
+首先注意需要在meta-custom的哪次提交基础上做补丁，就要在meta-custom中检出相应的提交版本。
+```
 创建ov2740.c和ov2740v2.c，并用版本控制起来
-devtool modify virtual/kernel
+devtool modify linux-dey
 复制这两个驱动，相应的修改Kconfing和Makefile到相应目录，回到workspace/sources/linux-dey/
 make menuconfig （注意因为VIDEO_DEV项已经被弃用，所有这个菜单修改没啥用，找不到相关选项）还是直接改.config
-echo "CONFIG_VIDEO_OV2740=m" >> .config
+echo "CONFIG_VIDEO_OV2740=m" >> .config #注意，假如meta-custom已有相关的cfg文件，就不要另外添加
 echo "CONFIG_VIDEO_OV2740v2=m" >> .config
 回到项目目录
 cd ../../..
 devtool build linux-dey
+```

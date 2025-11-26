@@ -52,8 +52,18 @@ git commit -m "ov2740: support device tree and 24MHz clock"
 devtool finish linux-dey meta-custom
 注意生成的bbappend中，SRC_URI可能会少空格，要自己改
 
-# 7. finish之前清理 devtool 环境
+# 7. 清理 devtool 环境重新开始构建
+
 devtool reset linux-dey
+devtool modify linux-dey
+devtool shell linux-dey
+echo $ARCH              # 必须是arm64
+make ccmp2_defconfig    # 测试配置
+make ccmp25-dvk.dtb     # 测试设备树
+exit
+
+devtool build linux-dey
+
 
 # 8. 完整构建镜像
 bitbake dey-image-qt   # 你的镜像名
