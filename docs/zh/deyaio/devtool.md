@@ -63,11 +63,12 @@ make ccmp2_defconfig
 #make savedefconfig
 # 将生成的 defconfig 复制出来保存
 #或 
-echo "CONFIG_VIDEO_OV2740V2=m" >> .config
+echo "CONFIG_VIDEO_OV2740V2=m" >> .config  (不在devtool的目录中，它的是.config.new被链接到原始的配置文件)
 
 echo $ARCH              # 检查测试环境，必须是arm64
 make ccmp2_defconfig    # 先要编译配置，以便生成.config，这是shell下编译所必须的
 make ccmp25-dvk.dtb     # 测试编译设备树
+生成的构件位于：tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/linux-dey-6.6/arch/arm64/boot/dts/digi/
 make ov2740.o #测试编译驱动
 
 exit

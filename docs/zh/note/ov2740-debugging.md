@@ -146,3 +146,17 @@ static int ov2740_check_hwcfg(struct device *dev)
 	return 0;
 }
 ```
+
+中间很多故事，略
+
+临时跳过 ID 读（不重新编译，用 rmmod + insmod 验证）
+```
+static bool skip_id;
+module_param(skip_id, bool, 0644);
+
+ov2740_identify_module里：
++       if (skip_id) {
++               dev_info(ov2740->dev, "skip ID read for debug\n");
++               return 0;
++       }
+```
