@@ -153,6 +153,7 @@ static int ov2740_check_hwcfg(struct device *dev)
 ```
 static bool skip_id;
 module_param(skip_id, bool, 0644);
+MODULE_PARM_DESC(skip_id, "skip chip-id read for debug");
 
 ov2740_identify_module里：
 +       if (skip_id) {
@@ -160,3 +161,28 @@ ov2740_identify_module里：
 +               return 0;
 +       }
 ```
+编译需要进入bitbake -c devshell linux-dey, 然后make modules
+
+```
+./scripts/config --module CONFIG_VIDEO_OV2740
+make olddefconfig          # 自动解决依赖
+```
+# 强制手动加载内核模块
+有时需要调查什么地方crash，就需要模块加载过程的一些log，而内核模块被占用就无法手动insmod，那么，可以这样做：
+临时黑名单（仅本次启动生效）：
+```
+echo blacklist ov2740 > /etc/modprobe.d/ov2740.conf
+echo blacklist stm32_csi >> /etc/modprobe.d/ov2740.conf
+reboot
+```
+重启后 ov2740 不会自动加载，此时：
+```
+lsmod | grep ov2740        # 应该为空
+i2cdetect -y 0             # 确认 0x36 仍在
+```
+在“完全准备好”的用户空间手动加载
+```
+insmod /lib/modules/$(uname -r)/extra/ov2740.ko
+dmesg | tail -20
+```
+
