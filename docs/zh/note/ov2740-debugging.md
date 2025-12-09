@@ -186,3 +186,5 @@ insmod /lib/modules/$(uname -r)/extra/ov2740.ko
 dmesg | tail -20
 ```
 
+# 编译成功后的调试
+按官方文档来，本次调试所用的commit hash是57e6a23。

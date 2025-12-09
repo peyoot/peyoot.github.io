@@ -1,5 +1,5 @@
 # 在DEY AIO环境下使用devtool进行驱动开发和调试
-使用 devtool 确实是一种更简单和推荐的方式来修改 Yocto 项目中的内核源代码（如你的 OV2740 驱动补丁）。相比直接用 bitbake -c devshell virtual/kernel（这种方式需要手动管理源代码路径、生成补丁，并可能导致 tmp/work 目录混乱），devtool 有以下优势：
+本文旨在帮助对嵌入式系统不熟悉的用户熟悉和了解驱动程序的相关开发知识。虽然可以直接在yocto项目的tmp目录下找到相关的源代码并用bitbake -c devshell virtual/kernel来进入配置好环境的终端进行编译和测试，但这种方式需要手动管理源代码路径、生成补丁，并可能导致 tmp/work 目录混乱。这对需要迭代开发非常不友好，因此一般还是要使用 devtool工具并结合bitbake相关命令来开发和修改 Yocto 项目中的内核源代码（如驱动补丁，设备树等）。devtool 有以下优势：
 
 自动化管理：它会自动从 tmp/work 提取源代码到项目 workspace 的 sources/ 目录下，提供一个干净的开发环境。你可以像本地编辑一样修改文件，而不用担心构建目录的临时性。
 补丁生成：修改后，直接用 devtool update-recipe 生成补丁，并自动更新内核配方（recipe），无需手动 quilt 或 git 格式化补丁。
@@ -18,16 +18,31 @@ source dey-setup-environment
 # 1. 提取内核（自动处理 virtual/kernel → linux-dey）
 devtool modify virtual/kernel
 
-这个命令会在项目根目录下创建workspace工作区，并它这个工作区作为一个layer加入到conf/bblayers.conf中。linux的源码树会复制一份到工作区，即workspace/sources/linux-dey。不过，需要注意的是，所有的devtool命令都需要在原来项目根目录下进行！
+这个命令会在项目根目录下创建workspace工作区，并它这个工作区作为一个layer加入到conf/bblayers.conf中。linux的源码树会复制一份到工作区，即workspace/sources/linux-dey。不过，需要注意的是，所有的devtool命令都需要在原来DEY项目根目录下进行！
+
 # 3. 修改驱动
+一般内核驱动目录在workspace/sources/linux-dey/drivers下，设备树在workspace/sources/linux-dey/arch/arm64/boot/dts/digi/下。建议在工作电脑下新建一个基于git的源码库，比如~/mygit/mydriver，以便保存中间迭代过程。如果内核驱动有相关源码，复制到这个目录并做首次提交，然后每次修改则复制到内核中对应的驱动目录内，再进行编译测试。如果是原内核没有的驱动，也一样的新建好驱动代码库，并复制到对应的内核驱动目录下。
+可以用修改驱动可以用nano或vim等文本编辑器。如下面对原ov2740驱动进行修改：
 vim workspace/sources/linux-dey/drivers/media/i2c/ov2740.c
 
+对于不在内核选项的一些驱动，你可能还需要同步修改Kconfig
+
 # 4. 打开内核配置
-devtool menuconfig linux-dey
-# → 打开 OV2740、添加自定义选项
+两种办法，一种直接用bitbake来，另一种是在devshell中操作，任选一种：
+I. devshell
+bitbake -c devshell linux-dey
+然后在devshell中配置和编译
+make ccmp25_defconfig  
+make menuconfig
+make savedefconfig
+将生成的 defconfig 复制出来保存备份，当然一般不需要，只有一两项手动改linux-dey-6.6/.config也行
+II. bitbake方式
+bitbake -c menuconfig linux-dey
+添加修改内核选项
+bitbake -c savedefconfig linux-dey
 
 # 5. 编译测试
-devtool build linux-dey
+devtool build linux-dey 或直接 bitbake linux-dey
 
 # 6. 内核和设备树验证
 对于内置驱动的变更，直接推 Image + dtb 到开发板就可以。如果是外挂的.ko模块，则还要把对应的.ko拷到/lib/modules/6.6*/下，也可以用rsync -avz --delete \
@@ -69,14 +84,16 @@ echo $ARCH              # 检查测试环境，必须是arm64
 make ccmp2_defconfig    # 先要编译配置，以便生成.config，这是shell下编译所必须的
 make ccmp25-dvk.dtb     # 测试编译设备树
 生成的构件位于：tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/linux-dey-6.6/arch/arm64/boot/dts/digi/
+在devshell中可以尝试
 make ov2740.o #测试编译驱动 
-不成功就用这个：bitbake linux-dey -C compile virtual/kernel
+exit退出
+如果不成功，可以用这个：bitbake linux-dey -C compile virtual/kernel
 其中-C compile 会强制清除 sstate 缓存后重新编译
-
-exit
-
+但实际上更标准的做法是直接:
+bitbake -f -c compile linux-dey
+或
 devtool build linux-dey
-
+如果需要先清缓存，则bitbake -c cleansstate linux-dey
 
 # 8. 完整构建镜像
 bitbake dey-image-qt   # 你的镜像名
