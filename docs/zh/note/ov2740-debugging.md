@@ -187,4 +187,13 @@ dmesg | tail -20
 ```
 
 # 编译成功后的调试
-按官方文档来，本次调试所用的commit hash是57e6a23。
+按官方文档来，
+media-ctl -d platform:48030000.dcmipp -p
+和
+media-ctl -d /dev/media2 -p
+效果一样
+media-ctl -d /dev/media2 --print-dot > graph.dot
+
+在线转成图片
+https://dreampuf.github.io/GraphvizOnline/
+
