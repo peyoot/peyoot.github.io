@@ -1,3 +1,17 @@
+# 基础知识点
+MPU内有一个lcdif或LTDC模块，MP25是LTDC。
+LTDC是LCD-TFT Display Controller的缩写，这是STM32微控制器中专门用于驱动显示器的硬件模块。
+```
+CPU → 内存(FrameBuffer) → LTDC硬件 → RGB信号 → 显示器
+```
+显示的数据流，以LVDS为例：
+```
+应用程序 → 显示服务器 → Linux帧缓冲 → LTDC控制器 → LVDS转换器 → 液晶面板
+    ↑              ↑           ↑           ↑           ↑           ↑
+  软件层         系统层       驱动层      硬件层      接口转换    显示设备
+```
+STM32MP25有LTDC和LVDS两个模块，分别实现RGB信号和LVDS转换。
+
 # 型号分析
 Part Number : EN10.1-1024600W-B004  （可能是二道贩子的型号）
 标签：HC101IKA0050-A86  这个大概是正式型号， 查得：https://cn.sz-htc.com/products_details/53.html#c_static_001_P_18072-16805774017790
