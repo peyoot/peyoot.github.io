@@ -1,5 +1,16 @@
 ## 调试ccmp25 dvk和屏套件
+基本参考是https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/display/panel/panel-lvds.yaml
+除非特定屏，比如：Innolux Corporation 10.1" EE101IA-01D WXGA (1280x800) LVDS panel 有专门驱动：
+https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/display/panel/innolux%2Cee101ia-01d.yaml
 
+另外，panel-simple里定义了一系列常用屏：
+https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
+
+时序定义上有几种：
+https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/display/panel/panel-timing.yaml
+https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/display/panel/display-timings.yaml
+
+以下是官方套件lvds屏输出参考
 ```
 root@ccmp25-dvk:~# dmesg |grep -i ltdc
 [    0.000000] OF: reserved mem: 0x00000000be800000..0x00000000beffffff (8192 KiB) nomap non-reusable ltdc-sec-layer@be800000
@@ -236,7 +247,63 @@ connector[32]: LVDS-1
         self_refresh_aware=0
         max_requested_bpc=0
         colorspace=Default
-root@ccmp25-dvk:/usr/share/qt5everywheredemo-1.0#
+------------------------------------------------------
+1. 检查显示设备状态
+# 检查帧缓冲设备
+root@ccmp25-dvk:~# ls /dev/fb*
+/dev/fb   /dev/fb0
+# 检查DRM设备
+root@ccmp25-dvk:~# ls /dev/dri/
+by-path  card0
+# 检查显示相关的sysfs节点
+root@ccmp25-dvk:~# ls /sys/class/graphics/
+fb0    fbcon
+root@ccmp25-dvk:~# ls /sys/class/drm/
+card0         card0-LVDS-1  version
 
+2. 检查显示驱动加载状态
+# 检查所有显示相关驱动
+root@ccmp25-dvk:~# dmesg | grep -E "(drm|fb|ltdc|lvds|panel|display)"
+[    0.000000] OF: reserved mem: 0x0000000081300000..0x0000000081fbffff (13056 KiB) nomap non-reusable spare1@81300000
+[    0.000000] OF: reserved mem: 0x00000000be800000..0x00000000beffffff (8192 KiB) nomap non-reusable ltdc-sec-layer@be800000
+[    0.000000] OF: reserved mem: 0x00000000bf000000..0x00000000bfffffff (16384 KiB) nomap non-reusable ltdc-sec-rotation@bf000000
+[    0.000000] NUMA: NODE_DATA [mem 0xb9fbcac0-0xb9fbefff]
+[    0.000000] Kernel command line: console=ttySTM0,115200 fbcon=logo-pos:center fbcon=logo-count:1 root=PARTUUID=3fcf7bf1-b6fe-419d-9a14-f87950727bc0 rootwait rw
+[    0.077296] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.077895] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.080122] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.080665] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.086824] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.092271] /soc@0/bus@42080000/display-controller@48010000: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.092381] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /soc@0/bus@42080000/display-controller@48010000
+[    0.105738] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /panel-lvds
+[    0.105879] /panel-lvds: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+[    0.348780] scmi-regulator scmi_dev.5: Regulator vrefbuf registered for domain [9]
+[    0.438990] [drm] Initialized simpledrm 1.0.0 20200625 for ba200000.framebuffer on minor 0
+[    0.464269] simple-framebuffer ba200000.framebuffer: [drm] fb0: simpledrmdrmfb frame buffer device
+[    1.931131] stm32-display-lvds 48060000.lvds: version 0x20 initialized
+[    4.159652] [drm] Initialized stm 1.0.0 20170330 for 48010000.display-controller on minor 0
+[    4.200883] stm32-display 48010000.display-controller: Runtime PM usage count underflow!
+[    4.269047] stm32-display 48010000.display-controller: [drm] fb0: stmdrmfb frame buffer device
+[    5.776716] systemd[1]: Starting Load Kernel Module drm...
+[    6.309467] systemd[1]: modprobe@drm.service: Deactivated successfully.
+[    6.310460] systemd[1]: Finished Load Kernel Module drm.
 
+#仅查看panel面板驱动是否加载
+root@ccmp25-dvk:~# dmesg |grep panel                            
+[    0.105738] /soc@0/bus@42080000/lvds@48060000: Fixed dependency cycle(s) with /panel-lvds
+[    0.105879] /panel-lvds: Fixed dependency cycle(s) with /soc@0/bus@42080000/lvds@48060000
+#查看背光亮度实际值，不论有无程序
+root@ccmp25-dvk:~# cat /sys/class/backlight/panel-lvds-pwm-backlight/actual_brightness  
+8
+# 检查具体的设备状态
+cat /sys/kernel/debug/dri/0/state 2>/dev/null || echo "DRM debug not available"
+有输出即可
+# 检查设备树节点状态
+find /sys/firmware/devicetree/base -name "*ltdc*" -o -name "*lvds*" -o -name "*panel*" | xargs ls -la
+
+3. 检查显示流水线连接
+
+# 检查显示控制器状态
+cat /sys/class/graphics/fb0/name 2>/dev/null || echo "No framebuffer"
 ```
