@@ -14,7 +14,9 @@ bitbake -c devshell linux-dey
 make ccmp2_defconfig  这会应用默认的板级配置ccmp2_defconfig
 make menuconfig    打开图型化内核选项配置菜单
 ```
-保存后，如果我们想得到cfg配置片段，就要进入build目录
+保存后，可以直接bitbake linux-dey，继而编译出更改内核选项的固件。如果不放心，可以在build内的.config里查询相关的配置项，不过任何修改在bitbake -c cleansstate linux-dey之后就会被清空。
+
+如果我们想得到cfg配置片段，就要进入build目录
 ```
 cd tmp/work/ccmp25_dvk-dey-linux/linux-dey/6.6/build
 cp .config.old .config.orig
