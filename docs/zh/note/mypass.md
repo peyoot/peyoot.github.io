@@ -9,6 +9,8 @@
 | 网易 | 163 | p*t | k系列1刀h |  |
 | Namesilo | www.namesilo.com | p*t | .N+小house |  |
 | Godaddy | www.godaddy.com | 8*18373 | .G+小house | *为女谐 |
+| atlassian | home.atlassian.com | p*t@h*.com | a+k系列1刀h |  |
+id.atlassian.com
 
 # 邮箱或企业邮箱 
 | 服务商 | 管理员/帐号 | 密码 | SMTP | 端口 | 加密 |
@@ -61,3 +63,10 @@
 | paypal  | p*t@h*t | 感+K系列无我+服务商 |  | |
 | stripe  | p*t@h*t | 感+K系列无我+农新生 |  | |
 | etrade  | 名_姓 | K系列1刀h |  | |
+
+# selina
+| 平台 | 网址 | 用户 | 密 | 手机 | 邮箱 | 备注 |
+|---------|---------|---------|---------|---------|---------|---------|
+| 学藉号  |31011#2003320250001|小闲学号： 20252101|---------|---------|---------| #为老婆数字|
+| 博雅网 | http://sj.21boya.cn | orielle | K系列1刀h | 19901*13049 | orielle@163.com | 上海市学生社会实践信息记录平台 |
+| 安脉 | http://www.anmai.net/jysygz.htm | orielle | K系列1刀h | 19901*13049 | orielle@163.com | 上海市学生社会实践信息记录平台 |
