@@ -1,6 +1,13 @@
 # 触控屏驱动调校
 Linux下开发驱动程序，实际是是开发对应驱动的设备树片段。它主要是根据对应驱动芯片和设备的文档来进行调校。
 本章以兼容TI ADS7846驱动的ET2046芯片和一款四线电阻屏为例来讲解。
+
+## 硬件GPIO
+触控屏一般会有一个中断GPIO，不同芯片由于这个引脚在内部处理不同而有所区别，比如goodix中它是推挽输出（Push-Pull），驱动可能自动配置bias或在它的方案中有偏置，因此对应这个引脚的GPIO的pinctrl可以不配置。
+而ET2046中，PENIRQ这个中断引脚是开漏输出（Open-Drain）, 必须外接上拉电阻，而在电路中没有上拉，则在MPU中需要设置对应GPIO上拉偏置。
+
+
+# 设备树参数
 首先，我们需要知道触控芯片对应的参数，这需要访问https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/input/touchscreen/ads7846.txt
 
 从工程图上可以看到一些参数，比如：
