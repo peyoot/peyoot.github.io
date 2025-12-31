@@ -3,11 +3,14 @@ Linux下开发驱动程序，实际是是开发对应驱动的设备树片段。
 本章以兼容TI ADS7846驱动的ET2046芯片和一款四线电阻屏为例来讲解。
 
 ## 硬件GPIO
-触控屏一般会有一个中断GPIO，不同芯片由于这个引脚在内部处理不同而有所区别，比如goodix中它是推挽输出（Push-Pull），驱动可能自动配置bias或在它的方案中有偏置，因此对应这个引脚的GPIO的pinctrl可以不配置。
-而ET2046中，PENIRQ这个中断引脚是开漏输出（Open-Drain）, 必须外接上拉电阻，而在电路中没有上拉，则在MPU中需要设置对应GPIO上拉偏置。
+触控屏一般会有一个中断GPIO，不同芯片由于这个引脚在内部处理不同而有所区别，比如goodix中它是推挽输出（Push-Pull），驱动可能自动配置bias或在它的方案中有偏置，因此对应这个引脚的GPIO的pinctrl可以不配置。而ET2046中，PENIRQ这个中断引脚是开漏输出（Open-Drain）, 必须外接上拉电阻，而在电路中没有上拉，则在MPU中需要设置对应GPIO上拉偏置。
+另外，ET2046内部上拉电阻设计目标是：
+未触摸时：PENIRQ = VCC（使能中断检测下降沿）；
+触摸时：PENIRQ = 0（触发中断）。
+应根据这一逻辑来设计设备树。
 
 
-# 设备树参数
+## 设备树参数
 首先，我们需要知道触控芯片对应的参数，这需要访问https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/input/touchscreen/ads7846.txt
 
 从工程图上可以看到一些参数，比如：
@@ -17,10 +20,32 @@ Linux下开发驱动程序，实际是是开发对应驱动的设备树片段。
 ti,x-plate-ohms = <400>;   /* 用面板电阻400Ω，不是回路电阻范围 */
 ```
 ti,x-min/max和ti,y-min/max 这些是实际触摸测试边缘的ADC值，x对应左右边缘，y对应上下边缘。
-# 实测方法
+## 测试方法
+一般上电后，可通过检查spi相关的log，来确定驱动是否生效
 ```
-# 方法1：使用evtest查看原始值
-evtest /dev/input/eventX  # 触摸四个角落，记录min/max值
+root@ccmp25-dvk:~# dmesg |grep spi
+[    0.000000] OF: reserved mem: 0x0000000060000000..0x000000006fffffff (262144 KiB) nomap non-reusable mm-ospi@60000000
+[   10.144457] spi_stm32 400c0000.spi: driver initialized (master mode)
+[   10.941720] ads7846 spi0.0: touchscreen, irq 92
+[   10.951908] input: ADS7846 Touchscreen as /devices/platform/soc@0/42080000.bus/400c0000.spi/spi_master/spi0/spi0.0/input/input1
+root@ccmp25-dvk:~# dmesg |grep touch
+[   10.138865] touchscreen@0 enforce active low on GPIO handle
+[   10.941720] ads7846 spi0.0: touchscreen, irq 92
+```
+如果触控没反应，可以用这两个命令检查
+```
+# 方法1：查看中断是否生效
+cat /proc/interrupts | grep ads7846  # 触碰几下，再用这个命令查，会看到中断数增加
+或是用这个来实时观察： watch -n 0.5 'cat /proc/interrupts | grep ads7846'
+
+# 方法二：确认事件和触碰数据
+cat /proc/bus/input/devices
+查看ads7846驱动对应的handler，如果是event1，则用
+hexdump -v /dev/input/event1
+在屏上触碰，观察是否有数据 
+```
+## 添加校准
+
 
 # 方法2：使用tslib校准
 ts_calibrate  # 生成校准文件pointercal
