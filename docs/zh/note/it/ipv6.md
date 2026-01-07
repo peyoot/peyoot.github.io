@@ -7,4 +7,21 @@ DHCPv6-PD：DHCPv6 Prefix Delegation 也就是IPv6前缀下发（或称IPv6前�
 SLAAC：Stateless Address Auto-Configuration 无状态地址自动配置，其实这也就是IPV6的静态IP，因为ipv6不需要手动设置，每台机器都有64位的mac地址，无需手动分配个数字。
 
 ## ipv6一般情况
-由于/64是一般家用或普通企业路由器能拿到的PD，对于下级路由器
+对于电信宽带路由器，新建一个IPoE连接，启用ipv4/ipv6双栈，这样如AC-8的WAN口，它可以配置IPv4为静态公网IP，而ipv6的“前缀获取方式”可配置为None. 这是因为它已经在公网中，不需要DHCPv6从上级路由分配前缀。不确定这一项是否可以改为其它的。由于/64是一般家用或普通企业路由器能拿到的PD。对于“ipv6地址获取方式”，用Static，把WAN分配的ipv6地址和默认网关填好。（即电信工单上的互联地址），比如WAN用::3/64，缺省网关用::2。
+
+而LAN口侧，以A8-C为例，它是需要在vlan1000中设置，按工单上的用户地址设置即可：
+ipv6地址配置成240e:688:400:XXXX::1/64 ，静态前缀240e:688:400:XXXX::/64 ， 其它信息分配方式选择的是DHCPV6, 地址/前缀分配方式选择的是无状态SLAAC。
+这种方式，AC-8 会把整个/64 通过SLAAC下发给所有直连设备，比如下级路由器如ix20的WAN 口（eth1）通过 SLAAC 拿到了公网的240e:688:400:XXXX:227:4ff:fe43:yyyy/128。
+
+由于A8-C是接下级路由器的WAN，而下级路由器的LAN口才和办公室的内网连在一起，如果希望内多的服务器也能用这个公网IPV6网段，最好的办法是创建仅ipv6的桥接。这样就不影响ipv4本身设置好的路由功能，又能让内网的服务器通过dhcpv6获取公网IPv6地址。
+
+## DAL路由器之ipv6桥接
+先在ETH1和ETH2里把ipv6的功能关闭，保留原有的ipv4的功能以便不受影响。然后创建一个Bridge，命名为V6ETH，Device里一样选择ETH1和ETH2，并启用。最关键的是新建一个接口ETHV6br，Device选择"V6ETH",关闭IPV4，并开启IPV6，类型为DHCPv6 address，Zone选择"internal"。
+
+这样，这个新接口ETHV6br就桥接ETH1和ETH2的IPV6功能，由于ETH2和内网连接，内网的服务器也能通过dhcpv6和DAL路由器一样从A8-C获取到指定前缀的公网ipv6地址。
+
+## ipv6探针 
+测一下外网连通性：
+ping -6 240c::6666                 # 国内常用 IPv6 探针
+ping -6 2001:4860:4860::8888       # Google DNS
+curl -6 https://ip.sb              # 看出口地址是否为 240e:688:400:1074:90::90
