@@ -25,3 +25,15 @@ bitbake -c diffconfig linux-dey
 
 ```
 上面命令会在linux-dey/6.6下生成一个：fragment.cfg，包含了内核选项的变更，以便整合到linux的bbappend配方当中。
+
+但有时我们只是临时测试，也可以在devshell里临时打开某个开关，比如：
+```
+bitbake -c devshell linux-dey     # 进 shell
+make ccmp2_defconfig
+# 在linux的build目录执行：
+echo 'CONFIG_TOUCHSCREEN_ADS7846_DEBUG=y' >> .config
+make Image.gz -j4
+# 编译时间较长，会生成Image.gzin
+
+```
+我们需要重命名为相应平台对应的名称，比如Image.gz-ccmp25-dvk.bin，再把旧内核重命名备份，用新的替代。
