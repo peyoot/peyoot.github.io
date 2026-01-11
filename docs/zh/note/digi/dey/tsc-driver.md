@@ -20,6 +20,9 @@ Linux下开发驱动程序，实际是是开发对应驱动的设备树片段。
 ti,x-plate-ohms = <400>;   /* 用面板电阻400Ω，不是回路电阻范围 */
 ```
 ti,x-min/max和ti,y-min/max 这些是实际触摸测试边缘的ADC值，x对应左右边缘，y对应上下边缘。
+
+TI的TSC2046，用内部基准电压源有很多办法，至少打开keep-vref-on和vref-mv设置为2500是可以的。 但SPI通信碰上cs-gpios片选极性反转问题，需要相反配置在反转回来。
+
 ## 测试方法
 一般上电后，可通过检查spi相关的log，来确定驱动是否生效
 ```
@@ -43,6 +46,50 @@ cat /proc/bus/input/devices
 查看ads7846驱动对应的handler，如果是event1，则用
 hexdump -v /dev/input/event1
 在屏上触碰，观察是否有数据 
+
+# 方法三
+
+按下触摸屏时，主机发出的 24 位帧（8 位命令 + 16 位数据）应类似：
+MOSI: 0x90 0x00 0x00   // 读 X
+MISO: 0xXX 0xXX 0xXX   // 高 12 位有效
+若 MISO 全 0x00 或 0xFF → 基准/供电/连线问题；
+若 12 位值在 300–3500 区间 → ADC 正常，跳第 3 步。
+3. 检查驱动 “无效采样” 过滤
+ads7846 驱动在 ads7846_read12_ser() 里会连续丢包的条件：
+X=0 或 Y=0
+pressure=0（Z1=0 或 Z2=0）
+X/Y > max（被你设为 3550/4050）
+只要任一条件为真，就会 continue 掉，evtest 看不到事件。
+
+快速验证
+echo 8 > /proc/sys/kernel/printk   # 打开 debug
+echo 1 > /sys/module/ads7846/parameters/debug    # 如果编译了 CONFIG_TOUCHSCREEN_ADS7846_DEBUG
+
+
+再按屏，dmesg 会打出：
+ads7846: X=0 Y=0 Z1=0 Z2=0  <--- 被丢
+或者
+ads7846: X=3899 (>x_max) dropped
+出现 全 0 → 回第 1/2 步，基准或采样时序 不对；
+出现 >max → 把 ti,x-max/y-max 再放大 20 %；
+Z1=0 → 把 ti,pressure-min 改成 0 先关掉压力过滤：
+
+
+
+****
+进一步确认：用 ls /sys/class/spi_master/spi0/statistics，触摸时看 bytes/messages/transfers 计数是否增（表示 SPI 事务发生）。如果不增，可能是 CS 或时钟问题。
+
+# 清屏前
+cd /sys/class/spi_master/spi0/statistics
+cat messages timedout errors
+# 输出：messages: 12  timedout: 0  errors: 0
+
+# 手指按住屏 5 秒
+sleep 5; cat messages timedout errors
+# 输出：messages: 112  timedout: 0  errors: 0   <-- messages 涨 100，正常
+# 输出：messages: 12   timedout: 0  errors: 0   <-- 不涨 → PENIRQ 中断根本没来
+# 输出：messages: 112  timedout: 15 errors: 0   <-- timedout 涨 → SPI 硬件超时
+
 ```
 ## 添加校准
 

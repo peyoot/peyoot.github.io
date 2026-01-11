@@ -25,10 +25,11 @@ https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation
 MOSI处理器需要drive-push-pull，并定义slew-rate，而输入则不需要。因为​配置为推挽输出，使引脚在主动驱动时（无论是高电平还是低电平）都具有低阻抗和强驱动能力，确保信号边沿陡峭，适用于SCK、MOSI等主机输出信号。
 
 几个问题：
-1、MISO被smartIOMX也配置成推挽输出，包括片选信号也放在MISO一组，
+1、Pinctrl配置
+MISO被smartIOMX也配置成推挽输出，包括片选信号也放在MISO一组，这应该是错误的。需报告修正。
 
-，片选信号可以是drive-push-pull，也可以不定义。原始cs-gpio是不定义的，因为原理图中有10K上拉，但原理图中把SCLK给下拉了，这适合从设备工作在CPOL=0的模式。
+另外，片选信号可以是drive-push-pull，也可以不定义。原始cs-gpio是不定义的，因为原理图中有10K上拉，但原理图中把SCLK给下拉了，这适合从设备工作在CPOL=0的模式。
 
-
-极性反转问题有两种处理办法：
-1、不用cs-gpios，使用平台自带的CSS
+2、极性反转问题处理办法：
+不可使用平台自带的NSS片选，这更容易出问题，原因是ST平台这个不稳定，参考：https://efton.sk/STM32/gotcha/g21.html 。
+解决办法是把极性反转过来，只要原来是低电平使能的片选，在slave节点内配置一下“spi-cs-high; ”,这样就可以了
