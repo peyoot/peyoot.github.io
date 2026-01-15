@@ -11,6 +11,77 @@ Viena中改用CH334H这个USB Hub芯片，固定偏置PWR和Reset，在linux下�
 注：使用viena的uboot刷到dvk上，会造成dvk的uboot也不能用，可能和5v_board有实施负载开关有关，因为viena硬件上拉，这个负载开关控制的GPIO已经在之前移除，但可以加回去，不过需要反转控制电平（和SPI片选被gpio子系统反转一样的原因，这个坑已经处理过，可以完美避开）。
 但需调查一下官方开发板的负载开关片选为何不受影响。
 
+# UBoot下的USB调试
+参考下面官方开发板的调试命令
+```
+=> usb start
+starting USB...
+Bus usb@482f0000: USB EHCI 1.00
+scanning bus usb@482f0000 for devices... 3 USB Device(s) found
+       scanning usb for storage devices... 1 Storage Device(s) found
+=> usb info
+1: Hub,  USB Revision 2.0
+ - u-boot EHCI Host Controller
+ - Class: Hub
+ - PacketSize: 64  Configurations: 1
+ - Vendor: 0x0000  Product 0x0000 Version 1.0
+   Configuration: 1
+   - Interfaces: 1 Self Powered 0mA
+     Interface: 0
+     - Alternate Setting 0, Endpoints: 1
+     - Class Hub
+     - Endpoint 1 In Interrupt MaxPacket 8 Interval 255ms
+
+2: Hub,  USB Revision 2.0
+ - Class: Hub
+ - PacketSize: 64  Configurations: 1
+ - Vendor: 0x0424  Product 0x2514 Version 11.179
+   Configuration: 1
+   - Interfaces: 1 Self Powered Remote Wakeup 2mA
+     Interface: 0
+     - Alternate Setting 0, Endpoints: 1
+     - Class Hub
+     - Endpoint 1 In Interrupt MaxPacket 1 Interval 12ms
+     - Endpoint 1 In Interrupt MaxPacket 1 Interval 12ms
+
+3: Mass Storage,  USB Revision 2.0
+ - Generic Mass Storage 5083A0CA
+ - Class: (from Interface) Mass Storage
+ - PacketSize: 64  Configurations: 1
+ - Vendor: 0x058f  Product 0x6387 Version 1.3
+   Configuration: 1
+   - Interfaces: 1 Bus Powered 100mA
+     Interface: 0
+     - Alternate Setting 0, Endpoints: 2
+     - Class Mass Storage, Transp. SCSI, Bulk only
+     - Endpoint 1 Out Bulk MaxPacket 512
+     - Endpoint 2 In Bulk MaxPacket 512
+
+=> usb tree
+USB device tree:
+  1  Hub (480 Mb/s, 0mA)
+  |  u-boot EHCI Host Controller
+  |
+  +-2  Hub (480 Mb/s, 2mA)
+    |
+    +-3  Mass Storage (480 Mb/s, 100mA)
+         Generic Mass Storage 5083A0CA
+
+=> usb storage
+  Device 0: Vendor: Generic  Rev: 8.07 Prod: Flash Disk
+            Type: Removable Hard Disk
+            Capacity: 4012.0 MB = 3.9 GB (8216576 x 512)
+=> fatls usb 0:1
+            System Volume Information/
+            core-image-base-ccmp25-dvk-20251119164915.installer/
+            dfu-util/
+            core-image-base-ccmp25-viena-20260113014420.installer/
+ 667422720   core-image-base-ccmp25-dvk.ext4
+ 12887552   core-image-base-ccmp25-dvk.boot.vfat
+
+2 file(s), 4 dir(s)
+
+```
 
 
 # USB设备树片段
