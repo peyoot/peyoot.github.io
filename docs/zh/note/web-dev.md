@@ -38,10 +38,8 @@ docker network create pvpn --subnet 172.100.100.0/24
 mkdir -p ~/docker/portainer
 nano ~/docker/portainer/docker-compose.yml
 ```
-原先测试用2.19.4，现在最新版已经是2.33.1了，docker-compose.yml文件内容如下：
+原先测试用2.19.4，现在最新版已经是2.33.1了，docker-compose.yml文件内容如下，其中一些过时的用法已经修正，比如移除version, 修正name，external定义等：
 ```
-version: '3'
-
 services:
   portainer:
     image: portainer/portainer-ce:2.33.1
@@ -59,8 +57,8 @@ volumes:
   data:
 networks:
   default:
-    external:
-      name: pvpn
+    name: pvpn
+    external: true
 
 ```
 把它放在~/docker/portainer下，然后用docker compose up -d来运行它，之后就可以打开http://ip:9000，使用portainer的stack来运行dnmp
