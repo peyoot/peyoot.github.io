@@ -38,6 +38,28 @@ network:
           - 2606:4700:4700::1111
 
 ```
+上面仅改cloudflare的ipv6 dns是没什么用，可以
+```
+sudo nano /etc/systemd/resolved.conf
+[Resolve]
+DNS=2606:4700:4700::1111 2606:4700:4700::1001
+DNSOverTLS=yes
+# 或使用 DoH
+# DNSOverTLS=opportunistic
+# 或完全强制加密
+# DNSOverTLS=yes
+```
+上面两步对当前GFW已经够用，但DoT使用专用端口 853 进行加密传输，网络监控可以识别到端口 853 的DNS流量（虽然内容加密），如果将来访问受限，还需开启DOH，
+
+```
+[Resolve]
+DNS=2606:4700:4700::1111
+FallbackDNS=2606:4700:4700::1001
+DNSOverHTTPS=yes
+# 或者指定具体的 DoH 端点
+# DNSOverHTTPS=cloudflare https://cloudflare-dns.com/dns-query
+```
+或者还可以进一步配置直接使用 cloudflared 作为本地DoH代理
 
 ## DAL路由器之ipv6桥接
 先在ETH1和ETH2里把ipv6的功能关闭，保留原有的ipv4的功能以便不受影响。然后创建一个Bridge，命名为V6ETH，Device里一样选择ETH1和ETH2，并启用。最关键的是新建一个接口ETHV6br，Device选择"V6ETH",关闭IPV4，并开启IPV6，类型为DHCPv6 address，Zone选择"internal"。
