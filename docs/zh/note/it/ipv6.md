@@ -15,6 +15,30 @@ ipv6地址配置成240e:688:400:XXXX::1/64 ，静态前缀240e:688:400:XXXX::/64
 
 由于A8-C是接下级路由器的WAN，而下级路由器的LAN口才和办公室的内网连在一起，如果希望内多的服务器也能用这个公网IPV6网段，最好的办法是创建仅ipv6的桥接。这样就不影响ipv4本身设置好的路由功能，又能让内网的服务器通过dhcpv6获取公网IPv6地址。
 
+## 服务器netplan的设置
+注意，不要另search字段，否则访问DNS服务器都有问题，探针也ping不通
+```
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens18:
+      dhcp4: false
+      dhcp6: true
+      addresses:
+        - 10.70.1.90/24
+      routes:
+        - to: default
+          via: 10.70.1.1
+          metric: 100
+          on-link: true
+      nameservers:
+        addresses:
+          - 1.1.1.1
+          - 2606:4700:4700::1111
+
+```
+
 ## DAL路由器之ipv6桥接
 先在ETH1和ETH2里把ipv6的功能关闭，保留原有的ipv4的功能以便不受影响。然后创建一个Bridge，命名为V6ETH，Device里一样选择ETH1和ETH2，并启用。最关键的是新建一个接口ETHV6br，Device选择"V6ETH",关闭IPV4，并开启IPV6，类型为DHCPv6 address，Zone选择"internal"。
 

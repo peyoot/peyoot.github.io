@@ -42,7 +42,7 @@ nano ~/docker/portainer/docker-compose.yml
 ```
 services:
   portainer:
-    image: portainer/portainer-ce:2.33.1
+    image: portainer/portainer-ce:2.33.6
     container_name: portainer
     restart: unless-stopped
     security_opt:
