@@ -100,4 +100,57 @@ IMAGE_INSTALL:append = " \
 ```
 
 ## 镜像优化
-未完待续
+
+```
+DISTRO_FEATURES:append = " rt opengl pam "
+DISTRO_FEATURES:remove = " wayland x11 "
+
+# 设置默认的Qt平台（针对STM32MP25优化）
+QT_QPA_DEFAULT_PLATFORM = "eglfs"
+QT_QPA_EGLFS_INTEGRATION = "eglfs_kms"
+
+GLIBC_GENERATE_LOCALES = "zh_CN.UTF-8 en_GB.UTF-8 en_US.UTF-8"
+IMAGE_LINGUAS = "zh-cn"
+# LOCALE_UTF8_ONLY="1"
+
+IMAGE_INSTALL:append = " \
+    qtbase \
+    qtbase-plugins \
+    qtdeclarative \
+    qtquickcontrols2 \
+    qtquickcontrols2-qmlplugins \
+    qtgraphicaleffects \
+    qtgraphicaleffects-qmlplugins \
+    qtsvg \
+    qtserialport \
+    qtwebsockets \
+    libdrm \
+    libegl \
+    libgles2 \
+    tslib tslib-calibrate touch-calibration \
+    homeaddons \
+    iproute2 i2c-tools \
+    mesa \
+    ttf-dejavu-sans \
+"
+
+RDEPENDS:packagegroup-dey-core:remove = "connectcore-demo-example"
+CELLULAR_PKGS= ""
+CCCS_PKGS = ""
+CC_DEMO_PACKAGE = ""
+
+
+# 移除不再需要的配置，特别是明确禁用linuxfb和egl
+PACKAGECONFIG:remove:pn-qtbase = "glib x11 xcb linuxfb"
+
+# 添加DRM/KMS和硬件加速所必须的配置
+PACKAGECONFIG:append:pn-qtbase = " kms gbm eglfs egl gles2 fontconfig jpeg png gif"
+
+IMAGE_INSTALL:remove = " wayland wayland-protocols libxkbcommon libinput libevdev \
+                         mtdev vsftpd lighttpd avahi-daemon hostapd \
+                         tools-debug \
+                         swupdate swupdate-www ssh-server-openssh \
+                       "
+
+
+```

@@ -73,3 +73,21 @@ ping -6 240c::6666                 # 国内常用 IPv6 探针
 ping -6 2001:4860:4860::8888       # Google DNS
 curl -6 https://ip.sb              # 看出口地址是否为本机的ipv6地址
 ```
+
+## 禁用ipv6
+
+```
+sudo nano /etc/sysctl.conf
+
+# 禁用所有网络接口的 IPv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+# 如果需要也禁用本地回环的 IPv6
+net.ipv6.conf.lo.disable_ipv6 = 1
+
+sudo sysctl -p
+
+重启网络
+sudo systemctl restart systemd-networkd
+
+```
