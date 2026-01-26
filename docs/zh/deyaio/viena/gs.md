@@ -142,6 +142,7 @@ CC_DEMO_PACKAGE = ""
 
 # 移除不再需要的配置，特别是明确禁用linuxfb和egl
 PACKAGECONFIG:remove:pn-qtbase = "glib x11 xcb linuxfb"
+PACKAGECONFIG:remove:pn-gstreamer1.0-plugins-bad = "vulkan"
 
 # 添加DRM/KMS和硬件加速所必须的配置
 PACKAGECONFIG:append:pn-qtbase = " kms gbm eglfs egl gles2 fontconfig jpeg png gif"
