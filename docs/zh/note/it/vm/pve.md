@@ -125,6 +125,18 @@ Discard选项要勾选，这个选项允许虚拟机向PVE宿主发送 TRIM/Disc
 另外如果是性能至上，还可以把Cache改为write back，不过只在ZFS池本身需配置了冗余（如RAIDZ1/2，Mirror），这样才能修复断电数据没及时写入的错误。如果是单机raid0就不要动它，用默认即可。
 
 
+### 新安装ubuntu server精简版后的操作
+安装一些常用包
+```
+sudo apt install iputils-ping traceroute tmux nano rsync
+
+docker安装参考其它地方，也包括这些
+sudo apt install docker.io docker-compose-v2
+sudo apt install docker-buildx
+
+```
+
+
 ### PVE主机启动常见错误解决办法：
  * 错误类型1：
 ```
