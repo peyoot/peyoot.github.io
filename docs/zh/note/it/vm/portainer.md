@@ -20,14 +20,19 @@ newgrp docker
 ```
 如果我们从未运行任何容器，/var/lib/docker/volume这一目录是空的，如果已经有运行过程序，也可以清空。
 使用server-maintainer，一般在远程机上，docker卷的路径在~/remote-bk/ecceeweb1/server-maintainer/backups/docker_volumes下的volumes目录，只需将这个docker的volume目录同步到/var/lib/docker/volume，相关的服务即可恢复
-不同docker版本是否会有影响，一般还是要看release note，小的变更如27.5到28.2应该是兼容的。但如果docker compose有大变化，则由它编排的portainer容器也容易出问题，更重要的是portainer的版本最好是相同的。
+不同docker版本是否会有影响，一般还是要看release note，小的变更如27.5到28.2应该是兼容的。但如果docker compose有大变化，则由它编排的portainer容器也容易出问题，更重要的是portainer的版本最好是相同的。如果这个卷没压缩备份档，请先压缩一下，然后就可以删除docker compose创建的portainer相关的东西。
 ```
 cd
-cd remote-bk/ecceeweb1/server-maintainer/backups/docker_volumes
+cd remote-bk/ecceeweb1/server-maintainer/backups/docker_volumes/volumes/
+rm -rf backingFsBlockDev metadata.db portainer_data/
 sudo -H tmux
 cp -r volumes /var/lib/docker/
 reboot
 ```
-不过，如果是docker-compose和docker compose版本的区别，还是会引发错误，这时就要把portainer的服务单独用新的docker-compose编排，然后用下面portainer的备份档恢复。
-## 通过portainer的备份和压缩档来恢复
-原理上大致相同，考虑到已经有volumes整个目录备份，无需每天压一个，server-maintainer应该相应改一个版本，用于设置压缩包的时间间隔，比如每周一个。
+进入
+```
+~/docker/portainer
+dockmer compose up -d
+```
+打开http://10.70.1.90:9000 ,从备份的portainer-backup_日期.tar.gz.encrypted恢复，然后输入portainer密码。
+可能要先把编排的服务停止一下，再开始，就可以用了。
