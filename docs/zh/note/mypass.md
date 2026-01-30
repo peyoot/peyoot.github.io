@@ -1,6 +1,17 @@
 # ipv6安强"加固
-2026-01-16  出于对ipv6使能后内网安强的考虑，原在内网中ssh用简单密码的，升级后在原来基础上增加"oldhome+newhome"。
+2026-01-16  出于对ipv6使能后内网安强的考虑，原在内网中ssh用简单密码的，升级后在原来基础上增加"oldhome+newhome",oldhome指福建老家
 
+# 内网简易密码
+请参考运维相关笔记的内容
+| 应用 | 网址/数据库 | 用户/帐号 | 密 | 备注/手机 |
+|---------|---------|---------|---------|---------|
+| pve主机 | ip:8006 | root | .k系列+1刀h | 仅ipv4 |
+| pve虚拟机 |  |  | .k系列+oldhome+newhome | 无ipv4仅前面就可，美国服务器不用. |
+| mysql |  | root | M+密+用户 | |
+| portainer登 |  | p用户名 | .p系列1刀h+dual叹 | |
+| keycloak登 |  | admin | .p系列1刀h+dual叹 | |
+| keycloak DB | keycloak | keycloak | K+密+用户 | postgres:15 |
+| gitea DB | gitea | gitea | G+密+用户 | postgres:15  |
 
 # 网络平台
 

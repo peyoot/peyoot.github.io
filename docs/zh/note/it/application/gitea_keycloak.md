@@ -17,15 +17,18 @@ Portainer → Stacks → Add stack
 | **Environment variables** | **点 "Advanced mode"** → 逐行添加（见下表） |
 ```
 KC_ADMIN=admin
-KC_ADMIN_PWD=你的强密码
-KC_DB_PWD=kcdb123456
-GITEA_DB_PWD=gitea123456
-KC_HOST=sso.yourdomain.com
-GITEA_HOST=git.yourdomain.com
+KC_ADMIN_PWD=.p系列1刀h+dual叹
+KC_DB_PWD=K+密+用户
+GITEA_DB_PWD=G+密+用户
+KC_HOST=sso.kc.ip90
+GITEA_HOST=git.kc.ip90
+PGADMIN_EMAIL=p*t@h*t.com
+PGADMIN_PWD=P+密+用户
 ```
 3. compose文件
 ```
 services:
+  # ========== 1. 反向代理 ==========
   npm:
     image: jc21/nginx-proxy-manager:latest
     container_name: npm
@@ -40,6 +43,7 @@ services:
     networks:
       - npm
 
+  # ========== 2. SSO 中心 ==========
   keycloak-db:
     image: postgres:15-alpine
     container_name: keycloak-db
@@ -75,6 +79,7 @@ services:
     depends_on:
       - keycloak-db
 
+  # ========== 3. Git 托管 ==========
   gitea-db:
     image: postgres:15-alpine
     container_name: gitea-db
@@ -110,6 +115,32 @@ services:
     depends_on:
       - gitea-db
 
+  # ========== 4. 数据库管理工具 ==========
+  
+  # 方案 A: pgAdmin (推荐，功能全)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
+      PGADMIN_CONFIG_SERVER_MODE: "False"  # 单用户模式，简化登录
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - npm
+
+  # 方案 B: Adminer (极简备用，可选启用)
+  # adminer:
+  #   image: adminer:latest
+  #   container_name: adminer
+  #   restart: unless-stopped
+  #   environment:
+  #     ADMINER_DEFAULT_SERVER: gitea-db  # 默认连接 Gitea 数据库
+  #   networks:
+  #     - npm
+
 networks:
   npm:
     external: true
@@ -122,6 +153,7 @@ volumes:
   kc_providers:
   gitea_db:
   gitea_data:
+  pgadmin_data:
 ```
 
 4. 部署后操作
