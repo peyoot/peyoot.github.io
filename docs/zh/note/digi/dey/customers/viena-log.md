@@ -35,17 +35,15 @@ LVDS液晶屏尺寸: 222.72 x 125.28
 为了保证线性，建议在触屏有效尺寸之外不放触控键。
 
 
-考虑添加：
-```
-    /* 关键校准属性 */
-    touchscreen-size-x = <1024>; // 映射到显示屏的水平像素数
-    touchscreen-size-y = <600>;  // 映射到显示屏的垂直像素数
+欧洲研发报告（拟）：
+1、Linux主线驱动调整：
+针对ADS7846驱动，从内核6.6 (代码：1411行)到6.18(代码：1438行)
+ads7846.c 驱动有少许渐进式改进，主要聚焦于兼容性、错误处理和资源管理，而不是重大重构。
+Raspberry Pi bookworm社区报告v6.6 有 IRQ/pendown 问题，这可能在 v6.18 通过 genirq 和 spi-fix merge解决，但内核的 input 子系统有更新，也许不可以直接用最新主线内核驱动，而应聚集于Raspberry的补丁。
+1. 6.6~6.18间，哪个版本有子系统更新，在没有更新之前，最新内核应可用。
+2. Raspberry社区中的相关资源：
+https://github.com/raspberrypi/linux/tree/rpi-6.6.y
 
-    /* 可选但建议：声明触摸屏的物理尺寸，有助于系统进行更精确的校准 */
-    touchscreen-physical-width = <22532>; // 单位通常是0.01mm，即225.32mm
-    touchscreen-physical-height = <12788>; // 127.88mm
-```
-
-
+Raspberry Pi 上 TSC2046 (或兼容的 XPT2046) 触控芯片的最新设备树参考主要通过 Device Tree Overlay (DTO) 来配置，而不是完整的 DTS 文件。这在官方 Raspberry Pi 论坛的 2025 年帖子中被确认，使用内置的 piscreen overlay，支持 3.5" TFT LCD (480x320) 和 XPT2046 触控控制器，无需额外驱动安装。 这适用于 Raspberry Pi OS Bookworm (基于较新内核，如 v6.x 系列)，并在 Raspberry Pi 3B 上验证过。
 
 
