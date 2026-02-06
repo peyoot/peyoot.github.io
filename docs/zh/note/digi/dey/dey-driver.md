@@ -73,13 +73,20 @@ make menuconfig
 # 或者直接修改 .config 文件
 echo 'CONFIG_USB_SERIAL_CH343=m' >> .config
 
-# 编译特定目录驱动模块
-make drivers/usb/serial/
+# 准备内核驱动编译环境
+make modules_prepare
+先构建一次完整的内核模块
+make -j$(nproc) modules
 
-# 或者编译所有USB串口驱动
-make M=drivers/usb/serial/
+# 修改和编译特定目录驱动模块
+make drivers/usb/serial/ modules
+
 ```
-编译完成后，.ko 文件会生成在相应的位置。
+编译完成后，.ko 文件会生成在build目录相应的位置。
+加载测试：
+```
+insmod /usr/lib/modules/$(uname -r)/kernel/drivers/input/touchscreen/ads7846.ko
+```
 
 4、生成内核补丁
 由于是在git仓库中操作，生成补丁非常方便，但是由于执行手动的make，环境已经被污染，先要恢复一下，

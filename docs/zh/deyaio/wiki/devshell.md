@@ -37,3 +37,22 @@ make Image.gz -j4
 
 ```
 我们需要重命名为相应平台对应的名称，比如Image.gz-ccmp25-dvk.bin，再把旧内核重命名备份，用新的替代。
+
+
+# 修改编译驱动程序 
+
+## 准备内核驱动编译环境
+```
+make modules_prepare
+先构建一次完整的内核模块
+make -j$(nproc) modules
+```
+## 修改和编译特定目录驱动模块
+make drivers/usb/serial/ modules
+
+```
+编译完成后，.ko 文件会生成在build目录相应的位置。
+加载测试：
+```
+insmod /usr/lib/modules/$(uname -r)/kernel/drivers/input/touchscreen/ads7846.ko
+```
