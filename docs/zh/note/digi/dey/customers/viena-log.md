@@ -58,3 +58,77 @@ https://github.com/raspberrypi/linux/tree/rpi-6.6.y
 Raspberry Pi 上 TSC2046 (或兼容的 XPT2046) 触控芯片的最新设备树参考主要通过 Device Tree Overlay (DTO) 来配置，而不是完整的 DTS 文件。这在官方 Raspberry Pi 论坛的 2025 年帖子中被确认，使用内置的 piscreen overlay，支持 3.5" TFT LCD (480x320) 和 XPT2046 触控控制器，无需额外驱动安装。 这适用于 Raspberry Pi OS Bookworm (基于较新内核，如 v6.x 系列)，并在 Raspberry Pi 3B 上验证过。
 
 
+### IIO 方式的驱动
+可能需要  CONFIG_TOUCHSCREEN_ADC
+
+ Symbol: TOUCHSCREEN_ADC [=n]                                                                                                      <
+  < Type  : tristate                                                                                                                  <
+  < Defined at drivers/input/touchscreen/Kconfig:92                                                                                   <
+  <   Prompt: Generic ADC based resistive touchscreen                                                                                 <
+  <   Depends on: INPUT [=y] && INPUT_TOUCHSCREEN [=y] && IIO [=y]                                                                    <
+  <   Location:                                                                                                                       <
+  <     -> Device Drivers                                                                                                             <
+  <       -> Input device support                                                                                                     <
+  <         -> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])                                                     <
+  <           -> Touchscreens (INPUT_TOUCHSCREEN [=y])                                                                                <
+  <             -> Generic ADC based resistive touchscreen (TOUCHSCREEN_ADC [=n])                                                     <
+  < Selects: IIO_BUFFER [=y] && IIO_BUFFER_CB [=m] 
+
+## EETI相关  
+CONFIG_TOUCHSCREEN_EETI say Y here to enable support for I2C connected EETI touch panels. 
+
+CONFIG_TOUCHSCREEN_EGALAX:    Say Y here to enable support for I2C connected EETI eGalax multi-touch panels. 
+
+CONFIG_TOUCHSCREEN_EGALAX_SERIAL:  Say Y here to enable support for serial connected EETI  eGalax touch panels.   
+
+<   Location:                                                                                                                       <
+  <     -> Device Drivers                                                                                                             <
+  <       -> Input device support                                                                                                     <
+  <         -> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])                                                     <
+  <           -> Touchscreens (INPUT_TOUCHSCREEN [=y])                                                                                <
+  <             -> EETI eGalax serial touchscreen (TOUCHSCREEN_EGALAX_SERIAL [=n])    
+
+
+### USB电阻屏触控探索
+
+USB电阻屏驱动商家包括和瑞亚芯片控制板和其它类似的控制板卡，这类控制器采用的是EETI（eGalax）的TouchKit控制器方案，在电脑端被识别为标准USB HID触摸屏设备，Linux内核原生支持，无需额外开发驱动，即插即用。驱动可能还需要相关的X视窗支持，而非最新的wayland技术栈。
+淘宝上可购得USB电阻屏支持
+6.6 内核选项中有：CONFIG_TOUCHSCREEN_USB_COMPOSITE: 
+https://cateee.net/lkddb/web-lkddb/TOUCHSCREEN_USB_COMPOSITE.html
+https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/drivers/input/touchscreen/usbtouchscreen.c
+
+依赖关系：
+USB Touchscreen Driver                                                                                                  Depends on: INPUT [=y] && INPUT_TOUCHSCREEN [=y] && USB_ARCH_HAS_HCD [=y]
+   Location:                                                                                                            
+  -> Device Drivers -> Input device support  -> Generic input layer (needed for keyboard, mouse, ...) 
+   -> Touchscreens (INPUT_TOUCHSCREEN [=y])-> USB Touchscreen Driver (TOUCHSCREEN_USB_COMPOSITE [=n])   
+
+注意：EETI有两种驱动支持，它们相互冲突：
+
+  * 有X11，要高级校准 -> 用EETI的egalax方案，不碰内核EETI选项，即EETI和瑞亚官方提供驱动和安装脚本。内核中要打开
+[Device Drivers] / [Input device support] / [Event interface]
+[Device Drivers] / [Input device support] / [Miscellaneous devices] / [User level driver support]
+[Device Drivers] / [HID Bus Support] / [USB HID support]/ [/dev/hidraw raw HID device support] ( for USB Interface )
+[Device Drivers] / [HID Bus Support] / [Special HID drivers] / [HID Multitouch panels ]
+并移除：
+[Device Drivers] / [Input device support] 
+[Touchscreens] / [USB Touchscreen Driver]
+
+  * 无X11，要通用兼容 -> 用内核TOUCHSCREEN_USB_COMPOSITE方案，并确保设备是HID兼容
+Device Drivers / Input device support / Generic input layer/ INPUT Touchscreens/ USB Touchscreen Driver (TOUCHSCREEN_USB_COMPOSITE [=n]) 
+
+
+#### USB触控内核选项
+
+ CONFIG_INPUT_UINPUT
+<   Location:                                                                                                                       <
+  <     -> Device Drivers                                                                                                             <
+  <       -> Input device support                                                                                                     <
+  <         -> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])                                                     <
+  <           -> Miscellaneous devices (INPUT_MISC [=y])                                                                              <
+  <             -> User level driver support (INPUT_UINPUT [=n])                                                                      <
+  <                                                                   
+
+
+### 临时开启的调试功能
+1. CONFIG_INPUT_EVBUG
