@@ -114,9 +114,17 @@ USB Touchscreen Driver                                                          
 [Device Drivers] / [Input device support] 
 [Touchscreens] / [USB Touchscreen Driver]
 
-  * 无X11，要通用兼容 -> 用内核TOUCHSCREEN_USB_COMPOSITE方案，并确保设备是HID兼容
-Device Drivers / Input device support / Generic input layer/ INPUT Touchscreens/ USB Touchscreen Driver (TOUCHSCREEN_USB_COMPOSITE [=n]) 
+  * 无X11，要通用兼容 -> 用内核CONFIG_TOUCHSCREEN_USB_COMPOSITE方案，并确保设备是HID兼容
+Device Drivers / Input device support / Generic input layer/ INPUT Touchscreens/ USB Touchscreen Driver (CONFIG_TOUCHSCREEN_USB_COMPOSITE [=n]) 
 
+# ads7846 v6.12驱动测试，
+头文件不可用6.12中的新增项<linux/unaligned.h>，只能用<asm/unaligned.h>
+顺便加上
+测试时加上：
+/* CONFIG_TOUCHSCREEN_ADC=m */
+CONFIG_TOUCHSCREEN_ADS7846=m
+CONFIG_TOUCHSCREEN_USB_COMPOSITE=m
+CONFIG_INPUT_EVBUG=m
 
 #### USB触控内核选项
 
