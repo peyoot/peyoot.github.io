@@ -27,7 +27,7 @@ git config --global user.email you@email.com
 cd
 mkdir deyaio-rtnodemo
 cd deyaio-rtnodemo
-repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m rtnodemo.xml 
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m rt-nodemo.xml 
 repo sync
 ```
 

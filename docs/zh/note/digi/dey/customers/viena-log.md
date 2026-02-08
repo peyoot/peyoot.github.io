@@ -88,6 +88,8 @@ CONFIG_TOUCHSCREEN_EGALAX_SERIAL:  Say Y here to enable support for serial conne
   <           -> Touchscreens (INPUT_TOUCHSCREEN [=y])                                                                                <
   <             -> EETI eGalax serial touchscreen (TOUCHSCREEN_EGALAX_SERIAL [=n])    
 
+### dvk上验证viena设备树
+在viena的设备树上放一个ccmp25-dvk-tsc.dts，手动在devshell中编译，进入系统后拷到内核并设计为默认加载的设备树，就可以做以下相关的验证。
 
 ### USB电阻屏触控探索
 
@@ -159,3 +161,51 @@ spi_stm32              24576  0
 nfnetlink              20480  1
 
 ```
+
+## tsc2046驱动上电
+```
+root@ccmp25-dvk:~# lsmod
+Module                  Size  Used by
+hci_uart               49152  1
+btbcm                  24576  1 hci_uart
+brcmfmac_cyw           12288  0
+ti_tsc2046             16384  1
+brcmfmac              372736  1 brcmfmac_cyw
+brcmutil               16384  1 brcmfmac
+galcore               380928  0
+stm32_dcmipp           81920  0
+stm32_csi              20480  1
+stm32_lptimer          12288  0
+stm32_cryp             36864  1
+crypto_engine          24576  1 stm32_cryp
+stm32_crc32            16384  0
+spi_stm32              24576  0
+evbug                  12288  0
+nfnetlink              20480  1
+root@ccmp25-dvk:~# ls /sys/bus/iio/devices/
+iio:device0  trigger0     trigger10    trigger12    trigger14    trigger16    trigger3     trigger5     trigger7     trigger9
+iio:device1  trigger1     trigger11    trigger13    trigger15    trigger2     trigger4     trigger6     trigger8
+root@ccmp25-dvk:~# cat /proc/bus/input/devices
+I: Bus=0000 Vendor=0000 Product=0000 Version=0000
+N: Name="stpmic pwrkey"
+P: Phys=stpmic-pwrkey/input0
+S: Sysfs=/devices/platform/power_button/input/input0
+U: Uniq=
+H: Handlers=kbd event0 evbug
+B: PROP=0
+B: EV=3
+B: KEY=10000000000000 0
+
+root@ccmp25-dvk:~# ls /sys/bus/iio/devices/iio\:device0
+buffer                        in_voltage6_raw               oversampling_ratio_available  trigger_polarity_available
+buffer0                       in_voltage_offset             power                         uevent
+dev                           in_voltage_scale              scan_elements                 waiting_for_supplier
+in_voltage0_raw               name                          subsystem
+in_voltage14_input            of_node                       trigger
+in_voltage1_raw               oversampling_ratio            trigger_polarity
+root@ccmp25-dvk:~# cat /sys/bus/iio/devices/iio\:device0/name
+404e0000.adc:adc@0
+root@ccmp25-dvk:~# cat /sys/bus/iio/devices/iio\:device1/name
+tsc2046
+```
+
