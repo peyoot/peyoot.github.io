@@ -126,17 +126,36 @@ CONFIG_TOUCHSCREEN_ADS7846=m
 CONFIG_TOUCHSCREEN_USB_COMPOSITE=m
 CONFIG_INPUT_EVBUG=m
 
-#### USB触控内核选项
-
- CONFIG_INPUT_UINPUT
-<   Location:                                                                                                                       <
-  <     -> Device Drivers                                                                                                             <
-  <       -> Input device support                                                                                                     <
-  <         -> Generic input layer (needed for keyboard, mouse, ...) (INPUT [=y])                                                     <
-  <           -> Miscellaneous devices (INPUT_MISC [=y])                                                                              <
-  <             -> User level driver support (INPUT_UINPUT [=n])                                                                      <
-  <                                                                   
-
 
 ### 临时开启的调试功能
 1. CONFIG_INPUT_EVBUG
+
+### USB触控测试
+                                         
+测试时间：20260207  版本 ads7846版镜像，ads7846用v6.12源码，include中的头文件仍用v6.6
+编译出来后：
+```
+cp evbug.ko /usr/lib/modules/6.6.78-rt51-dey-gf582bf40eaa4-dirty/kernel/drivers/input/
+cp usbtouchscreen.ko /usr/lib/modules/6.6.78-rt51-dey-gf582bf40eaa4-dirty/kernel/drivers/input/touchscreen/
+顺带拷新的ads7846 cp ads7846.ko /usr/lib/modules/6.6.78-rt51-dey-gf582bf40eaa4-dirty/kernel/drivers/input/touchscreen/ads7846.ko
+```
+lsmod 时新ads7846没加载，调查后发现，是因为devshell这样编译出来是非实时的
+```
+root@ccmp25-dvk:~# lsmod
+Module                  Size  Used by
+hci_uart               49152  1
+btbcm                  24576  1 hci_uart
+brcmfmac_cyw           12288  0
+galcore               380928  0
+brcmfmac              372736  1 brcmfmac_cyw
+brcmutil               16384  1 brcmfmac
+stm32_dcmipp           81920  0
+stm32_csi              20480  1
+stm32_lptimer          12288  0
+stm32_cryp             36864  1
+crypto_engine          24576  1 stm32_cryp
+stm32_crc32            16384  0
+spi_stm32              24576  0
+nfnetlink              20480  1
+
+```
