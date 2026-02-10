@@ -91,6 +91,11 @@ sleep 5; cat messages timedout errors
 # 输出：messages: 112  timedout: 15 errors: 0   <-- timedout 涨 → SPI 硬件超时
 
 ```
+## gpio检查
+cat /sys/kernel/debug/gpio
+检查各GPIO情况
+
+
 ## 添加校准
 
 

@@ -34,6 +34,11 @@ mount -t debugfs none /sys/kernel/debug
 ```
 echo 'file drivers/input/touchscreen/ads7846.c +p' > /sys/kernel/debug/dynamic_debug/control
 ```
+调大loglevel
+```
+echo 8 > /proc/sys/kernel/printk
+```
+
 触碰屏幕，查看 dmesg 中的日志
 
 
