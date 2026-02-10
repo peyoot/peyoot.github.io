@@ -34,6 +34,13 @@ LVDS液晶屏尺寸: 222.72 x 125.28
 
 为了保证线性，建议在触屏有效尺寸之外不放触控键。
 
+### 使用DVK的MikroBUS SPI3测试客户spi和触屏接口
+需注意spi是相同的spi3，但pendown中断，客户板卡是pd5，DVK是pg3。
+
+Mikrobus的接口示意图如下：
+![Mikrobus](mikrobus.png)
+
+
 
 欧洲研发报告（拟）：
 1、Linux主线驱动调整：
