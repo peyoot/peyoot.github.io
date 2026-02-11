@@ -216,3 +216,13 @@ root@ccmp25-dvk:~# cat /sys/bus/iio/devices/iio\:device1/name
 tsc2046
 ```
 
+## 开启调试功能后的测试
+开启调试
+```
+echo 'file drivers/input/touchscreen/ads7846.c +p' > /sys/kernel/debug/dynamic_debug/control
+
+```
+v1.0 开放debug数据，未屏蔽轮询数据
+| 设备树名 | 主要特性 | linux按下中断 | evtest数据 | 备注 |
+|---------|---------|---------|---------|---------|
+|ccmp25-500spi00l-x690.dtb | cs0,pen0,irql | 有 | 无 |  |
