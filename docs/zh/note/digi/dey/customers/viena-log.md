@@ -13,7 +13,7 @@
 
 
 ### 寄到上海的产品初测：
-![alt text](1dc0e7c9-0ee2-46f5-b35f-669b845a417e.png)
+![resistive-tsc](resistive-touchscreen.png)
 
 X面板电阻：1，3引脚： 695
 Y面板电阻：2, 4引脚： 235

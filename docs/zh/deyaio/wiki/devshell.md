@@ -43,6 +43,7 @@ make Image.gz -j4
 
 ## 准备内核驱动编译环境
 ```
+make ccmp2_defconfig
 make modules_prepare
 先构建一次完整的内核模块
 make -j$(nproc) modules
