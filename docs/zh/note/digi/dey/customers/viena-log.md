@@ -1,3 +1,12 @@
+# 近期日志和一些确定的事
+
+```
+interrupts = <3 IRQ_TYPE_LEVEL_HIGH>;
+pendown-gpio = <&gpiog 3 GPIO_ACTIVE_HIGH>;
+```
+则没有触碰的情况下，它中断数量不断增加，说明interrupts = <3 IRQ_TYPE_LEVEL_LOW>;才是对的。而pendown-gpio要active_high是因为反转了，对于这种反转如果edge的话， 有可能不是falling而是rising. 但理论上IRQ_TYPE_LEVEL_LOW肯定可以。
+
+
 # vienaPLC设备接口同DVK区别
 
 #### HDMI接口相关 
