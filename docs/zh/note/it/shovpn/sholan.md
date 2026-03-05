@@ -30,3 +30,12 @@ down /etc/openvpn/update-systemd-resolved
 其中passfile为两行，一行用户名，一行密码
 
 由于真正密码都一样放在passfile中，所以不同客户端的配置文件都是同样内容，只是文件名有所不同。
+
+# 客户机ubuntu
+```
+sudo apt install openvpn openvpn-systemd-resolved
+sudo reboot
+检查sudo systemctl status openvpn-client@用户名 
+然后看看ip addr，如果有IP地址是192.168.14.x就成功了
+
+```

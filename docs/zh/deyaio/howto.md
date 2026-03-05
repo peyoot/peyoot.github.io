@@ -151,3 +151,24 @@ DISTRO_FEATURES 是定义整个发行版（distro）特性的变量，它在 Yoc
 ## qtfb 环境变量设置
 
 
+## 如何测试手动加载模块
+驱动程序调试时，有时我们希望手动加载模块，以便观察不同阶段加载的效果，这里可以先创建模块黑名单，以触控ads7846为例：
+```
+echo "blacklist ads7846" | tee /etc/modprobe.d/ads7846-blacklist.conf
+重启，查看模块是否不在加载列表中了
+lsmod
+再手动加载
+modprobe ads7846
+```
+
+## 移除早期开机画面
+早期开机画面，在splash画面生效前，有两个位置
+1、uboot
+设置splashpos为画面外的坐标，比如
+```
+setenv splashpos1280,800
+saveenv
+```
+2、内核console logo
+需编译取消
+CONFIG_LOGO=n
