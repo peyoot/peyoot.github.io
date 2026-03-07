@@ -67,6 +67,14 @@ penirq_recheck_delay_usecs
 
 发生在数据已获取、上报之前，用于再次确认 pen 是否仍按下。这个延迟不影响两次采样之间的间隔，只影响上报时刻。
 
+## 镜像打包
+如果需要校准工具，光tslib不够，还要
+```
+    tslib tslib-calibrate tslib-tests #校准工具和校准测试工具
+    touch-calibration #校准服务程序 
+
+```
+
 ## 测试方法
 一般上电后，可通过检查spi相关的log，来确定驱动是否生效
 ```
