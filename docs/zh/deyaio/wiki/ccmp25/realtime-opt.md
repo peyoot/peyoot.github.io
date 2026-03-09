@@ -40,6 +40,8 @@ DISTRO_FEATURES_NATIVESDK="x11"
 其中看到Default里有cellular 3g ，因此可以用DISTRO_FEATURES:remove移除
 ```
 DISTRO_FEATURES:remove = "  cellular 3g  "
+
+检查是否仍有/usr/sbin/ModemManager
 ```
 #### 禁用wifi，BT,音视频
 禁用这些可以提升实时性，但根据硬件需要可以有所选择保留
