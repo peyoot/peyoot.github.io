@@ -71,3 +71,7 @@ DISTRO_FEATURES:remove = " bluetooth wifi "
 FILESEXTRAPATHS:prepend:u-boot-dey_2023.10 := "${THISDIR}/files:"
 ```
 如果仅替换boot.txt不能起作用，可以复制整个目录，或是直接在meta-digi-arm/recipes-bsp/u-boot/u-boot-dey/ccmp25-dvk中更改（临时方案）
+
+用编译出来的boot.scr替换原有/mnt/linux下的boot.scr，并改名ccmp25_bt.dtbo和ccmp25_wifi.dtbo，如果成功无报错上电，log上不再加载这两个设备树overlay，即成功。
+
+注：您可能仍需移除一些自动启服务，如果之前的更改没有移除干净的话。
