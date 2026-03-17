@@ -47,7 +47,9 @@ source ../../mkproject.sh -p ccmp25-dvk
 ```
 阅读DEY的开源声明，空格键翻页，最后输入y确认。
 
-创建好项目后，根据需要更改QT支持选项，修改conf/bblayers.conf中的QT版本，默认是QT6，如果是要QT5，请改为QT5。
+然后到conf/local.conf中，修改它的内容为meta-custom下homeaddons配方里提供的.local.conf中的内容
+
+*************以下不用看*********************
 
 在conf/local.conf中设置实时选项，添加或移除包，
 实时开启：
