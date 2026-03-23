@@ -53,15 +53,19 @@ ConnectCore 95目前是处于Beta阶段，您可以从Digi的[官方固件库](h
 一、使用uSD/TF卡或U盘进行卡刷升级固件
 注意32G以上的大容量的SD卡或U盘在windows下默认是格式化exFAT格式，而嵌入式领域通常需要格式化为FAT32。请使用正确的工具格式化好安装介质，然后将安装包解压到根目录中，并插入到开发板的相应接口上，上电开机，按任意键停留在UBoot中：
 ![cc95-dvk-booting](cc95-booting.png)
-如果使用默认的刷机包，可以直接执行卡刷或usb刷机命令：
+可以使用默认的刷机包，直接执行卡刷或usb刷机命令，或是在uboot中先设置一下image-name指定所刷的镜像包名称：
 ```
-#setenv image-name <镜像包名>   仅刷非默认的镜像时需要，比如setenv image-name core-image-qt, ConnectCore 95默认刷机镜像名称为dey-image-chromium
-
-run install_linux_fw_sd     #使用SD卡刷机
-或
-run install_linux_fw_usb    #使用usb刷机
+setenv image-name <镜像包名>  #仅刷非默认的镜像时需要，比如setenv image-name core-image-qt, 
 ```
-
+ConnectCore 95默认刷机镜像名称为dey-image-chromium，如果您下载的是这个默认的镜像包，不需要上面设置，可以直接刷机：
+  * 使用SD卡刷机时，所用命令：
+```
+run install_linux_fw_sd
+```
+或者，使用u盘时
+```
+run install_linux_fw_usb
+```
 刷机时请保持电源连接，并耐心等到刷机结束，通常一分钟内就能刷好，自动重启并进入系统。
 
   #### 四、使用手机APP例程配置您的设备
