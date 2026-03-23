@@ -31,13 +31,13 @@ Please plug/unplug your usb device to be recognized.
 ```
 硬件连接示意图如下：
 ![ConnectCore 95开发板](cc95-dvk.png)
-  1. 把 USB Type-C 线连接到主板上的 USB CONSOLE 接口，如果还没做的话，连接到你的主机电脑。
-  2. 将 Wi-Fi 天线连接到 SMA 天线连接器。
-  3. 把以太网线连接到以太网口。
-  4. 可选：将一根未附带的 HDMI 线连接到 HDMI 接口，再连接到兼容 HDMI 的显示器。
-  5. 确保启动微动开关（SW3）设置为从 eMMC 启动：
+ 1. 把 USB Type-C 线连接到主板上的 USB CONSOLE 接口，如果还没做的话，连接到你的主机电脑。
+ 2. 将 Wi-Fi 天线连接到 SMA 天线连接器。
+ 3. 把以太网线连接到以太网口。
+ 4. 可选：将一根未附带的 HDMI 线连接到 HDMI 接口，再连接到兼容 HDMI 的显示器。
+ 5. 确保启动微动开关（SW3）设置为从 eMMC 启动：
 ![ConnectCore 95启动选项](cc95-boot-sw.png)
-  6. 将 12V/4A 电源连接到电源桶连接器。
+ 6. 将 12V/4A 电源连接到电源桶连接器。
 
   #### 三、系统固件下载和升级
 
