@@ -51,24 +51,24 @@ firmware 22.11.48.10 first, reboot the USB hub then update to your final 23.x or
 建立好OpenVPN连接后，就可以用VPN定义的网段和IP地址打开web界面，如同本地打开一般。
 如果需要使用Ipsec等其它VPN方式，请参考官方文档中相应内容。
 
-## 使用DRM的API
-请登陆到[DRM平台](https://devicecloud.digi.com),确保之前您已经添加了这个设备到DRM平台。详细指南请参考[Digi Remote Manager官方API文档](https://doc-remotemanager.digi.com/pages/discovering-apis/)。
+## 设置以太网绑定
+Digi的AnywhereUSB 24有两个以太网口，它可以配置成绑定，以防止某个网口断开时影响连接，在工业应用上这也可以作为防止单点失效的可靠方法。
 
-首先，在设备列表中，找到你想用作目标的设备，点击Device ID边上的复制按钮，将设备 ID 复制到剪贴板上。  
-在主菜单中，点击API Explorer，也可以在这里直接点Target选择设备，那么稍后就无需粘贴ID。
-点击Examples，选择要测试的API, 例如，要获取设备信息，选择 Examples > v1/devices > Retrieve a device.  
-将剪贴板中的设备 ID 粘贴到 API调用中，如果刚才有手动选择Target，设备ID已经在命令中了。  
-点击“send"按钮，这会模拟向DRM发送该API指令，相关的返回值也会出现在“Response"栏上。
-![api-test](retrieve-api.png)
+配置路径：
 
+本地：System>Configuration>Device Configuration>Network>Ethernet Bonding  
+DRM: Settings>Network>>Ethernet Bondings
 
+请输入名称比如ethbond，点击"+"添加。其中模式可以是：
+Active-backup 主动备份 ：一次只在绑定设备中传输数据。当活动设备故障时，列表中下一个可用设备被选中。该模式提供容错能力。
+Round-robin 轮转 ：在绑定设备之间交替使用，以实现负载均衡和容错。
 
-## 使用本地web service API
+然后在 ADD Device中把两个网口都添加进以太网绑定。
 
-除了用DRM的API外，也可以在本地网络中使用部分web service API，虽然功能不如DRM API全，不够也能满足大多数场景需求。
-
-
-## Python实现本地远程登陆执行CLI
+接着，我们在Network>Interface中，创建新的网络接口eth_bond_interface，以便连接到上面创建的以太网绑定。然后禁用这个绑定的接口用到的网络接口。
 
 
-# 备注，本文内容持续更新中，请及时关注...
+
+
+
+

@@ -157,9 +157,19 @@ volumes:
 ```
 
 4. 部署后操作
-| 任务       | 操作                                            |
+| 任务       | 操作                                           |
 | -------- | --------------------------------------------- |
 | 申请 SSL   | `http://<服务器IP>:81` → NPM → SSL Certificates  |
 | 配置反向代理   | NPM → Proxy Hosts → 添加两条路由                    |
 | 上传插件（可选） | Portainer → Volumes → `kc_providers` → Browse |
+
+首次打开http://IP:81 会创建用户密码，用p*t@h*.com，密码为一点也不介意
+
+浏览器打开 http://<IP>:81
+先添加 SSL 证书（Let’s Encrypt → 输入 git.example.com + sso.example.com 一键申请）
+再建两条 Proxy Host。
+
+注意，如果是内网的域名，则用custom添加自签名证书，Certificate Key: 留空；
+Certificate: 留空 ；不过最好还是公网子域名来操作，解析到内网，这样如果将来要开放外网，也更方便一些。
+比如sso.eccee.com和gitea.eccee.com。
 
