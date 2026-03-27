@@ -1,5 +1,8 @@
+# AnywhereUSB API用法示例
+本文陆续更新中...
+
 ## 将AnywhereUSB接入互联网
-您只需将AnywhereUSB接入办公室网络，如果您的办公室网络可以连上互联网，则AnywhereUSB便可以通过Digi Remote Manager云服务（简称DRM）远程访问。为了通过DRM远程支持和访问AnywhreUSB，首先您需要申请或注册一个DRM帐号,请通过设备上的标签提示注册，或是联系渠道商或是Digi销售代表。当您获得DRM试用帐号后，就可以登陆，并添加您已经联网的设备。
+您只需将AnywhereUSB接入办公室网络，如果您的办公室网络可以连上互联网，则AnywhereUSB便可以通过Digi Remote Manager云服务（简称DRM）远程访问。为了通过DRM远程支持和访问AnywhreUSB，首先您需要申请或注册一个DRM帐号,请通过设备附有的标签提示注册，或是联系渠道商或是Digi销售代表。当您获得DRM试用帐号后，就可以登陆，并添加您已经联网的设备。
 
 DRM同时也是一个资产管理平台，您可以对不同区域或类型的设备进行分组，以便统一管理。比如，在左侧菜单我们点击"Add Group"创建一个叫channels的组，然后点击右上角的"Register Devices"把设备添加到这个组中：
 
