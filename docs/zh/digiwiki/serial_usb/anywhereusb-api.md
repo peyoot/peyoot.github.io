@@ -87,45 +87,7 @@ $ curl -k -u admin https://ip-address/cgi-bin/config.cgi/value/path -X GET
 其中ip-address 是DAL设备的IP地址，path 是要返回的信息在配置中的路径位置，可从Admin CLI获取path 的允许值，请执行以下操作：
 通过Web或SSH，以admin 以访问 Admin CLI，在命令行中，键入 config 以进入配置模式：
 在配置提示符处，键入 ？（问号）：
-```
-(config)> ?
- auth                      Authentication      
- cloud                     Central management  
- firewall                  Firewall            
- modem                     Modem               
- monitoring                Monitoring          
- network                   Network             
- service                   Services            
- system                    System              
- vpn                       VPN             
-```
 
-允许的 path 值列在第一列（左）列中。要使用 ？（问号）和路径名称来确定进一步允许的路径位置值：
-
-```
-
-config> service ?
-
-Services
-
- Additional Configuration
- -------------------------------------------------------------------------------
- dns                       DNS
- iperf                     IPerf
- location                  Location
- mdns                      Service Discovery (mDNS)
- modbus_gateway            Modbus Gateway
- multicast                 Multicast
- ntp                       NTP
- ping                      Ping responder
- snmp                      SNMP
- ssh                       SSH
- telnet                    Telnet
- web_admin                 Web administration
-
-(config)> service
-
-```
 
 ## 本地远程登陆执行CLI命令
 未完，参考下面进阶用法
