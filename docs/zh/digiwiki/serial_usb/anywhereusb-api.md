@@ -60,7 +60,7 @@ firmware 22.11.48.10 first, reboot the USB hub then update to your final 23.x or
 1、用API设置或获取信息：
 首先，在设备列表中，找到你想用作目标的设备，点击Device ID边上的复制按钮，将设备 ID 复制到剪贴板上。  
 在主菜单中，点击API Explorer，也可以在这里直接点Target选择设备，那么稍后就无需粘贴ID。
-点击Examples，选择要测试的API, 例如，要获取设备信息，选择 Examples > v1/devices > Retrieve a device.  
+点击Examples，选择要测试的API, 例如，要获取设备信息，选择 Examples》v1/devices 》 Retrieve a device.  
 将剪贴板中的设备 ID 粘贴到 API调用中，如果刚才有手动选择Target，设备ID已经在命令中了。  
 点击“send"按钮，这会模拟向DRM发送该API指令，相关的返回值也会出现在“Response"栏上。
 ![api-test](retrieve-api.png)
