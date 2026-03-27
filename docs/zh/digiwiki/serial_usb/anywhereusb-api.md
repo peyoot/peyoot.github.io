@@ -54,6 +54,7 @@ firmware 22.11.48.10 first, reboot the USB hub then update to your final 23.x or
 ## 使用DRM的API
 请登陆到[DRM平台](https://devicecloud.digi.com),确保之前您已经添加了这个设备到DRM平台。详细指南请参考[Digi Remote Manager官方API文档](https://doc-remotemanager.digi.com/pages/discovering-apis/)。
 
+1、用API设置或获取信息：
 首先，在设备列表中，找到你想用作目标的设备，点击Device ID边上的复制按钮，将设备 ID 复制到剪贴板上。  
 在主菜单中，点击API Explorer，也可以在这里直接点Target选择设备，那么稍后就无需粘贴ID。
 点击Examples，选择要测试的API, 例如，要获取设备信息，选择 Examples > v1/devices > Retrieve a device.  
@@ -61,14 +62,87 @@ firmware 22.11.48.10 first, reboot the USB hub then update to your final 23.x or
 点击“send"按钮，这会模拟向DRM发送该API指令，相关的返回值也会出现在“Response"栏上。
 ![api-test](retrieve-api.png)
 
+2、用API运行命令
+和上面类似，在Example里选择SCI>CLI，将API中的命令替换为你想要执行的，比如"show network"
+
+![cli-show network](cli-api.png)
+注意，得到的值是base64格式，如需明文，请将base64转回ASCII格式。
 
 
 ## 使用本地web service API
 
-除了用DRM的API外，也可以在本地网络中使用部分web service API，虽然功能不如DRM API全，不够也能满足大多数场景需求。
+除了用DRM的API外，也可以在本地网络中使用[REST API](https://docs.digi.com/resources/documentation/digidocs/90002383/default.htm#os/applications-rest-api-t.htm)，虽然功能不如DRM API多，不够也能满足大多数场景需求。
 
+打开本地web配置界面并登陆后，您可以通过打开网址从网页浏览器查看 REST API 规范：https://ip-address/cgi-bin/config.cgi
 
-## Python实现本地远程登陆执行CLI
+### 示例
+1、使用 GET 方法返回设备配置信息
+要返回设备配置，请发出 GET 方法。例如，使用 curl：
+```
+$ curl -k -u admin https://ip-address/cgi-bin/config.cgi/value/path -X GET
+```
+其中ip-address 是DAL设备的IP地址，path 是要返回的信息在配置中的路径位置，可从Admin CLI获取path 的允许值，请执行以下操作：
+通过Web或SSH，以admin 以访问 Admin CLI，在命令行中，键入 config 以进入配置模式：
+在配置提示符处，键入 ？（问号）：
+```
+(config)> ?
+ auth                      Authentication      
+ cloud                     Central management  
+ firewall                  Firewall            
+ modem                     Modem               
+ monitoring                Monitoring          
+ network                   Network             
+ service                   Services            
+ system                    System              
+ vpn                       VPN             
+```
 
+允许的 path 值列在第一列（左）列中。要使用 ？（问号）和路径名称来确定进一步允许的路径位置值：
+
+```
+
+config> service ?
+
+Services
+
+ Additional Configuration
+ -------------------------------------------------------------------------------
+ dns                       DNS
+ iperf                     IPerf
+ location                  Location
+ mdns                      Service Discovery (mDNS)
+ modbus_gateway            Modbus Gateway
+ multicast                 Multicast
+ ntp                       NTP
+ ping                      Ping responder
+ snmp                      SNMP
+ ssh                       SSH
+ telnet                    Telnet
+ web_admin                 Web administration
+
+(config)> service
+
+```
+
+## 本地远程登陆执行CLI命令
+未完，参考下面进阶用法
+
+## 进阶用法
+
+下面是Ukey管理平台可以在无需手动干预的情况下更改 AnywhereUSB Plus 的 USB 组配置设置的几个选项:  
+1、如果软件能运行 SSH 命令，它们也能运行 shell 命令来进行配置更改。 示例：
+```
+ sshpass -pPASSWORD123^  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o CheckHostIP=no admin@192.168.2.1 "config set service.anywhereusb.groups.group01.ports.0 2"
+```
+  以下是关于这个命令的一些说明，您可以通过python,Java等不同语言来调用，从而实现自动化任务。
+  a. sshpass 是一款应用程序，可以通过命令行为 SSH 提供密码。 这对使用 SSH 自动化任务非常有用。 你也可以设置一个 SSH 密钥，用 AnywhereUSB Plus 设备认证，而不是要求密码。  
+  更多参考：  
+  ttps://linux.die.net/man/1/sshpass  
+  https://www.digi.com/resources/documentation/digidocs/90002383/default.htm#os/services-ssh-key-auth-t.htm  
+  b. 以 -o 标注的各种 SSH 选项旨在帮助自动与 AnywhereUSB Plus 设备进行身份验证，因此无需用户输入提示。
+  c. 最后的配置集命令是用来更改或更新 AnywhereUSB Plus 配置设置的 。调整配置密钥路径以匹配你想更改的配置设置，并将值调整到你想设置的配置选项。
+
+2、通过SNMP实现配置
+3、本地web service API，已经如上面示例给出。
 
 # 备注，本文内容持续更新中，请及时关注...
