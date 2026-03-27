@@ -165,7 +165,7 @@ volumes:
 
 首次打开http://IP:81 会创建用户密码，用p*t@h*.com，密码为一点也不介意
 
-浏览器打开 http://<IP>:81
+浏览器打开 http://IP:81
 先添加 SSL 证书（Let’s Encrypt → 输入 git.example.com + sso.example.com 一键申请）
 再建两条 Proxy Host。
 
