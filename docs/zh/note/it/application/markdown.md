@@ -144,3 +144,53 @@ Unicode 符号
 📊 - 条形图（数据图表）
 📈 - 上升图表
 📉 - 下降图表
+
+▲ 向上箭头
+▼ 向下箭头
+▶ 向右箭头
+◀ 向左箭头
+⏩ 快进按钮
+⏪ 快退按钮
+⬆️ Emoji向上箭头
+⬅️ Emoji向左箭头
+基本实心：▲ ▼ ▶ ◀ ▴ ▾ ▸ ◂ 
+空心三角：△ ▽ ▷ ◁
+
+🎨 使用示例
+🔽🔼 
+<span style="font-family: Arial, sans-serif; font-size: 24px;">▲</span>
+<span style="font-family: Arial, sans-serif; font-size: 24px;">▼</span>
+<span style="font-family: Arial, sans-serif; font-size: 24px;">▶</span>
+<span style="font-family: Arial, sans-serif; font-size: 24px;">◀</span>
+
+❶ ❷ ❸ - 实心带圈数字
+✅ - 绿色勾选标记（Emoji）
+❎ - 叉选框
+特殊列表标记
+⚫ - 黑色小圆（U+26AB）
+⚪ - 白色小圆（U+26AA）
+🔸 - 小橙色菱形
+🔹 - 小蓝色菱形
+🔺 - 小红色三角形
+🔻 - 小红色倒三角形
+🟠 - 橙色圆形
+🟡 - 黄色圆形
+🟢 - 绿色圆形
+🔵 - 蓝色圆形
+🟣 - 紫色圆形
+🟤 - 棕色圆形
+📋 快速复制区
+无序列表：• ◦ ▪ ▫ ⦁ ⁃
+复选框：☐ ☑ ✅ ✔ ✓ ✗ ✘ ⬜ ⬛ ◻ ◼
+任务标记：📝 📋 📑 📌 📎 🗒️ 🗓️
+层级标记：↳ ↴ ↵ ⇢ ⇨ ├ └ │
+特殊符号：⚫ ⚪ 🔸 🔹 🔺 🔻
+
+### 项目进度
+├─ 设计阶段
+│  ├─ 原型设计
+│  └─ UI设计
+└─ 开发阶段
+   ├─ 前端开发
+   └─ 后端开发
+   
