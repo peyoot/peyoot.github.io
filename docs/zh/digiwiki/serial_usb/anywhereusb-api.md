@@ -1,4 +1,4 @@
-## 📒AnywhereUSB API用法示例
+## AnywhereUSB API用法示例
 本文陆续更新中...
 
 ### 💫将AnywhereUSB接入互联网
