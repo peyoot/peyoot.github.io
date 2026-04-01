@@ -1,3 +1,29 @@
+## 从物理接口谈起
+
+根据USB Type-C接口的标准规范，一个完整的USB Type-C连接器（插座或插头）共有 24个引脚。
+其引脚排列的核心特征是对称设计，以实现“正反插”功能。具体分布和主要功能如下：
+
+ * 电源与接地 (Power & Ground)
+VBUS​ (引脚: A4, A9, B4, B9): 电源引脚，共有4个。在USB PD协议下可支持最高20V/5A (100W) 的电力传输。  
+GND​ (引脚: A1, A12, B1, B12): 接地引脚，共有4个，与VBUS对应，为电源提供回流路径。  
+ * 高速数据传输差分对 (SuperSpeed Differential Pairs)
+TX/RX 通道​ (各2对): 用于USB 3.1/3.2 Gen 1/2、DisplayPort、PCIe等高速信号。  
+TX1+/-​ (A2, A3) | RX1+/-​ (B10, B11)  
+TX2+/-​ (B2, B3) | RX2+/-​ (A10, A11)  
+正反插时，由芯片（如之前讨论的 CBTU02043HE​ 这类开关）自动选择正确的TX/RX对进行连接。  
+  * USB 2.0 数据线 (D+ / D-)
+D+​ 和 D-​ (引脚: A6, A7, B6, B7): 用于USB 2.0数据传输。它们在接口两侧是内部短路相连的，因此无论正插反插，始终连通同一对信号。  
+  * 配置通道 (Configuration Channel, CC)  
+CC1, CC2​ (引脚: A5, B5): 这是Type-C接口最关键的引脚，用于：  
+检测插头的插入和方向。  
+建立设备角色（主机、设备、双角色）。  
+通信USB Power Delivery (PD) 协议，协商电压和电流。  
+建立和管理Alternate Mode（如DisplayPort模式）。  
+* 边带使用引脚 (Sideband Use, SBU)
+SBU1, SBU2​ (引脚: A8, B8): 在Alternate Mode（如DisplayPort模式）下，用于传输辅助信号，如DisplayPort的AUX信道（AUX+/-）音频回传通道等。
+其他  
+VCONN​ (引脚: 通常复用CC引脚): 当使用带有芯片的“全功能”线缆（E-Mark线）时，为线缆内的芯片供电。供电方会在未用于CC通信的那个CC引脚上输出VCONN电源。  
+
 # I2C1的潜在影响
 在Digi官方的开发板上，I2C1并没有连接什么东西，而在viena中I2C1还接着STUSB1600AQTR，但一般无需用它控制更改参数，除非将来需要更改模式，比如U口供电。
 
