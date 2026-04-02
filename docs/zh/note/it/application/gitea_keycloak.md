@@ -166,10 +166,74 @@ volumes:
 首次打开http://IP:81 会创建用户密码，用p*t@h*.com，密码为一点也不介意
 
 浏览器打开 http://IP:81
-先添加 SSL 证书（Let’s Encrypt → 输入 git.example.com + sso.example.com 一键申请）
-再建两条 Proxy Host。
+先添加 SSL 证书（Let’s Encrypt → 输入 gitip90.eccee.com + sso.ssoip90.eccee.com 一键申请）
+再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
+1. ssoip90.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
+2. gitip90.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
 
-注意，如果是内网的域名，则用custom添加自签名证书，Certificate Key: 留空；
-Certificate: 留空 ；不过最好还是公网子域名来操作，解析到内网，这样如果将来要开放外网，也更方便一些。
-比如sso.eccee.com和gitea.eccee.com。
+ssl页面选择申请的证书，勾选这两项：  
+✅ Force SSL  
+✅ HTTP/2 Support  
 
+5、登陆keycloak  
+登陆用户名和密码就是Advance Mode中定义的KC_ADMIN和它的密码。
+
+6、创建gitea管理员并登陆  
+Gitea 首次访问时，不会自动弹出安装向导（因为设置了 GITEA__security__INSTALL_LOCK: "true"），你需要手动执行创建管理员的操作。
+```
+# 进入 gitea 容器
+docker exec -it gitea /bin/sh
+
+# 创建管理员账号
+gitea admin user create \
+  --username peyoot \
+  --password 1点也不介意 \
+  --email peyoot@hotmail.com \
+  --admin
+```
+
+7、让gitea使用keycloak用户
+  A. keycloak中配置
+  * 登录 https://ssoip90.eccee.com/admin
+  * 选择你的 realm（默认是 master，新建一个 eccee）
+  * Clients → Create client  
+Client ID: gitea  
+Client Protocol: openid-connect  
+点击 Next  
+Capability config:  
+✅ Client authentication: ON  
+✅ Standard flow: ON  
+✅ Direct access grants: ON  
+点击 Next，然后 Save  
+  * 进入刚创建的 gitea 客户端，Credentials 标签页：  
+Client Authenticator: Client ID and Secret  
+复制 Client Secret（一串 UUID，后面要用）  
+  * Settings 标签页，配置 Valid redirect URIs:  
+  https://gitip90.eccee.com/user/oauth2/keycloak/callback  
+  或更宽松（测试用）：https://gitip90.eccee.com/*
+  * 记录 OpenID Endpoint Configuration：
+  https://ssoip90.eccee.com/realms/eccee/.well-known/openid-configuration  
+
+B. gitea配置OAuth2
+  * 用管理员账号登录 Gitea  
+点击头像 → Site Administration → Authentication Sources → Add Authentication Source  
+填写表单：
+
+| 字段 | 值 |
+|----|---|  
+| Authentication Name | Keycloak |
+| Authentication Type | OAuth2 |
+| OAuth2 Provider |	OpenID Connect |
+| Client ID | gitea |
+| Client Secret |	刚才复制的 Client Secret |
+| OpenID Connect Auto Discovery URL |	https://ssoip90.eccee.com/realms/eccee/.well-known/openid-configuration |
+| Additional Scopes |	openid email profile |
+
+点击 Add Authentication Source  
+
+C.测试 SSO 登录
+  * 退出 Gitea，回到登录页
+  * 应该出现 "Sign in with Keycloak" 按钮
+  * 点击后跳转到 Keycloak 登录页
+  * 用 Keycloak 中的用户登录
+  * 首次登录会自动在 Gitea 创建关联账号
