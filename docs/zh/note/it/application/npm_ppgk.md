@@ -1,4 +1,110 @@
-## gitea和keycloak sso系统搭建
+## 搭建npm,gitea和keycloak sso系统
+本系统在公网上部署Nginx Proxy Manager(npm)，使用Let's Encrypt证书，使用portainer stack在内网编排部署gitea和keycloak sso系统，并使用podmant替代docker。
+
+## 在云服务器上部署npm
+云服务器需开放80,81,443端口，结合openvpn或FRP 隧道实现路由转发到内网。
+
+<details>   
+<summary><font size="4"><b>🖧无VPN时设置FRP</b></font></summary>  
+如果内网环境没有公网IP出口，或无法在路由器上搭vpn，则可以用FRP。</br>   
+1. 云服务器上需部署 NPM + FRP Server， </br>   
+创建目录： </br>  
+sudo mkdir -p /opt/{npm,frp} </br>  
+创建FRP文件frp.ini：   
+
+```
+[common]
+bind_port = 7000
+token = your_secure_token_32chars
+
+dashboard_port = 7500
+dashboard_user = admin
+dashboard_pass = your_dashboard_pass
+```
+Compose 文件  
+
+```
+version: "3"
+
+services:
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - /opt/npm/data:/data
+      - /opt/npm/letsencrypt:/etc/letsencrypt
+
+  frps:
+    image: snowdreamtech/frps:latest
+    container_name: frps
+    restart: unless-stopped
+    ports:
+      - "7000:7000"
+      - "7500:7500"
+    volumes:
+      - /opt/frp/frps.ini:/etc/frp/frps.ini:ro
+
+```
+启动：
+
+```
+sudo podman-compose -f /opt/npm/compose.yml up -d
+```
+
+生成 systemd 服务（确保开机启动）
+
+```
+sudo podman generate systemd --new --name npm > /etc/systemd/system/npm.service
+sudo podman generate systemd --new --name frps > /etc/systemd/system/frps.service
+sudo systemctl daemon-reload
+sudo systemctl enable npm frps
+```
+
+2. 内网服务器需要部署 FRP Client,  
+frpc.ini配置文件：  
+```
+# frpc.ini
+[common]
+server_addr = <Azure 公网 IP>
+server_port = 7000
+token = your_secure_token_here
+
+[keycloak]
+type = http
+local_port = 8080
+custom_domains = sso.yourdomain.com
+
+[gitea]
+type = http
+local_port = 3000
+custom_domains = git.yourdomain.com
+
+[pgadmin]
+type = http
+local_port = 80
+custom_domains = db.yourdomain.com
+```
+启动frp客户端（直接运行，或是也在compose服务中类似上面加上它)：
+```
+wget https://github.com/fatedier/frp/releases/download/v0.58.1/frp_0.58.1_linux_amd64.tar.gz
+tar xzf frp_0.58.1_linux_amd64.tar.gz
+./frpc -c frpc.ini
+```
+
+</details>
+
+▼<font size="4"><b>🖧已有VPN,在云服务器中部署npm </b> </font>  
+如果已经实现公网内网的VPN隧道，只需用podman compose编排npm服务。  
+  * 安装podman
+```
+
+```
+
 在portainer中编排这个服务，
 
 1. 创建external网络npm
