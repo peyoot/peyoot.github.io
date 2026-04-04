@@ -61,6 +61,8 @@ services:
     image: quay.io/keycloak/keycloak:24.0
     restart: unless-stopped
     command: start-dev
+    ports:
+      - "8080:8080"
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-db
@@ -96,6 +98,8 @@ services:
   gitea:
     image: gitea/gitea:1.21-rootless
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     environment:
       GITEA__database__DB_TYPE: postgres
       GITEA__database__HOST: gitea-db:5432
@@ -122,6 +126,8 @@ services:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
     restart: unless-stopped
+    ports:
+      - "8081:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
@@ -166,10 +172,10 @@ volumes:
 首次打开http://IP:81 会创建用户密码，用p*t@h*.com，密码为一点也不介意
 
 浏览器打开 http://IP:81
-先添加 SSL 证书（Let’s Encrypt → 输入 gitip90.eccee.com + sso.ssoip90.eccee.com 一键申请）
+先添加 SSL 证书（Let’s Encrypt → 输入 git.eccee.com + sso.eccee.com 一键申请）
 再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
-1. ssoip90.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
-2. gitip90.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
+1. sso.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
+2. git.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
 
 ssl页面选择申请的证书，勾选这两项：  
 ✅ Force SSL  

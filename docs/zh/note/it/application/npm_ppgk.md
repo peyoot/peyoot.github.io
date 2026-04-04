@@ -101,9 +101,66 @@ tar xzf frp_0.58.1_linux_amd64.tar.gz
 ▼<font size="4"><b>🖧已有VPN,在云服务器中部署npm </b> </font>  
 如果已经实现公网内网的VPN隧道，只需用podman compose编排npm服务。  
   * 安装podman
-```
 
 ```
+sudo apt update
+sudo apt install -y podman podman-compose
+```
+创建目录
+```
+sudo mkdir -p /opt/npm
+```
+创建/opt/npm/npm.yml文件，注意使用podman不认短容器名，要加docker.io
+```
+version: "3"
+
+services:
+  npm:
+    image: docker.io/jc21/nginx-proxy-manager:latest
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - /opt/npm/data:/data
+      - /opt/npm/letsencrypt:/etc/letsencrypt
+```
+手动启动服务
+```
+sudo podman-compose -f /opt/npm/npm.yml up -d
+```
+启动后，浏览器打开 http://IP:81 ，创建一个管理员帐户，一点也不介意生年  
+先添加 SSL 证书（Let’s Encrypt → 输入 git.eccee.com + sso.eccee.com 一键申请）
+再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
+1. ssoip90.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
+2. gitip90.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
+
+ssl页面选择申请的证书，勾选这两项：  
+✅ Force SSL  
+✅ HTTP/2 Support  
+
+
+
+
+
+
+设置开机启动
+```
+# 为运行中的容器生成 systemd 配置
+sudo podman generate systemd --new --name npm | sudo tee /etc/systemd/system/npm.service
+
+# 启用并开机启动
+sudo systemctl daemon-reload
+sudo systemctl enable --now npm
+```
+
+
+
+————————————————————————————————————————————————————————————
+
+
 
 在portainer中编排这个服务，
 
@@ -134,22 +191,7 @@ PGADMIN_PWD=P+密+用户
 3. compose文件
 ```
 services:
-  # ========== 1. 反向代理 ==========
-  npm:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: npm
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-      - "81:81"
-    volumes:
-      - npm_data:/data
-      - npm_le:/etc/letsencrypt
-    networks:
-      - npm
-
-  # ========== 2. SSO 中心 ==========
+  # ========== 1. SSO 中心 ==========
   keycloak-db:
     image: postgres:15-alpine
     container_name: keycloak-db
@@ -167,6 +209,8 @@ services:
     image: quay.io/keycloak/keycloak:24.0
     restart: unless-stopped
     command: start-dev
+    ports:
+      - "8080:8080"
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-db
@@ -176,6 +220,8 @@ services:
       KEYCLOAK_ADMIN: ${KC_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PWD}
       KC_HOSTNAME: ${KC_HOST}
+      KC_HOSTNAME_STRICT: "false" 
+      KC_HOSTNAME_STRICT_HTTPS: "false"  
       KC_PROXY: edge
     volumes:
       - kc_themes:/opt/keycloak/themes
@@ -185,7 +231,7 @@ services:
     depends_on:
       - keycloak-db
 
-  # ========== 3. Git 托管 ==========
+  # ========== 2. Git 托管 ==========
   gitea-db:
     image: postgres:15-alpine
     container_name: gitea-db
@@ -202,6 +248,8 @@ services:
   gitea:
     image: gitea/gitea:1.21-rootless
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     environment:
       GITEA__database__DB_TYPE: postgres
       GITEA__database__HOST: gitea-db:5432
@@ -221,13 +269,15 @@ services:
     depends_on:
       - gitea-db
 
-  # ========== 4. 数据库管理工具 ==========
+  # ========== 3. 数据库管理工具 ==========
   
   # 方案 A: pgAdmin (推荐，功能全)
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
     restart: unless-stopped
+    ports:
+      - "8081:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
@@ -252,14 +302,13 @@ networks:
     external: true
 
 volumes:
-  npm_data:
-  npm_le:
   kc_db:
   kc_themes:
   kc_providers:
   gitea_db:
   gitea_data:
   pgadmin_data:
+
 ```
 
 4. 部署后操作
