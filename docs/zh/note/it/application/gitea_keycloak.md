@@ -1,12 +1,13 @@
+## 搭建npm,gitea和keycloak sso系统
+本系统在公网上部署Nginx Proxy Manager(npm)，使用Let's Encrypt证书，使用portainer stack在内网编排部署gitea和keycloak sso系统，并使用podmant替代docker。
+
+## 在云服务器上部署npm
+云服务器需开放80,81,443端口，结合openvpn隧道实现路由转发到内网，先实现内网访问，再由云服务器npm转发，请参考最后的章节。
+
 ## gitea和keycloak sso系统搭建
 在portainer中编排这个服务，
 
-1. 创建external网络npm
-Portainer → Networks → Add network
-Name = npm , Driver = bridge , Enable “Manual network creation” 
-这和用docker network创建的区别在于它的attachable是"true"
-
-2.新建stack
+1. 创建stack
 Portainer → Stacks → Add stack
 
 | 字段                        | 填写内容                              |
@@ -27,25 +28,12 @@ PGADMIN_PWD=P+密+用户
 ```
 3. compose文件
 ```
-services:
-  # ========== 1. 反向代理 ==========
-  npm:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: npm
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-      - "81:81"
-    volumes:
-      - npm_data:/data
-      - npm_le:/etc/letsencrypt
-    networks:
-      - npm
+version: "3.8"
 
-  # ========== 2. SSO 中心 ==========
+services:
+  # ========== 1. SSO 中心 ==========
   keycloak-db:
-    image: postgres:15-alpine
+    image: docker.io/postgres:15-alpine
     container_name: keycloak-db
     restart: unless-stopped
     environment:
@@ -59,6 +47,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
     restart: unless-stopped
     command: start-dev
     ports:
@@ -71,8 +60,9 @@ services:
       KC_DB_PASSWORD: ${KC_DB_PWD}
       KEYCLOAK_ADMIN: ${KC_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PWD}
-      KC_HOSTNAME: ${KC_HOST}
-      KC_PROXY: edge
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_PROXY: "edge"
     volumes:
       - kc_themes:/opt/keycloak/themes
       - kc_providers:/opt/keycloak/providers
@@ -81,9 +71,9 @@ services:
     depends_on:
       - keycloak-db
 
-  # ========== 3. Git 托管 ==========
+  # ========== 2. Git 托管 ==========
   gitea-db:
-    image: postgres:15-alpine
+    image: docker.io/postgres:15-alpine
     container_name: gitea-db
     restart: unless-stopped
     environment:
@@ -96,7 +86,8 @@ services:
       - npm
 
   gitea:
-    image: gitea/gitea:1.21-rootless
+    image: docker.io/gitea/gitea:1.21-rootless
+    container_name: gitea
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -119,11 +110,9 @@ services:
     depends_on:
       - gitea-db
 
-  # ========== 4. 数据库管理工具 ==========
-  
-  # 方案 A: pgAdmin (推荐，功能全)
+  # ========== 3. 数据库管理 ==========
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: docker.io/dpage/pgadmin4:latest
     container_name: pgadmin
     restart: unless-stopped
     ports:
@@ -131,29 +120,17 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
-      PGADMIN_CONFIG_SERVER_MODE: "False"  # 单用户模式，简化登录
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
       - npm
 
-  # 方案 B: Adminer (极简备用，可选启用)
-  # adminer:
-  #   image: adminer:latest
-  #   container_name: adminer
-  #   restart: unless-stopped
-  #   environment:
-  #     ADMINER_DEFAULT_SERVER: gitea-db  # 默认连接 Gitea 数据库
-  #   networks:
-  #     - npm
-
 networks:
   npm:
-    external: true
+    driver: bridge
 
 volumes:
-  npm_data:
-  npm_le:
   kc_db:
   kc_themes:
   kc_providers:
@@ -162,29 +139,11 @@ volumes:
   pgadmin_data:
 ```
 
-4. 部署后操作
-| 任务       | 操作                                           |
-| -------- | --------------------------------------------- |
-| 申请 SSL   | `http://<服务器IP>:81` → NPM → SSL Certificates  |
-| 配置反向代理   | NPM → Proxy Hosts → 添加两条路由                    |
-| 上传插件（可选） | Portainer → Volumes → `kc_providers` → Browse |
 
-首次打开http://IP:81 会创建用户密码，用p*t@h*.com，密码为一点也不介意
-
-浏览器打开 http://IP:81
-先添加 SSL 证书（Let’s Encrypt → 输入 git.eccee.com + sso.eccee.com 一键申请）
-再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
-1. sso.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
-2. git.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
-
-ssl页面选择申请的证书，勾选这两项：  
-✅ Force SSL  
-✅ HTTP/2 Support  
-
-5、登陆keycloak  
+4、登陆keycloak  
 登陆用户名和密码就是Advance Mode中定义的KC_ADMIN和它的密码。
 
-6、创建gitea管理员并登陆  
+5、创建gitea管理员并登陆  
 Gitea 首次访问时，不会自动弹出安装向导（因为设置了 GITEA__security__INSTALL_LOCK: "true"），你需要手动执行创建管理员的操作。
 ```
 # 进入 gitea 容器
@@ -198,7 +157,7 @@ gitea admin user create \
   --admin
 ```
 
-7、让gitea使用keycloak用户
+6、让gitea使用keycloak用户
   A. keycloak中配置
   * 登录 https://ssoip90.eccee.com/admin
   * 选择你的 realm（默认是 master，新建一个 eccee）
@@ -244,4 +203,23 @@ C.测试 SSO 登录
   * 用 Keycloak 中的用户登录
   * 首次登录会自动在 Gitea 创建关联账号
 
-  ***********本方案由于npm在内网，keycloak邮箱smtp发送鉴权会有问题，可把npm移到公网IP中
+  ***********
+  
+7. 公网部署反代操作
+| 任务       | 操作                                           |
+| -------- | --------------------------------------------- |
+| 申请 SSL   | `http://<服务器IP>:81` → NPM → SSL Certificates  |
+| 配置反向代理   | NPM → Proxy Hosts → 添加两条路由                    |
+| 上传插件（可选） | Portainer → Volumes → `kc_providers` → Browse |
+
+首次打开http://IP:81 会创建用户密码，用p*t@h*.com，密码为一点也不介意
+
+浏览器打开 http://IP:81
+先添加 SSL 证书（Let’s Encrypt → 输入 git.eccee.com + sso.eccee.com 一键申请）
+再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
+1. sso.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
+2. git.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
+
+ssl页面选择申请的证书，勾选这两项：  
+✅ Force SSL  
+✅ HTTP/2 Support 

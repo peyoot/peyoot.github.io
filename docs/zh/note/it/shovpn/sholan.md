@@ -18,8 +18,12 @@ remote IP 11194
 对于ubuntu来说，尾行改为：
 ```
 #auth-user-pass
+#authentication
 auth-user-pass passfile
 
+route 192.168.12.0 255.255.252.0 vpn_gateway_ip
+route 10.70.0.0 255.255.0.0 vpn_gateway_ip
+route 10.10.8.0 255.255.255.0 vpn gateway_ip
 
 mute 20
 script-security 2

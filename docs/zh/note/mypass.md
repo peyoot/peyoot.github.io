@@ -9,7 +9,8 @@
 | pve虚拟机 |  |  | .k系列+oldhome+newhome | 无ipv4仅前面就可，美国服务器不用. |
 | mysql |  | root | M+密+用户 | |
 | portainer登 |  | p用户名 | .p系列1刀h+dual叹 | |
-| keycloak登 |  | admin | .p系列1刀h+dual叹 | |
+| keycloak登 |  | p*t | .p系列1刀h+dual叹 | |
+| npm登 |  | p*t | 一点也不介意生年 | |
 | keycloak DB | keycloak | keycloak | K+密+用户 | postgres:15 |
 | gitea DB | gitea | gitea | G+密+用户 | postgres:15  |
 
