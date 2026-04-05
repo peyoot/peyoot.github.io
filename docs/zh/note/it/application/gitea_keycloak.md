@@ -207,6 +207,40 @@ C.测试 SSO 登录
   ***********
   
 7. 公网部署反代操作
+
+如果已经实现公网内网的VPN隧道，只需用podman compose编排npm服务。  
+  * 安装podman
+
+```
+sudo apt update
+sudo apt install -y podman podman-compose
+```
+创建目录
+```
+sudo mkdir -p /opt/npm
+```
+创建/opt/npm/npm.yml文件，注意使用podman不认短容器名，要加docker.io
+```
+version: "3"
+
+services:
+  npm:
+    image: docker.io/jc21/nginx-proxy-manager:latest
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - /opt/npm/data:/data
+      - /opt/npm/letsencrypt:/etc/letsencrypt
+```
+手动启动服务
+```
+sudo podman-compose -f /opt/npm/npm.yml up -d
+```
+
 | 任务       | 操作                                           |
 | -------- | --------------------------------------------- |
 | 申请 SSL   | `http://<服务器IP>:81` → NPM → SSL Certificates  |
@@ -218,8 +252,8 @@ C.测试 SSO 登录
 浏览器打开 http://IP:81
 先添加 SSL 证书（Let’s Encrypt → 输入 git.eccee.com + sso.eccee.com 一键申请）
 再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
-1. sso.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
-2. git.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
+1. sso.eccee.com  转到 内网IP:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选， 可用Ssl,可勾选Advanced项。
+2. git.eccee.com  转到 内网IP:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选， 证书一定要，Advanced也要勾选
 
 ssl页面选择申请的证书，勾选这两项：  
 ✅ Force SSL  
