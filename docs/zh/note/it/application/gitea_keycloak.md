@@ -21,8 +21,8 @@ KC_ADMIN=admin
 KC_ADMIN_PWD=.p系列1刀h+dual叹
 KC_DB_PWD=K+密+用户
 GITEA_DB_PWD=G+密+用户
-KC_HOST=sso.kc.ip90
-GITEA_HOST=git.kc.ip90
+KC_HOST=sso.eccee.com
+GITEA_HOST=git.eccee.com
 PGADMIN_EMAIL=p*t@h*t.com
 PGADMIN_PWD=P+密+用户
 ```
@@ -152,10 +152,11 @@ docker exec -it gitea /bin/sh
 # 创建管理员账号
 gitea admin user create \
   --username peyoot \
-  --password 1点也不介意 \
+  --password 1点也不介意生年 \
   --email peyoot@hotmail.com \
   --admin
 ```
+注意，默认的配置是https://ROOT_URL ，内网用ip是无法登陆，要在公网反向代理设置好，可用https://sso.eccee.com登陆
 
 6、让gitea使用keycloak用户
   A. keycloak中配置
@@ -223,3 +224,6 @@ C.测试 SSO 登录
 ssl页面选择申请的证书，勾选这两项：  
 ✅ Force SSL  
 ✅ HTTP/2 Support 
+
+并且开启Advanced中的选项，以实现包头转发
+
