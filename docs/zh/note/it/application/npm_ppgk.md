@@ -160,16 +160,9 @@ sudo systemctl enable --now npm
 
 ————————————————————————————————————————————————————————————
 
+使用rootless的podman，在portainer中编排这个服务，
 
-
-在portainer中编排这个服务，
-
-1. 创建external网络npm
-Portainer → Networks → Add network
-Name = npm , Driver = bridge , Enable “Manual network creation” 
-这和用docker network创建的区别在于它的attachable是"true"
-
-2.新建stack
+1. 新建stack
 Portainer → Stacks → Add stack
 
 | 字段                        | 填写内容                              |
@@ -188,12 +181,29 @@ GITEA_HOST=git.kc.ip90
 PGADMIN_EMAIL=p*t@h*t.com
 PGADMIN_PWD=P+密+用户
 ```
-3. compose文件
+3. compose文件，注意podman和docker区别，本篇为podman版本，需先验证rootless是true并有用户的socket.
 ```
+version: "3.8"
+
 services:
-  # ========== 1. SSO 中心 ==========
+  # ========== 1. 反向代理 ==========
+  npm:
+    image: docker.io/jc21/nginx-proxy-manager:latest
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - "8080:80"    # HTTP
+      - "8443:443"   # HTTPS
+      - "8081:81"    # 管理界面
+    volumes:
+      - npm_data:/data
+      - npm_le:/etc/letsencrypt
+    networks:
+      - npm
+
+  # ========== 2. SSO 中心 ==========
   keycloak-db:
-    image: postgres:15-alpine
+    image: docker.io/postgres:15-alpine
     container_name: keycloak-db
     restart: unless-stopped
     environment:
@@ -207,10 +217,11 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
     restart: unless-stopped
     command: start-dev
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: keycloak-db
@@ -220,8 +231,6 @@ services:
       KEYCLOAK_ADMIN: ${KC_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PWD}
       KC_HOSTNAME: ${KC_HOST}
-      KC_HOSTNAME_STRICT: "false" 
-      KC_HOSTNAME_STRICT_HTTPS: "false"  
       KC_PROXY: edge
     volumes:
       - kc_themes:/opt/keycloak/themes
@@ -231,9 +240,9 @@ services:
     depends_on:
       - keycloak-db
 
-  # ========== 2. Git 托管 ==========
+  # ========== 3. Git 托管 ==========
   gitea-db:
-    image: postgres:15-alpine
+    image: docker.io/postgres:15-alpine
     container_name: gitea-db
     restart: unless-stopped
     environment:
@@ -246,7 +255,8 @@ services:
       - npm
 
   gitea:
-    image: gitea/gitea:1.21-rootless
+    image: docker.io/gitea/gitea:1.21-rootless
+    container_name: gitea
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -269,39 +279,29 @@ services:
     depends_on:
       - gitea-db
 
-  # ========== 3. 数据库管理工具 ==========
-  
-  # 方案 A: pgAdmin (推荐，功能全)
+  # ========== 4. 数据库管理 ==========
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: docker.io/dpage/pgadmin4:latest
     container_name: pgadmin
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "8083:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PWD}
-      PGADMIN_CONFIG_SERVER_MODE: "False"  # 单用户模式，简化登录
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
       - npm
 
-  # 方案 B: Adminer (极简备用，可选启用)
-  # adminer:
-  #   image: adminer:latest
-  #   container_name: adminer
-  #   restart: unless-stopped
-  #   environment:
-  #     ADMINER_DEFAULT_SERVER: gitea-db  # 默认连接 Gitea 数据库
-  #   networks:
-  #     - npm
-
 networks:
   npm:
-    external: true
+    driver: bridge
 
 volumes:
+  npm_data:
+  npm_le:
   kc_db:
   kc_themes:
   kc_providers:
