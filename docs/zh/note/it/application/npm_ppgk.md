@@ -172,7 +172,7 @@ Portainer → Stacks → Add stack
 | **Web editor**            | 贴下面的 compose 文件                   |
 | **Environment variables** | **点 "Advanced mode"** → 逐行添加（见下表） |
 ```
-KC_ADMIN=admin
+KC_ADMIN=admin或p*t
 KC_ADMIN_PWD=.p系列1刀h+dual叹
 KC_DB_PWD=K+密+用户
 GITEA_DB_PWD=G+密+用户
@@ -230,8 +230,9 @@ services:
       KC_DB_PASSWORD: ${KC_DB_PWD}
       KEYCLOAK_ADMIN: ${KC_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PWD}
-      KC_HOSTNAME: ${KC_HOST}
-      KC_PROXY: edge
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_PROXY: "none"
     volumes:
       - kc_themes:/opt/keycloak/themes
       - kc_providers:/opt/keycloak/providers
@@ -310,6 +311,8 @@ volumes:
   pgadmin_data:
 
 ```
+其中npm没用，可移除
+
 
 4. 部署后操作
 | 任务       | 操作                                           |
@@ -318,9 +321,9 @@ volumes:
 | 配置反向代理   | NPM → Proxy Hosts → 添加两条路由                    |
 | 上传插件（可选） | Portainer → Volumes → `kc_providers` → Browse |
 
-首次打开http://IP:81 会创建用户密码，用p*t@h*.com，密码为一点也不介意
+首次打开http://IP:8081 会创建用户密码，用p*t@h*.com，密码为一点也不介意生年
 
-浏览器打开 http://IP:81
+浏览器打开 http://IP:8081
 先添加 SSL 证书（Let’s Encrypt → 输入 gitip90.eccee.com + sso.ssoip90.eccee.com 一键申请）
 再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
 1. ssoip90.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
