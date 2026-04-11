@@ -152,8 +152,8 @@ docker exec -it gitea /bin/sh
 # 创建管理员账号
 gitea admin user create \
   --username peyoot \
-  --password 1点也不介意生年 \
-  --email peyoot@hotmail.com \
+  --password g+k系列1刀h \
+  --email p*t@hotmail.com \
   --admin
 ```
 注意，默认的配置是https://ROOT_URL ，内网用ip是无法登陆，要在公网反向代理设置好，可用https://sso.eccee.com登陆
