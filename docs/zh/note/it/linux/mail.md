@@ -118,15 +118,30 @@ echo "Test from msmtp after company root ca" | msmtp -v me@hotmail.com
 
 ## keycloak和gitea
 
-用同样的方式添加只读挂载
+用同样的方式添加只读挂载，不过keycloak是java程序，它不直接扫描文件系统里的 .pem文件，而是依赖一个专用的数据库文件（Keystore/Truststore），通常是 cacerts或 .jks文件。
+必须用 keytool这个专门的工具，把证书“登记/导入”到这个数据库里，Java 运行时才会认。仅仅把证书文件放在磁盘上，Java 是看不见的。
 
 ```
-services:
-  keycloak:
     volumes:
-      - /etc/ssl/certs:/etc/ssl/certs:ro  # 关键：系统级映射
-  gitea:
-    volumes:
-      - /etc/ssl/certs:/etc/ssl/certs:ro  # 关键：系统级映射
+      - /etc/ssl/certs/company_root.pem:/tmp/company_root.pem:ro # 挂载证书
+    user: root
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        keytool -import -alias company_root \
+          -keystore /etc/pki/ca-trust/extracted/java/cacerts \
+          -file /tmp/company_root.pem \
+          -storepass changeit -noprompt
+        exec /opt/keycloak/bin/kc.sh start-dev
+```
+但是rootless没法导入证书，所以得用rootful的方式运行服务和容器，上面加了user:root, 但如果portainer本身是rootless，可能还是无法拉起，先到宿主机用rootful来启动portainer
+
+```
+
+# 停止旧服务（防止端口冲突）
+podman-compose down
+
+# 用 Root 强制拉起（绕过 Portainer）
+sudo podman-compose up -d
 
 ```
