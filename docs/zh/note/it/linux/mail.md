@@ -115,3 +115,18 @@ EOF
 echo "Test from msmtp after company root ca" | msmtp -v me@hotmail.com
 
 ```
+
+## keycloak和gitea
+
+用同样的方式添加只读挂载
+
+```
+services:
+  keycloak:
+    volumes:
+      - /etc/ssl/certs:/etc/ssl/certs:ro  # 关键：系统级映射
+  gitea:
+    volumes:
+      - /etc/ssl/certs:/etc/ssl/certs:ro  # 关键：系统级映射
+
+```
