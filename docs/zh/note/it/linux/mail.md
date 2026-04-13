@@ -134,14 +134,12 @@ echo "Test from msmtp after company root ca" | msmtp -v me@hotmail.com
           -storepass changeit -noprompt
         exec /opt/keycloak/bin/kc.sh start-dev
 ```
-但是rootless没法导入证书，所以得用rootful的方式运行服务和容器，上面加了user:root, 但如果portainer本身是rootless，可能还是无法拉起，先到宿主机用rootful来启动portainer
+但是rootless没法导入证书，所以得用rootful的方式运行服务和容器，上面加了user:root, 但如果portainer本身是rootless，可能还是无法拉起，先到宿主机用rootful来启动portainer, 不过实测发现，只要用user:root就可以了，不需要实施下面的情况
 
 ```
-
-# 停止旧服务（防止端口冲突）
 podman-compose down
 
-# 用 Root 强制拉起（绕过 Portainer）
+# 用 Root 强制拉起（绕过 Portainer）  不需要，因为yaml文件里还用了rootless的socket，虽然关系不大，即使需要也只要运行一次把证书装上，但实测已经显示 不需要用rootful的portainer了
 sudo podman-compose up -d
 
 ```
