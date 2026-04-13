@@ -11,7 +11,7 @@
 | portainer登 |  | p用户名 | .p系列1刀h+dual叹 | |
 | keycloak登 |  | p*t | .p系列1刀h+dual叹 | |
 | npm登 |  | p*t | 一点也不介意生年 | |
-| gitea登 | p*t | 一点也不介意生年 | |
+| gitea登 | p*t | 同github | |
 | keycloak DB | keycloak | keycloak | K+密+用户 | postgres:15 |
 | gitea DB | gitea | gitea | G+密+用户 | postgres:15  |
 

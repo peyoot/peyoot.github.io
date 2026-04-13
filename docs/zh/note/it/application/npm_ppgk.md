@@ -134,15 +134,12 @@ sudo podman-compose -f /opt/npm/npm.yml up -d
 启动后，浏览器打开 http://IP:81 ，创建一个管理员帐户，一点也不介意生年  
 先添加 SSL 证书（Let’s Encrypt → 输入 git.eccee.com + sso.eccee.com 一键申请）
 再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
-1. ssoip90.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
-2. gitip90.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
+1. sso.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
+2. git.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
 
 ssl页面选择申请的证书，勾选这两项：  
 ✅ Force SSL  
 ✅ HTTP/2 Support  
-
-
-
 
 
 
@@ -176,8 +173,8 @@ KC_ADMIN=admin或p*t
 KC_ADMIN_PWD=.p系列1刀h+dual叹
 KC_DB_PWD=K+密+用户
 GITEA_DB_PWD=G+密+用户
-KC_HOST=sso.kc.ip90
-GITEA_HOST=git.kc.ip90
+KC_HOST=sso.eccee.com
+GITEA_HOST=git.eccee.com
 PGADMIN_EMAIL=p*t@h*t.com
 PGADMIN_PWD=P+密+用户
 ```
@@ -324,7 +321,7 @@ volumes:
 首次打开http://IP:8081 会创建用户密码，用p*t@h*.com，密码为一点也不介意生年
 
 浏览器打开 http://IP:8081
-先添加 SSL 证书（Let’s Encrypt → 输入 gitip90.eccee.com + sso.ssoip90.eccee.com 一键申请）
+先添加 SSL 证书（Let’s Encrypt → 输入 git.eccee.com + sso.sso.eccee.com 一键申请）
 再建两条 Proxy Host，scheme是http，Forward Hostname/IP填的是容器名：  
 1. ssoip90.eccee.com  转到 keycloak:8080  Cache assets不勾选，Block Common Exploits建议勾选，Websockets Support必须勾选
 2. gitip90.eccee.com  转到 gitea:3000 Cache assets可勾选，Block Common Exploits建议勾选，Websockets Support可选
@@ -352,7 +349,7 @@ gitea admin user create \
 
 7、让gitea使用keycloak用户
   A. keycloak中配置
-  * 登录 https://ssoip90.eccee.com/admin
+  * 登录 https://sso.eccee.com/admin
   * 选择你的 realm（默认是 master，新建一个 eccee）
   * Clients → Create client  
 Client ID: gitea  
@@ -366,15 +363,15 @@ Capability config:
   * 进入刚创建的 gitea 客户端，Credentials 标签页：  
 Client Authenticator: Client ID and Secret  
 复制 Client Secret（一串 UUID，后面要用）  
-  * Settings 标签页，配置 Valid redirect URIs:  
-  https://gitip90.eccee.com/user/oauth2/keycloak/callback  
-  或更宽松（测试用）：https://gitip90.eccee.com/*
+  * Settings 标签页，配置 Valid redirect URIs:  https://git.eccee.com/user/oauth2/keycloak/callback
+  * Root URL	https://git.eccee.com
   * 记录 OpenID Endpoint Configuration：
-  https://ssoip90.eccee.com/realms/eccee/.well-known/openid-configuration  
+  在Realm Setting的General可找到OpenID Endpoint Configuration这个链接，到时需要用
+  https://sso.eccee.com/realms/eccee/.well-known/openid-configuration  
 
 B. gitea配置OAuth2
   * 用管理员账号登录 Gitea  
-点击头像 → Site Administration → Authentication Sources → Add Authentication Source  
+点击头像 → Site Administration → Identity & Access | Authentication Sources → Add Authentication Source  
 填写表单：
 
 | 字段 | 值 |
@@ -384,7 +381,7 @@ B. gitea配置OAuth2
 | OAuth2 Provider |	OpenID Connect |
 | Client ID | gitea |
 | Client Secret |	刚才复制的 Client Secret |
-| OpenID Connect Auto Discovery URL |	https://ssoip90.eccee.com/realms/eccee/.well-known/openid-configuration |
+| OpenID Connect Auto Discovery URL |	https://sso.eccee.com/realms/eccee/.well-known/openid-configuration
 | Additional Scopes |	openid email profile |
 
 点击 Add Authentication Source  
@@ -396,4 +393,143 @@ C.测试 SSO 登录
   * 用 Keycloak 中的用户登录
   * 首次登录会自动在 Gitea 创建关联账号
 
-  ***********本方案由于npm在内网，keycloak邮箱smtp发送鉴权会有问题，可把npm移到公网IP中
+  
+D. 开启 Keycloak 用户自注册
+在 Realm settings → Login 标签页：
+| 设置项                   | 值            | 说明       |
+| --------------------- | ------------ | -------- |
+| **User registration** | ✅ **ON**     | 允许用户自己注册 |
+| **Verify email**      | ✅ **ON**（推荐） | 注册后需验证邮箱 |
+| **Login with email**  | ✅ **ON**（推荐） | 允许用邮箱登录  |
+| **Forgot password**   | ✅ **ON**（推荐） | 允许找回密码   |
+
+
+配置 Terms and Conditions 条款内容
+
+1. 进入 Realm Localization 设置
+
+Realm settings → Localization → Realm overrides
+
+点击 Add message 或找到已有条目，添加以下 Key：
+
+| Message Key           | Value（中文）                             |
+| --------------------- | ------------------------------------- |
+| `termsTitle`          | `注册验证Registration Verification`                                |
+| `termsText`           | `请确认您不是机器人，并同意以下条款：本服务仅供内部使用，禁止批量注册。Please confirm you are not a robot. Bulk registration is prohibited.` |
+| `termsAcceptanceText` | `我同意上述条款I agree to the terms`                             |
+
+注意，keycloak 24没有这key，我们要用自己的主题
+从portainer的volume查得kc_theme路径，然后
+```
+cd /home/robin/.local/share/containers/storage/volumes/npm_keycloak_gitea_kc_themes/_data
+mkdir -p mytheme/login/pages
+mkdir -p mytheme/login/resources/messages
+
+# 创建主题配置
+cat > mytheme/login/theme.properties << 'EOF'
+parent=keycloak
+EOF
+
+# 创建条款模板（用 msg 变量）
+```
+<#import "template.ftl" as layout>
+<@layout.registrationLayout displayInfo=false displayMessage=false; section>
+    <#if section = "header">
+        ${msg("termsTitle")}
+    <#elseif section = "form">
+        <div id="kc-terms-text">
+            ${msg("termsText")}
+        </div>
+        <form class="form-actions" action="${url.loginAction}" method="POST">
+            <div class="${properties.kcFormGroupClass!}">
+                <div id="kc-form-options">
+                    <div class="${properties.kcLabelWrapperClass!}">
+                        <div id="kc-registration-terms-text">
+                                ${msg("myCustomTermsText")}
+                        </div>
+                        <label class="pf-c-check__label">
+                            <input type="checkbox" name="accept" id="accept" aria-describedby="kc-terms-text" />
+                            ${msg("acceptTerms")}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="${properties.kcFormGroupClass!}">
+                <button type="submit" id="kc-accept" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!}">${msg("acceptTerms")}</button>
+            </div>
+        </form>
+    </#if>
+</@layout.registrationLayout>
+
+```
+
+# 创建中文消息
+cat > mytheme/login/resources/messages/messages_zh_CN.properties << 'EOF'
+myCustomTermsText=<h3>服务条款</h3>...
+EOF
+
+# 创建英文消息
+cat > mytheme/login/resources/messages/messages_en.properties << 'EOF'
+myCustomTermsText=<h3>Terms</h3>...
+EOF
+```
+
+似乎不起作用， 待查
+
+## keycloak的路由
+
+Keycloak Realm URL 结构
+
+| 访问地址                                                               | 说明               |
+| ------------------------------------------------------------------ | ---------------- |
+| `https://sso.eccee.com/admin`                                      | 管理控制台，登录后选 realm |
+| `https://sso.eccee.com/realms/master/protocol/openid-connect/auth` | master realm 登录页 |
+| `https://sso.eccee.com/realms/eccee/protocol/openid-connect/auth`  | eccee realm 登录页  |
+
+方案 1：Nginx Proxy Manager 路径重写
+
+| NPM 配置项              | 值                                    |
+| -------------------- | ------------------------------------ |
+| Forward Hostname     | `sso.eccee.com`                      |
+| Forward Port         | `8080`                               |
+| **Custom Locations** | 添加 `/` → 重写到 `/realms/eccee/account` |
+
+
+方案 2：Keycloak 欢迎页主题（官方推荐）
+
+方案 3：DNS + 子域名（最优雅）
+
+| 子域名               | 用途              | NPM 转发目标                            |
+| ----------------- | --------------- | ----------------------------------- |
+| `sso.eccee.com`   | eccee realm 登录  | `http://keycloak:8080/realms/eccee` |
+| `admin.eccee.com` | master realm 管理 | `http://keycloak:8080/admin`        |
+
+在 Gitea 或其他应用里，快捷入口直接链接到：
+
+https://sso.eccee.com/realms/eccee/protocol/openid-connect/auth?client_id=gitea&redirect_uri=https://git.eccee.com/user/oauth2/keycloak/callback
+
+## gitea配置自注册
+容器内配置文件位于/etc/gitea/app.ini ，可是
+挂载的数据卷gitea_data位于home/robin/.local/share/containers/storage/volumes/npm_keycloak_gitea_gitea_data/_data，在容器内是/var/lib/gitea ，先在容器内复制一份配置：
+
+从portainer进入容器： cp /etc/gitea/app.ini /var/lib/gitea/
+
+挂载到同一个郑
+
+    volumes:
+      - gitea_data:/var/lib/gitea
+      - gitea_data:/etc/gitea
+
+修改app.ini
+```
+[service]
+DISABLE_REGISTRATION = false
+REGISTER_EMAIL_CONFIRM = true
+
+[mailer]
+ENABLED = true
+HOST = smtp.exmail.qq.com:465
+FROM = info@eccee.com
+USER = info@eccee.com
+PASSWD = ox...xgx
+```
