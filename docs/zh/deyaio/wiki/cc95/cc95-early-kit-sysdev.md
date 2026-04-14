@@ -34,18 +34,16 @@ dey-aio-manifest的main分支持包含不同版本的DEY支持，如果只需开
 cd
 mkdir dey-aio
 cd dey-aio
-repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap 
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap
 repo sync
 ```
 
-这样，dey-aio的工具集就安装好了，可以新建项目进行DEY系统开发。如果项目有需要，您也可以使用repo命令来在不同的manifest仓库间切换，以使用不同的特性支持。
-
-但对于早期的CC95开发板，需要检出开发板硬件变动前的源，主要是meta-digi相关层的版本，可以用deyaio中对应的xml文件自动获取相关分支。
+这样，dey-aio的工具集就安装好了，可以新建项目进行DEY系统开发。如果项目有需要，您也可以使用repo命令来在不同的manifest仓库间切换，以使用不同的特性支持。由于Digi官方github上的源只支持正式的开发板的，早期开发板的源没有更新，但内网仍有大约三个月的更新没有同步到github，对于想在早期开发板上尝试这部分更新的用户，可以用下面这个方法。它需要检出开发板硬件变动前的源，主要是meta-digi相关层的版本，可以用deyaio中对应的xml文件自动获取相关分支。
 ```
 cd
 mkdir deyaio-cc95ea   
 cd deyaio-cc95ea
-repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m cc95-early-kit.xml   
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m cc95-early.xml   
 repo sync
 ```
 
@@ -77,3 +75,13 @@ dey-aio的目录结构如下，：
 └── README-cn.md
 
 要进行项目开发，您需要进入项目所需的DEY版本,然后创建项目：
+
+```
+cd deyaio-cc95ea/dey5.0/workspace/
+mkdir cc95-early
+cd cc95-early
+source ../../mkproject.sh -l
+source ../../mkproject.sh -p ccimx95-dvk
+空格下翻，最后输入y接受协议
+bitbake dey-image-chromium
+```
