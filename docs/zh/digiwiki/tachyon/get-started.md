@@ -1,7 +1,7 @@
 # Tachyon单板机上手指南
 完整教程请访问[Digi Particle官方文档库](https://developer.particle.io/tachyon/setup/setup-overview)
 
-## 开箱
+## 📦开箱
 默认地，收到的手掌心大小的Tachyon单板机后，先检查一下配件并认识一下接口。
 
 | 项目  | 描述 |
@@ -18,11 +18,13 @@
 ![接口说明](https://developer.particle.io/img/tachyon-topview-annotations-all.jpg)
 </details>
 
-## 让Tachyon跑起来
+## 🚀让Tachyon跑起来
+1. 连接
 需要准备一台电脑(Windows, macOS, or Linux)，用一根Type C的USB数据线连接电脑和Tachyon的USB1接口（即最边上的那个C口），插上电池，
 
 当你看到电源LED显示为红色时，Tachyon已经准备好运行了。
 
+2.下载Particle CLI
 接下来，您需要用Particle CLI配置Tachyon。大约需要3~10分钟，如果你电脑上还没有安装Particle CLI，请先下载安装。
 Linux或Mac OS只需一行命令：
 ```
@@ -36,9 +38,13 @@ particle update-cli
 ```
 Tachyon定期有更新的OS发布，收到的板卡内置镜像一般是较早的出厂默认镜像，所以要配置升级一下。
 
-在命令行中执行
+3.配置更新系统固件
+
+为了下载固件，需要先注册一个Particle帐号，如果之前没注册过，可[点击这里注册](https://login.particle.io/signup) ，如果您已经有帐号，可直接登陆。
+
+长按开关按钮四秒，Tachyon会进入配置模式，此时LED灯闪着黄绿色，此时在命令行中执行
 ```
 particle tachyon setup
 ```
-为了下载固件，如果之前没注册过，会引导你注册一个particle帐号，如果您已经有帐号，可直接登陆。
-注意，particle
+
+使用您注册的用户名和密码登陆，并给产品取一个名称，第一次更新可选择ubuntu20.04，并设置地点为美国，以便连上运营商网络并测试LTE连接。
