@@ -33,3 +33,15 @@ do_compile:prepend:ccimx93() {
     cp ${WORKDIR}/logo.bmp ${S}/tools/logos/digi.bmp
 }
 ```
+
+## 编译
+需要清理和重新编译的内容包括uboot和fip-stm32mp固件，因为uboot是打包在fip固修的当中的。
+
+```
+bitbake -c cleansstate u-boot-dey
+bitbake -c cleanall u-boot-dey
+bitbake -c cleansstate fip-stm32mp
+bitbake -c cleanall fip-stm32mp
+bitbake u-boot-dey
+bitbake fip-stm32mp
+```
