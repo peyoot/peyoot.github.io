@@ -7,9 +7,10 @@
 
 Uboot的配方位于：meta-digi/blob/scarthgap/meta-digi-arm/recipes-bsp/u-boot/
 
-其中，logo图片可放在配方目录下，以CCMP25为例，将其放置在meta-custom/recipes-bsp/u-boot/u-boot-dey/ccmp25-dvk/logo.bmp
+其中，logo图片可放在配方目录下，以CCMP25为例，将其放置在meta-custom/recipes-bsp/u-boot/u-boot-dey/ccmp25-dvk/logo640x480.bmp
 
-图片格式是否可以用其它的，待试。
+如果图片格式不是bmp，先行转换一下。最好根据所用屏幕分辨率的比例来做这个图片，只看比例，也不用太大，会自动延展，只要不影响清淅度，少占些内存更好些。
+比如1024x600的屏幕分辨率，相当于640x375，或是480×281。
 
 根据U-Boot版本号，如果没有则相应创建一个bbappend，以ccmp25为例，即/meta-custom/recipes-bsp/u-boot/u-boot-dey_2023.10.bbappend , 添加以下内容：
 
@@ -25,12 +26,12 @@ BUILD_UBOOT_SCRIPTS = "false"
 UBOOT_ENV = ""
 
 SRC_URI:append:ccmp25 = " \
-    file://logo.bmp \
+    file://logo640x480.bmp \
 "
 
-do_compile:prepend:ccimx93() {
+do_compile:prepend:ccmp25() {
     # Replace DIGI logo with a barcode image
-    cp ${WORKDIR}/logo.bmp ${S}/tools/logos/digi.bmp
+    cp ${WORKDIR}/logo640x480.bmp ${S}/tools/logos/digi.bmp
 }
 ```
 
