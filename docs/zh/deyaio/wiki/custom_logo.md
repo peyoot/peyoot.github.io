@@ -5,33 +5,25 @@
 
 ## UBoot启动Logo图片定制
 
-Uboot的配方位于：meta-digi/blob/scarthgap/meta-digi-arm/recipes-bsp/u-boot/
+Uboot的原始配方位于：meta-digi/blob/scarthgap/meta-digi-arm/recipes-bsp/u-boot/ ，不同平台有不同版本。
 
-其中，logo图片可放在配方目录下，以CCMP25为例，将其放置在meta-custom/recipes-bsp/u-boot/u-boot-dey/ccmp25-dvk/logo640x480.bmp
+其中，logo图片可放在配方目录下，以CCMP25为例，将其放置在meta-custom/recipes-bsp/u-boot/ccmp25-dvk/logo350x175.bmp
 
-如果图片格式不是bmp，先行转换一下。最好根据所用屏幕分辨率的比例来做这个图片，只看比例，也不用太大，会自动延展，只要不影响清淅度，少占些内存更好些。
-比如1024x600的屏幕分辨率，相当于640x375，或是480×281。
+如果图片格式不是bmp，先行转换一下。注意转成8位深度的让尺寸不超过60k。最好根据所用屏幕分辨率的比例来做这个图片，只看比例，也不用太大，会自动延展，只要不影响清淅度，少占些内存更好些。比如1024x600的屏幕分辨率，相当于480×281。事实上为了减少尺寸，宽离最好在400以下。
+一个简单的方式是先用tinypng转png文件，再用格式转换工具，这样能最小化logo。
 
 根据U-Boot版本号，如果没有则相应创建一个bbappend，以ccmp25为例，即/meta-custom/recipes-bsp/u-boot/u-boot-dey_2023.10.bbappend , 添加以下内容：
 
 ```
-FILESEXTRAPATHS:prepend := "${THISDIR}:${THISDIR}/${BP}:"
-
-SRCBRANCH = "v2023.10/maint"
-SRCREV = "${AUTOREV}"
-SRC_URI = "${UBOOT_GIT_URI};branch=${SRCBRANCH}"
-
-# Skip building boot and install scripts
-BUILD_UBOOT_SCRIPTS = "false"
-UBOOT_ENV = ""
+FILESEXTRAPATHS:prepend := "${THISDIR}:${THISDIR}:"
 
 SRC_URI:append:ccmp25 = " \
-    file://logo640x480.bmp \
+    file://logo350x175.bmp \
 "
 
 do_compile:prepend:ccmp25() {
     # Replace DIGI logo with a barcode image
-    cp ${WORKDIR}/logo640x480.bmp ${S}/tools/logos/digi.bmp
+    cp ${WORKDIR}/logo350x175.bmp ${S}/tools/logos/digi.bmp
 }
 ```
 
