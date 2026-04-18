@@ -28,7 +28,7 @@ do_compile:prepend:ccmp25() {
 ```
 
 ## 编译
-需要清理和重新编译的内容包括uboot和fip-stm32mp固件，因为uboot是打包在fip固修的当中的。
+需要清理和重新编译的内容包括uboot和fip-stm32mp固件，因为uboot是打包在fip固件当中的。
 
 ```
 bitbake -c cleansstate u-boot-dey
