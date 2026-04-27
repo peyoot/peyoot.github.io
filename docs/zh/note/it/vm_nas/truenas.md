@@ -5,3 +5,5 @@
 
 # Truenas 配置
 
+1. 邮箱，暂用hotmail
+2. 磁盘
