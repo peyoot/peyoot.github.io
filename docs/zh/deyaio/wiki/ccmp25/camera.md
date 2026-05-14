@@ -1,4 +1,5 @@
-# 使用Connectcore MP25开发套件或自己开发的板卡
+# CCMP25与摄像头接口
+## 使用Connectcore MP25开发套件或自己开发的板卡测试
 不论是开发板，或是自己做的板卡，默认只有U-Boot，为了测试不同的功能，需刷入不同的预编译镜像。
 
 针对无线摄像头功能开发的镜像名是dey-image-lvgl，因此如果从Digi下载或获取到该固件，首先要把固件刷入到核心板。2
@@ -20,7 +21,7 @@ setenv fdt_file ccmp25-dvk.dtb
 saveenv
 ```
 
-# CCMP25 MIPI摄像头接口
+## CCMP25 MIPI摄像头接口
 MPU有一个MIPI接口，在Digi的开发板上，它接着15针SFW15S-2STE1LF插座和22针54548-2271插座。
 ![MIPI interface](mipi.png)
 从开发套件实际接口来看，让MIPI接口在上，HDMI接口在下，这样右上方第1脚为原理图中的Pin1，接地。黑色较厚的那面为金手指面方向。
