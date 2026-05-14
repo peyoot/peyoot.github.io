@@ -1,3 +1,25 @@
+# 使用Connectcore MP25开发套件或自己开发的板卡
+不论是开发板，或是自己做的板卡，默认只有U-Boot，为了测试不同的功能，需刷入不同的预编译镜像。
+
+针对无线摄像头功能开发的镜像名是dey-image-lvgl，因此如果从Digi下载或获取到该固件，首先要把固件刷入到核心板。2
+先将U盘或SD卡格式化为FAT32格式，将获取的镜像解压到根目录下，插入U盘或SD卡，上电后按任意键停留在uboot下,执行：
+```
+setenv image-name dey-image-lvgl
+run install_linux_fw_sd  或者如果是用U盘 run install_linux_fw_usb
+```
+脚本会自动把系统镜像刷入到核心板的flash当中，并自动重启进入系统。
+
+
+一般通过上电时加载不同的设备树，以实现对不同板卡的支持。在U-Boot中，有个变量fdt_file定义了上电时默认加载的设备树。如果刷入官方下载的预编译镜像，则默认地这个变量fdt_file=ccmp25-dvk.dtb。在UBoot下，可以通过
+```
+printenv fdt_file
+```
+来查看变量fdt_file的值，如果使用针对自己板卡编译的镜像而要在开发套件上测试，则fdt_file可能默认已经用了该板卡的设备树，则可以用下面命令改回来：
+```
+setenv fdt_file ccmp25-dvk.dtb
+saveenv
+```
+
 # CCMP25 MIPI摄像头接口
 MPU有一个MIPI接口，在Digi的开发板上，它接着15针SFW15S-2STE1LF插座和22针54548-2271插座。
 ![MIPI interface](mipi.png)
