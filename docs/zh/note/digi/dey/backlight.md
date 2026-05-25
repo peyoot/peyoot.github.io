@@ -1,3 +1,7 @@
+## 背光驱动的设备树
+
+https://github.com/digi-embedded/linux/blob/v6.6/stm/dey-5.0/maint/Documentation/devicetree/bindings/leds/backlight/pwm-backlight.yaml
+
 #### 自动熄屏的正确实现方式
 这是一个典型的系统电源管理场景
 ##### 方案 1：systemd-logind（推荐，最简单）
