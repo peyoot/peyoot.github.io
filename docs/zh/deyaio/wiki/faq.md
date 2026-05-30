@@ -9,6 +9,15 @@ bitbake -e swupdate | grep -E "^PV=|^PREFERRED_VERSION|^FILE="
 ```
 
 如果swupdate所用的提交中的最高版本号和补丁不匹配，就会出现编译错误。
+一个好的办法是需要官方去执行，即你的补丁只适用于特定版本，那么就在meta-digi/meta-digi-dey/recipes-support/swupdate/swupdate_%.bbappend里加上
+
+```
+# Force using 2025.12 version + matching patches
+PREFERRED_VERSION_swupdate = "2025.12"
+
+# 可选：提高这个 append 的优先级
+DEFAULT_PREFERENCE_pn-swupdate = "1"
+```
 
 
 
