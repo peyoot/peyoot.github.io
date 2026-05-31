@@ -34,9 +34,33 @@ ConnectCore MP25 PLC开发板使用的设备树版本位于：https://github.com
 ## 应用程序开发
 您可使用官方的SDK，来开发应用程序，参考[官方文档](https://docs.digi.com/resources/documentation/digidocs/embedded/dey/5.0/ccmp25/develop-applications_c.html)
 
+一般使用相同的DEY版本的SDK，可登陆后查询：
+```
+cat /etc/buildinfo
+```
+
 ## 系统固件开发定制
 参考[DEY-AIO文档](https://peyoot.github.io/zh/deyaio/get-started.html)
 
+在DEY AIO开发环境中，用repo管理所使用的layer,安装好DEY AIO开发环境后，检出ccmp25plc所使用的repo代码库
+
+```
+cd
+mkdir deyaio-ccmp25plc   
+cd deyaio-ccmp25plc
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m ccmp25plc.xml   
+repo sync
+```
+重新开一个终端，或是tmux一个终端，然后
+```
+cd ~/deyaio-ccmp25plc/dey5.0/workspace
+mkdir ccmp25plc
+cd ccmp25plc
+source ../../mkproject.sh -p ccmp25-dvk
+按空格到最后，输入“y"接受协议，然后就可以编译镜像y
+bitbake core-image-base
+
+```
 
 # ConnnectCore MP25 PLC Codesys例程上手指南
 
