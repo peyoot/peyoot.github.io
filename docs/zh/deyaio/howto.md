@@ -65,6 +65,15 @@ repo init -m rtsp.xml
 repo init -b some-branch -m rtsp.xml
 repo sync
 ```
+有时，主分支已经变化，但之前打了tag，我们可以切换到该tag下
+
+```
+可删除.repo目录，重新配置，不影响已经存在的项目
+mv .repo /tmp/.repo_backup  # 先移走，别直接删，以防万一，或直接rm -rf .repo
+再重新拉取对的版本，比如dey5.0-r3下和isp.xml
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b refs/tags/dey5.0-r3 -m isp.xml
+repo sync
+```
 
 ## 如何生成锁定版本的manifest文件
 

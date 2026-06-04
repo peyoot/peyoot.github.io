@@ -19,5 +19,13 @@ PREFERRED_VERSION_swupdate = "2025.12"
 DEFAULT_PREFERENCE_pn-swupdate = "1"
 ```
 
+## DEY中tf-a固件版本
+如果发生tf-a固件报错，首先查一下版本
+
+```
+bitbake -e tf-a-stm32mp | grep -E "^PV=|^PREFERRED_VERSION|^FILE="
+```
+主要看PV="v2.10.13-stm32mp-r2"
+
 
 
