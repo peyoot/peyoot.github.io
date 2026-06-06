@@ -53,3 +53,14 @@ https://docs.digi.com/resources/documentation/digidocs/embedded/dey/5.0/ccmp25/b
 
 1. 首先检查驱动是否默认已经在源码树
 默认的linux源码树中只有st-vgxy61.c，一款全局快门图像传感器，分辨率是 0.5 兆像素。所以VD16Gz彩色全局快门图像传感器，分辨率是 1.5 兆像素。两个驱动应该是不同。应些需要拉取正确的驱动到linux源码树下编译。未完待续...
+
+
+#### 内网参考资料链接：
+
+https://onedigi.atlassian.net/wiki/spaces/~gruiz/pages/234588897304/Video
+
+#### 其它资料
+
+https://wiki.st.com/stm32mpu/index.php?title=STM32MP2_V4L2_camera_overview&sfr=stm32mpu
+
+https://test-videos.co.uk/
