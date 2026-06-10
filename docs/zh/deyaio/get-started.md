@@ -8,12 +8,31 @@
 由于国内github访问经常被间歇式阻断，而编译过程中需要流畅的github访问，建议使用PVPN自行搭建科学上网的环境，以确保编译不受GFW防火墙的干扰。
 
 ## 安装必要的依赖包
+
 ```
 sudo apt update
 sudo apt install gawk wget bison file flex git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa-dev libsdl1.2-dev libncurses-dev pylint xterm python3-subunit mesa-common-dev zstd liblz4-tool tmux
 sudo apt install python-is-python3
 ```
 
+桌面版ubuntu通常已经安装好locale，但如果是安装ubuntu server版本，还需要检查locale是否配置好。Ubuntu 22.04 默认把所有 locale 都编译成二进制放在 /usr/lib/locale/ 下，只有显式生成过才会出现。而且为了开发注释方便，我们通常也需要有中文支持，因此服务器版本需要下面配置
+
+```
+1、安装中文字符集
+sudo apt install language-pack-zh-hans
+
+2、修改/etc/locale.gen
+sudo nano /etc/locale.gen
+确保下面这两行没被注释
+en_US.UTF-8 UTF-8
+zh_CN.UTF-8 UTF-8
+然后：sudo locale-gen
+
+3、 立即生效
+sudo update-locale LANG=en_US.UTF-8
+
+最好重启一下
+```
 
 ## 安装repo并配置好git
 

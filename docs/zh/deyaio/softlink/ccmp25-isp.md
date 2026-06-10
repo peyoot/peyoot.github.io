@@ -29,3 +29,4 @@ source ../../mkproject.sh -l
 source ../../mkproject.sh -p ccmp25-dvk
 bitbake dey-image-lvgl
 ```
+
