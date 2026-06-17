@@ -6,7 +6,7 @@
 ## 安装前的准备
 同标准的deyaio一样，如果从没有安装过依赖包，请先安装，以下以Ubuntu 22.04为例：
 ```
-sudo apt install gawk wget file git diffstat file unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm python3-subunit mesa-common-dev zstd liblz4-tool
+sudo apt install gawk wget file git diffstat file unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm python3-subunit mesa-common-dev zstd liblz4-tool gfortran
 sudo apt install python-is-python3
 ```
 安装repo工具并配置git
@@ -59,3 +59,28 @@ cd ../..
 
 您可以选择将编译后的输出拷贝到发布文件夹并将其打包成卡刷包或发布到 TFTP/NFS 路径或服务器上。
 
+## 调试
+首次编译时没有镜像生成，先检查镜像配方，其中有：
+```
+inherit ros_distro_${ROS_DISTRO}
+inherit ${ROS_DISTRO_TYPE}_image
+```
+检查变量值
+```
+robin@nuc8vm1:~/deyaio-ros/dey5.0/workspace/ccmp25-ros$ bitbake-getvar -r dey-image-qtros ROS_DISTRO                                                                                                           
+#                                                                                                                                                                                                              
+# $ROS_DISTRO [2 operations]                                                                                                                                                                                   
+#   set /home/robin/deyaio-ros/dey5.0/sources/meta-ros/meta-ros-common/conf/ros-distro/ros-distro.conf:43                                                                                                      
+#     [_defaultval] "${@d.getVar('ROS2_DISTRO') if d.getVar('ROS2_DISTRO') not in (None, '') else d.getVar('ROS1_DISTRO')}"                                                                                    
+#   set /home/robin/deyaio-ros/dey5.0/sources/meta-ros/meta-ros2-humble/classes/ros_distro_humble.bbclass:5                                                                                                    
+#     "humble"                                                                                                                                                                                                 
+# pre-expansion value:                                                                                                                                                                                         
+#   "humble"                                                                                                                                                                                                   
+ROS_DISTRO="humble"                                                                                                                                                            
+robin@nuc8vm1:~/deyaio-ros/dey5.0/workspace/ccmp25-ros$ bitbake -e dey-image-qtros | grep -A 20 -B 5 "ROS_DISTRO"     
+```
+上面两个命令第一个是yocto新的功能，而另一个是传统方式，其中
+```
+-r dey-image-qtros：指定针对这个 recipe 的上下文（很重要，因为变量可能在不同 recipe 中有不同 override）。
+如果只想看最终值（不看历史），可以加 --value：Bashbitbake-getvar -r dey-image-qtros --value ROS_DISTRO
+```
