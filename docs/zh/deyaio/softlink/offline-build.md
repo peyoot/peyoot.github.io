@@ -62,7 +62,7 @@ bitbake -c cleansstate 出错配方名
 bitbake dey-image-lvgl
 ```
 直到最终编译完成，上面编译镜像也可用bitbake -k dey-image-lvgl以加快速度。
-如果确实无法编译完成，请向Digi官方索取相关的编译环境压缩包
+如果确实无法编译完成，请向Digi官方索取相关的编译环境压缩包，并用后文内网编译的方式实现离线编译。
 
 ## 本机离线编译配置
 
