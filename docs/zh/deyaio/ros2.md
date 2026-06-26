@@ -49,6 +49,10 @@ bitbake dey-image-qtros
 ```
 
 ## 发布并打包
+早期DEY没有提供打包功能，因此deyaio项目用脚本实现打包，在DEY 5.0时，编译项目已经可以自动打包了，两者生成的固件名称略有不同，因此安装时设置image-name时要因应设置。
+
+DEY-AIO的脚本打包，方法如下：
+
 ```
 cd ../..
 ./publish
@@ -58,6 +62,14 @@ cd ../..
 当提示询问它是否是 ROS 项目时，输入“yes”。
 
 您可以选择将编译后的输出拷贝到发布文件夹并将其打包成卡刷包或发布到 TFTP/NFS 路径或服务器上。
+
+而官方默认的打包生成的是：
+```
+dey-image-qt-wayland-humble-ccmp25-dvk.boot.vfat
+dey-image-qt-wayland-humble-ccmp25-dvk.ext4
+dey-image-qt-wayland-humble-ccmp25-dvk.recovery.vfat
+```
+因此运行卡刷时的image-name应设置成dey-image-qt-wayland-humble
 
 ## 调试
 首次编译时没有镜像生成，先检查镜像配方，其中有：
