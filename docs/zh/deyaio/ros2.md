@@ -69,7 +69,96 @@ dey-image-qt-wayland-humble-ccmp25-dvk.boot.vfat
 dey-image-qt-wayland-humble-ccmp25-dvk.ext4
 dey-image-qt-wayland-humble-ccmp25-dvk.recovery.vfat
 ```
-因此运行卡刷时的image-name应设置成dey-image-qt-wayland-humble
+因此运行卡刷时的image-name应设置成dey-image-qt-wayland-humble 或 core-image-base-humble
+
+如果注重实时性，应关闭WiFi，使用不带WiFi的型号效果最好，带Wifi的型号如果仅在uboot中禁掉WiFi，也有一定效果。
+其实，带wifi型号未禁用Wifi时的实测数据：
+![ros2_rt_test](wifi_ros2_rt_test.png)
+
+## 测试ros2功能
+为了测试ros功能，带有screen或tmux的固件会比较方便，以便打开更多终端session.
+进入linux后，先source一下ros2的环境变量：
+```
+source /opt/ros/humble/setup.bash
+# 1. 检查 ROS 环境变量
+echo $ROS_DISTRO
+echo $ROS_VERSION
+
+#2 检查 ROS 核心包是否安装
+ros2 pkg list | grep -E "rclcpp|std_msgs|demo|ros_core"
+
+#3 运行基础测试（ROS 2 推荐）
+#3.1 启动 ROS 2 daemon（后台）
+ros2 daemon start
+
+#3.2 检查是否正常
+ros2 daemon status
+
+#3.3 测试 talker + listener（最经典的测试）
+用screen或tmux新建Session, 以screen为例
+screen -S ros_test
+# screen终端 ros_test：
+ros2 run demo_nodes_cpp talker
+
+#3.4 按ctrl+a d 回原终端 ：
+ros2 run demo_nodes_cpp listener
+
+你应该能看到 talker 持续发布消息，listener 接收到消息。
+
+#3.5 其它快速测试
+ros2 node list
+ros2 topic list
+ros2 topic echo /chatter     # 如果有 talker 在跑
+```
+
+## recovery
+如果刷错固件，变砖，仍有办法恢复固件，一般最简单的就是用USBC来恢复，参考Digi官方的recover your device这一章节。
+您需要一台Linux机器，比如Ubuntu 24.04，先安装好dfu-tool
+
+```
+sudo apt install dfu-util
+```
+恢复变砖的设备，需要更改启动选项为USB启动，拨盘开关的2为on，其余三个是off。
+
+将刷机固件包解压到一台Ubuntu的机器上，注意不同版本可能不同，检查是否包括fip-ccmp25-dvk-ddr-optee-emmc.bin，如果缺失可以手动从编译目录拷过来。
+写个刷机脚本：
+```
+#!/bin/bash
+dfu-util -a 0 -D tf-a-ccmp25-dvk-optee-usb.stm32
+dfu-util -a 0 -e
+sleep 1
+dfu-util -a 0 -D fip-ccmp25-dvk-ddr-optee-emmc.bin
+dfu-util -a 0 -e
+sleep 1
+dfu-util -a 1 -D fip-ccmp25-dvk-optee-emmc.bin
+dfu-util -a 0 -e
+```
+你需要两条type C的线缆，一条是接console到调试主机，另一台是接USBC到提供dfu-util刷机工具和固件的Ubuntu机器上，当然如果你使用同一台电脑，用两个终端也行。但一般你可以用windows作为调试主机查看终端输出。
+运行脚本，最后一个指令加载uboot到内存后，就可以重新向模块内的闪存烧写正确的固件。
+
+注意，上面脚本启动时，你需要不停地在终端按任意键，以便停在uboot里,以任意方式刷固件。如果没有停在uboot中，则是默认进入uuu刷固件。
+不过既然已经用了USBC来恢复固件，用UUU的方式刷固件也是最容易的。如果只是刷uboot，可以用最简单的方式写个脚本
+```
+#!/bin/bash
+uuu FB: flash boot1 tf-a-ccmp25-dvk-optee-emmc.stm32
+sleep 10
+uuu FB: flash boot2 tf-a-ccmp25-dvk-optee-emmc.stm32
+sleep 10
+uuu FB: flash metadata1 metadata-ccmp25-dvk.bin
+sleep 10
+uuu FB: flash metadata2 metadata-ccmp25-dvk.bin
+sleep 10
+uuu FB: flash fip-a fip-ccmp25-dvk-optee-emmc.bin
+sleep 10
+uuu FB: flash fip-b fip-ccmp25-dvk-optee-emmc.bin
+```
+刷好后，模块的内置flash已经恢复了uboot固件，记得把拨盘开关拨回原来位置，以便从模块内置的闪存启动
+上面的方法适用于仅更新Uboot，如果您需要把系统固件也用uuu刷入，可以用Digi的install_linux_fw_uuu.sh脚本，注意其它intall开头的脚本是适用于在目标板上执行刷机，而适用于uuu这个脚本是在Ubuntu主机上执行的，只不过，你可以更改一下默认的镜像名称，特别是恢复固件后，默认image-name没设置，为了定义image-name，除了在uboot内设置外，也可以在这个install_linux_fw_uuu.sh里直接改，在130行左右的IMAGE_NAME里定义，比如
+```
+IMAGE_NAME="core-image-base-humble"
+```
+不过上面uuu刷机脚本主要针对dvk，其它的板卡建议直接用卡刷的方式来恢复固件
+
 
 ## 调试
 首次编译时没有镜像生成，先检查镜像配方，其中有：
