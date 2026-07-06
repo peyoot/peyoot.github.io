@@ -1,7 +1,5 @@
 # ROS2镜像快速上手
 
-::: warning
-目前只测试了 ROS2 Humble支持，并且仅使用 DEY4.0 kirkstone 进行了验证。其他版本的 DEY 可能有效，但您需要修改 dey-aio-manifest 存储库指向正确版本并自己尝试。
 :::
 ## 安装前的准备
 同标准的deyaio一样，如果从没有安装过依赖包，请先安装，以下以Ubuntu 22.04为例：
@@ -17,24 +15,78 @@ git config --global user.email you@email.com
 ```
 
 ## 安装带ros支持的deyaio
-如果您已经安装了 deyaio，现在您需要 ros 支持版本。建议您安装到另一个文件夹，例如 deyaio-ros 
+建议以板卡名称来命名deyaio目录，比如deyaio-ccmp25dvk-ros或deyaio-ccmp25plc-ros，
 
+比如Digi开发板
 ```
 cd
-mkdir deyaio-ros
-cd deyaio-ros
-repo init -u https://github.com/peyoot/dey-aio-manifest.git -b ros
+mkdir deyaio-ccmp25dvk-ros
+cd deyaio-ccmp25dvk-ros
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m ros.xml 
+repo sync
+```
+或是ST ccmp25plc开发板
+```
+cd
+mkdir deyaio-ccmp25plc-ros
+cd deyaio-ccmp25dvk-ros
+repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m ros-ccmp25plc.xml 
 repo sync
 ```
 
 ## 创建带ros支持的dey项目
-cd dey4.0/workspace
-mkdir my93ros
-cd my93ros
-source ../../mkproject.sh -p ccimx93-dvk
+cd dey5.0/workspace
+mkdir ccmp25dvk
+cd ccmp25dvk
+source ../../mkproject.sh -p ccmp25-dvk
 
 ## 编译并生成镜像
 编辑conf/local.conf 并添加您所需的软件包，以下仅供参考:
+对于不带屏的设备实时设备，建议
+```
+DISTRO_FEATURES:append = " rt opengl pam "
+DISTRO_FEATURES:remove = " weston x11 cellular 3g "
+DISTRO_FEATURES:remove = " bluetooth wifi "
+
+IMAGE_INSTALL:append = " \
+    ros-core \
+    packagegroup-ros2-demos \
+    screen \
+"
+
+PACKAGECONFIG:remove:pn-networkmanager = " modemmanager"
+PACKAGECONFIG:remove:pn-networkmanager = " ppp"
+
+RDEPENDS:packagegroup-dey-core:remove = " connectcore-demo-example xbee-init"
+RDEPENDS:packagegroup-dey-network:remove = " ppp modemmanager gstreamer "
+RDEPENDS:networkmanager:remove = " ppp modemmanager "
+RDEPENDS:packagegroup-machine-base:remove = " xbee-init"
+
+# 禁用 swupdate 服务的自动启动（同时会禁用其 socket，因为它们属于同一配方）
+SYSTEMD_AUTO_ENABLE:pn-swupdate = "disable"
+
+IMAGE_INSTALL:remove = " mtdev vsftpd lighttpd avahi-daemon hostapd \
+                         pulseaudio \
+                         ppp modemmanager \
+                       "
+
+IMAGE_INSTALL:remove = " wayland wayland-protocols libxkbcommon libinput libevdev \
+                         swupdate swupdate-www \
+                         ssh-server-openssh \
+                       "
+
+SKIP_RECIPE[modemmanager] = "Not needed, no cellular module"
+SKIP_RECIPE[ppp] = "Not needed, no cellular module"
+SKIP_RECIPE[xbee] = "Not needed, no xbee module"
+#SKIP_RECIPE[swupdate] = "Diagnosing dependency"
+
+# 移除调试特性
+IMAGE_FEATURES:remove = " eclipse-debug dbg-pkgs tools-debug tools-profile tools-testapps dev-pkgs package-management"
+
+# 全局抑制调试符号
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+```
+带屏的设备，可以编译镜像dey-image-qtros
 ```
 GLIBC_GENERATE_LOCALES = "zh_CN.UTF-8 en_GB.UTF-8 en_US.UTF-8"
 IMAGE_LINGUAS = "zh-cn"
@@ -45,6 +97,8 @@ IMAGE_INSTALL:append = " qt5-demo-extrafiles cinematicexperience-rhi cinematicex
 ```
 现在可以编译带ros支持的镜像了
 ```
+bitbake core-image-base
+或
 bitbake dey-image-qtros
 ```
 
