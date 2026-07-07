@@ -56,7 +56,7 @@ docker network create pvpn --subnet 172.100.100.0/24    #创建配合科学上�
 ```
 
 ## 用repo安装dey-aio工具集
-dey-aio-manifest的main分支持包含不同版本的DEY支持，如果只需开发特定版本，也可以用Yocto代号指定
+dey-aio-manifest的main分支持包含不同版本的DEY支持，如果只需开发特定版本，也可以用Yocto代号指定，以开发板为例：
 
 ```
 cd
@@ -68,7 +68,7 @@ repo sync
 
 这样，dey-aio的工具集就安装好了，可以新建项目进行DEY系统开发。如果项目有需要，您也可以使用repo命令来在不同的manifest仓库间切换，以使用不同的特性支持。
 
-您也可以在安装DEY时就指定好功能特性支持。比如开发基于ccmp25的PLC系列DEY 5.0镜像，参考如下：
+您也可以在安装DEY时就指定好不同板卡或功能特性支持。比如开发基于ccmp25的PLC系列DEY 5.0镜像，参考如下：
 ```
 cd
 mkdir deyaio-ccmp25plc   
@@ -76,6 +76,8 @@ cd deyaio-ccmp25plc
 repo init -u https://github.com/peyoot/dey-aio-manifest.git -b scarthgap -m ccmp25plc.xml   
 repo sync
 ```
+如果您已经自行设计了板卡，可以参考ccmp25plc.xml，来生成一份自己板卡适用的manifest仓库文件，通常您只需要fork一份meta-custom，来添加自己所需的板卡设备树支持和镜像功能定制。你也可以用Digi的预编译镜像，仅编译自己的设备树文件来测试系统软件和接口功能。 请同Digi技术支持团队联系以获取专属的manifest文件和meta-custom分支或技术支持。
+
  
 
 # DEY系统开发
