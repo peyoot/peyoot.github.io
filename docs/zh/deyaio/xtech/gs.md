@@ -71,7 +71,7 @@ dey-aio工具集在安装时就已经自动拉取DEY源码到sources，您可以
 
 ```text-plain
 cd workspace
-mkdir ccmp25-viena
+mkdir ccmp25-xtech
 source ../../mkproject.sh -l
 source ../../mkproject.sh -p ccmp25-dvk
 ```
