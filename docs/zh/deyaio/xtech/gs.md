@@ -11,7 +11,7 @@ sudo apt update
 sudo apt install gawk wget bison file flex git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa-dev libsdl1.2-dev libncurses-dev pylint xterm python3-subunit mesa-common-dev zstd liblz4-tool tmux
 sudo apt install python-is-python3
 ```
-使用ubuntu server最小化安装，可能还需要设置一个local
+使用ubuntu server最小化安装时，一般还需要设置一个locale，桌面版可略过。
 
 ```
 #安装中文字符集
@@ -64,6 +64,7 @@ repo sync
 dey-aio工具集在安装时就已经自动拉取DEY源码到sources，您可以在workspace中创建项目，直接编译。本项目对下载目录和sstate缓存做了一些优化处理，它们都存放于父级目录下的project\_shared，以方便不同项目共享使用。
 
 1、科学上网准备
+
 编译时会从github和其它上游开源社区拉取包括linux源码树在内的代码。由于国内对github等海外网站的访问是间歇式的，如果没有科学上网环境，容易出现编译出错。因此建议首次编译时使用科学上网代理或VPN。如果没有，海外云服务器自建vpn可参考：https://peyoot.github.io/pvpn/get-started.html
 
 2、创建项目
@@ -90,6 +91,7 @@ bitbake core-image-base
 编译结束后，DEY默认已经会在tmp/deploy/image/<平台>下生成zip安装包，您也可以直接使用这个卡刷包。
 
 4、刷入镜像
+
 使用U盘或SD卡，格式化为FAT32（切记），将安装包完整解压到盘或卡上，不要有任何目录，插入到板卡中，然后上电时按任意键停留在uboot上，执行刷机脚本，以U盘刷机为例：
 ```
 setenv image-name core-image-base 
@@ -98,7 +100,12 @@ run install_linux_fw_usb
 刷机完成后，会自动进入系统
 
 5、优化设备树
-使用官方的设备树或是基础设备树，虽然可以进入系统，但一些接口的设备树尚未适配，可能功能无法使用，这时可以对设备树进行修改优化和调试。
+
+当您 完成一次完整编译，并获得安装镜像，编译环境可以用来做进一步开发，包括linux系统镜像的进一步定制，以及设备树的修改和完善等。
+
+使用官方的设备树或是基础设备树，虽然可以进入系统，但部分接口的设备树尚未适配，此时接口功能无法使用，可以对设备树进行修改优化和调试。
 通常以官方设备树为模板，并参考smartIOmux设计文件，来进行不同接口的设备树替换。建议以接口节点逐项更改和测试。
+
 具体编译方法见：https://peyoot.github.io/zh/deyaio/custom-dt.html
+
 
