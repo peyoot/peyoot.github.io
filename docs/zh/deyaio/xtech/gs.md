@@ -87,6 +87,7 @@ source ../../mkproject.sh -p ccmp25-dvk
 ```
 bitbake core-image-base
 ```
+如果编译出错，也没关系，通常是网络情况，一般可以查看出错的配方(对应的bb或bbapend文件名前缀)，先用bitbake -c cleansstate <配方名>，再进一步重新执行。科学上网环境如果没搭配好，更容易出错，则可以用bitbake -k core-image-base来先完成大部分编译，再根据出错提示清理配方并重新执行。建议首次编译务必能科学上网，以便至少自行完成一次编译。
 
 编译结束后，DEY默认已经会在tmp/deploy/image/<平台>下生成zip安装包，您也可以直接使用这个卡刷包。
 
@@ -97,15 +98,20 @@ bitbake core-image-base
 setenv image-name core-image-base 
 run install_linux_fw_usb 
 ```
-刷机完成后，会自动进入系统
+刷机完成后，会自动进入系统，用默认用户名root可以登陆。
 
 5、优化设备树
 
 当您 完成一次完整编译，并获得安装镜像，编译环境可以用来做进一步开发，包括linux系统镜像的进一步定制，以及设备树的修改和完善等。
 
-使用官方的设备树或是基础设备树，虽然可以进入系统，但部分接口的设备树尚未适配，此时接口功能无法使用，可以对设备树进行修改优化和调试。
-通常以官方设备树为模板，并参考smartIOmux设计文件，来进行不同接口的设备树替换。建议以接口节点逐项更改和测试。
+如果您已提交过原理图review，Digi一般会提供一个相应的基础镜像，并已经集成了适配过的设备树。你可以先刷入镜像，Digi提供的镜像中的设备树，大部分接口可用，但仍有些接口或GPIO需要根据实际情况调整。因此请先，测试各接口功能，并记录哪些接口已经可用，哪些仍有问题，以便进一步完善。
+
+如果全新自行开发的板卡，使用官方的设备树或是基础单板机设备树，虽然可以进入系统，但部分接口的设备树尚未适配，此时接口功能无法使用，可以对设备树进行修改优化和调试。通常以官方设备树为模板，并参考smartIOmux设计文件，来进行不同接口的设备树替换。建议以接口节点逐项更改和测试。
 
 具体编译方法见：https://peyoot.github.io/zh/deyaio/custom-dt.html
 
+6、程序开发
+
+可以使用Digi官方的SDK或自行编译的SDK来开发应用程序，具体方法参考：
+https://docs.digi.com/resources/documentation/digidocs/embedded/dey/5.0/ccmp25/develop-applications_c.html
 
