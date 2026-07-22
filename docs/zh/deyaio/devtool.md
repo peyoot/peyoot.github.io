@@ -128,3 +128,9 @@ nano Makefile
 cd workspace/sources/linux-dey
 make ARCH=arm64 dtbs
 ```
+
+# linux配方bbappend
+早期设备树拷贝install_dts 被挂在 do_patch:append 里,也就是在 kernel-yocto 的 do_patch 主体(它会用 kern-tools 建 git 历史并把源码树 commit 掉)之后,把 ccmp25-softlink.dts 拷进，这会导致devtool modify的 post-patch 逻辑会把这份 untracked dts 收进 devtool 分支。从而使得这个命令执行出错，把这个安装动作挪到 do_patch 之后、do_configure 之前就行。
+```
+addtask install_dts after do_patch before do_configure
+```
