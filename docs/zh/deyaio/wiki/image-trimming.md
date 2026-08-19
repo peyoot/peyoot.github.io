@@ -52,6 +52,7 @@ PACKAGECONFIG:remove:pn-networkmanager = "modemmanager"
 RDEPENDS:networkmanager:remove = "modemmanager ppp"
 ```
 
+
 ### 更更进阶的处理
 让我们来解决这样一个问题，硬件设计上我们使用了带WiFi和不带WiFi都兼容的板卡，为了实时性，我们需要禁用WiFi和蓝牙。
 WiFi和蓝牙的特性一般是由DISTRO_FEATURE来决定，先检查一下：
@@ -75,3 +76,41 @@ FILESEXTRAPATHS:prepend:u-boot-dey_2023.10 := "${THISDIR}/files:"
 用编译出来的boot.scr替换原有/mnt/linux下的boot.scr，并改名ccmp25_bt.dtbo和ccmp25_wifi.dtbo，如果成功无报错上电，log上不再加载这两个设备树overlay，即成功。
 
 注：您可能仍需移除一些自动启服务，如果之前的更改没有移除干净的话。
+
+### 移除gstreamer
+在 poky/OE 里，合法的 distro feature 是 x11、wayland、opengl、pulseaudio、bluetooth、wifi、systemd 这类有明确 feature 开关的东西。而gstreamer 根本不是一个 DISTRO_FEATURE。不过把 x11 和 wayland 都从 DISTRO_FEATURES 里去掉了，于是 gst-plugins-bad 里的 vulkan 插件在配置阶段找不到任何窗口系统（X11/Wayland），meson 直接报错退出。
+
+要找到是谁把 gstreamer 拉进来的，从源头切断。
+
+第一步：生成构建镜像的依赖图
+```
+bitbake -g core-image-base
+```
+这会在当前目录下生成task-depends.dot，然后
+```
+# 看谁在依赖 gstreamer1.0-plugins-bad
+grep 'gstreamer1.0-plugins-bad' task-depends.dot | grep '\->'
+```
+输出内容不少，但关键是最后
+```
+"qtmultimedia.do_prepare_recipe_sysroot" -> "gstreamer1.0-plugins-bad.do_populate_sysroot"
+"qtmultimedia.do_package" -> "gstreamer1.0-plugins-bad.do_packagedata"
+```
+
+所以，要保留gstreamer，则至少要： 
+```
+PACKAGECONFIG:remove:pn-gstreamer1.0-plugins-bad = " vulkan "
+```
+或接着看
+```
+grep 'qtmultimedia' task-depends.dot | grep '\->' | grep -v '^"qtmultimedia'
+```
+会发现是qtvirtualkeyboard引入，并且在BB文件中是强依赖，用了 DEPENDS += 
+
+因此，如果要用QT，则可保留 qtvirtualkeyboard，但大幅瘦身
+
+完整应用下面，仅保留英文输入应该是够的，要中文再加 lang-zh_CN。
+```
+PACKAGECONFIG:remove:pn-qtvirtualkeyboard = " lang-all lipi-toolkit"
+PACKAGECONFIG:append:pn-qtvirtualkeyboard = " lang-en_US"
+```
