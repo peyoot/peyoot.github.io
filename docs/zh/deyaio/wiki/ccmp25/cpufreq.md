@@ -50,6 +50,10 @@ cat scaling_governor
 # 最大/最小频率
 cat cpuinfo_max_freq
 cat cpuinfo_min_freq
+
+# 复检opp表
+ls /sys/kernel/debug/opp/cpu*
+
 ```
 
 ## 在所有CPU类型上解锁1.5G主频
@@ -73,8 +77,7 @@ Meta-custom
 ```
 ## 实时系统的额外考量
 
-打了内核补丁实现超频后，一般需要认真重新测试一下实时性，看看是否引入未知的不确定性变化。
-对于实时系统，为了最佳实时性，可能需要关键动态调频，或直接在内核选项配置中指定默认用performance
+打了内核补丁实现超频后，一般需要认真重新测试一下实时性，看看是否引入未知的不确定性变化。也要关注对温度的影响，毕竟为了为了最佳实时性，可能需要关键动态调频，或直接在内核选项配置中指定默认用performance。如果设备不需要全天侯跑实时任务，也可以动态更改，或是牺牲一点实时性用schedutil。
 ```
 # 查看当前 governor
 cat /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
@@ -84,4 +87,13 @@ echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
 
 # 再跑一次 RT 测试对比
 cyclictest -l 100000 -m -p 99 -i 1000
+```
+
+## 防止CPU超温引发问题 
+默认地系统设置了个超温保护机制，在超105°C critical温度时，系统会重启。因此如果板卡没有散热措施，应关注常态运行时的温度。如果只是偶发临近关断温度，也可略微上调这个设定值。如果是长时间在高温下运行，应考增加虑散热片等措施。
+```
+# 持续监控处理器温度
+watch -n 1 'for z in /sys/class/thermal/thermal_zone*; do
+    echo "$(cat $z/type): $(( $(cat $z/temp) / 1000 ))°C"
+done'
 ```
