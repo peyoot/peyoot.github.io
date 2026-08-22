@@ -15,10 +15,11 @@ CONFIG_ARM_SCMI_PROTOCOL=y
 CONFIG_ARM_SCMI_PERF_PROTOCOL=y    ← 性能域协议，cpufreq 依赖此项
 # 3. SCMI CPUFreq 驱动
 CONFIG_ARM_SCMI_CPUFREQ=y          ← 这是关键，缺少它 cpufreq 目录不会出现
-# 4. 调频策略（至少选一个默认）
-CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y    ← 推荐，适合嵌入式，但调频调度不利于实时性
+# 4. 调频策略（三种至少选一个）
+CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y    ← 适合嵌入式，但调频调度不利于实时性
 CONFIG_CPU_FREQ_GOV_PERFORMANCE=y  
 CONFIG_CPU_FREQ_GOV_ONDEMAND=y
+CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE=y  ← 默认用 performance ，实时性最好
 ```
 可在当前板卡上查询上当前的内核配置：
 ```
