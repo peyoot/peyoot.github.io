@@ -77,6 +77,15 @@ Meta-custom
           └── fragment.cfg
           └── linux-dey_%.bbappend
 ```
+涉及到对内核选项和FIP固件的变更，因此需要清理
+```
+bitbake -c cleansstate linux-dey fip-stm32mp
+bitbake -c cleansstate core-image-base
+bitbake fip-stm32mp
+bitbake linux-dey
+bitbake core-image-base
+```
+
 ## 实时系统的额外考量
 
 打了内核补丁实现超频后，一般需要认真重新测试一下实时性，看看是否引入未知的不确定性变化。也要关注对温度的影响，毕竟为了为了最佳实时性，通常需要在内核选项配置中指定governor为performance。
