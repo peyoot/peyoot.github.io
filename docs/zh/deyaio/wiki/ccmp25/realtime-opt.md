@@ -19,7 +19,7 @@ irqaffinity=0：所有可迁移的中断默认只发往 CPU0。
 
 重启后，再执行检查
 ```
-taskset -c 0 cyclictest -p 98 -t 5 -a 1 -m -l 100000 -h 1000
+taskset -c 0 cyclictest -p 98 -t 5 -a 1 -m -l 100000
 
 各参数含义：
 -a 1：把测量线程绑定到 CPU1
@@ -29,17 +29,21 @@ taskset -c 0 ...：把 cyclictest 的主线程（非实时 SCHED_OTHER）钉在 
 -n：用 clock_nanosleep，精度更高
 -i 1000：1ms 周期
 -l 100000：10 万次循环
+-h 2000 测试结束时，输出一张延迟分布的直方图到终端,最大横坐标范围是 2000 微秒（2ms）。
+2000 表示直方图的
 ```
-或是
+或是带压力测试
 ```
-# CPU0 上加压（模拟真实业务）
-taskset -c 0 stress-ng --cpu 1 --io 2 --vm 1 --vm-bytes 128M &
-
-# CPU1 上跑实时测试
-taskset -c 0 cyclictest -p 98 -t 1 -a 1 -m -n -i 1000 -l 1000000 -h 2000
-
-# 跑完后杀掉 stress-ng
-killall stress-ng
+#后台CPU0 满载（死循环）
+taskset -c 0 sh -c 'while true; do :; done' &
+#后台加IO压力
+dd if=/dev/zero of=/dev/null bs=1M &
+#确认后台任务已启动
+jobs
+#在前台运行 cyclictest
+taskset -c 0 cyclictest -p 98 -t 3 -a 1 -m -l 50000
+#测试结束杀后台任务
+kill %1 %2 或 kill $(jobs -p)
 ```
 
 
