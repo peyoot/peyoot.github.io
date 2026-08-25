@@ -19,32 +19,45 @@
 </details>
 
 ## 🚀让Tachyon跑起来
-1. 连接
-需要准备一台电脑(Windows, macOS, or Linux)，用一根Type C的USB数据线连接电脑和Tachyon的USB1接口（即最边上的那个C口），插上电池，
+需要准备一台电脑(Windows, macOS, or Linux)，和一根Type C的USB数据线来配置Tachyon单板机。
 
-当你看到电源LED显示为红色时，Tachyon已经准备好运行了。
-
-2.下载Particle CLI
-接下来，您需要用Particle CLI配置Tachyon。大约需要3~10分钟，如果你电脑上还没有安装Particle CLI，请先下载安装。
+1. 下载安装Particle CLI 
+通常需要用Particle CLI这个工具来配置Tachyon。如果电脑上还没有安装Particle CLI，请先下载安装。
 Linux或Mac OS只需一行命令：
 ```
 bash <( curl -sL https://particle.io/install-cli )
 ```
 Windows用户点击这里[下载Windows CLI Installer](https://binaries.particle.io/particle-cli/installer/win32/ParticleCLISetup.exe) 。
 
-Particle Cli是命令行工具，安装完成后，就可以用命令行执行相关的命令，可以打开CMD命令行工具用下面命令检查是否安装好，并更新particle cli到最新版本：
+Particle Cli是命令行工具，安装完成后，就可以用命令行执行相关的命令，可以打开CMD命令行工具如powershell，用下面命令检查是否安装好，并更新particle cli到最新版本：
 ```
 particle update-cli
 ```
-Tachyon定期有更新的OS发布，新收到的板卡内置镜像一般是较早的出厂默认基础镜像，所以要配置升级一下操作系统，让Tachyon有完整的功能。
+2. 连接和USB访问配置
+用一根Type C的USB数据线连接电脑和Tachyon的USB1接口（即最边上的那个C口），如果想用锂电池做电源备份，也可插上锂电池。
 
-3.配置更新系统固件
+当你看到电源LED显示为红色时，Tachyon已经准备好运行了。长按开关按钮四秒，Tachyon会进入编程配置模式，此时LED灯闪着黄绿色，此时可在命令行中执行配置命令。但第一次使用时，Windows和Linux用户，需要安装或配置USB驱动，才能确保Tachyon设备能够通过USB正常进行通信。
+
+在 Linux 系统中，属于plugdev组的用户需要具备通过USB访问Tachyon的权限，通过运行以下命令来配置该设置：
+```
+particle usb configure
+```
+Windows 用户需要手动安装 USB 驱动程序，因为高通 QCOM 设备并不支持 Windows 系统的原生驱动。
+  - 下载 Zadig：https://zadig.akeo.ie/
+  - 确保“Tachyon”处于上述的编程配置模式。
+  - 打开 Zadig
+  - 在下拉列表中，选择 QUSB 设备。
+  - 请选择 libusb-win32 驱动程序。
+  - 点击“安装驱动”或“升级驱动”（如果之前有安装过旧版本）
+
+3. 配置更新系统固件
+Tachyon定期有更新的OS发布，新收到的板卡内置镜像一般是较早的出厂默认基础镜像，所以要配置升级一下操作系统，让Tachyon有完整的功能。
 
 为了下载固件，需要先注册一个Particle帐号，如果之前没注册过，可[点击这里注册](https://login.particle.io/signup) ，如果您已经有帐号，可直接登陆。需要注意的是帐号有长度和复杂性要求，其中要密码至少要有16个字符，很多人常用密码比较短，建议直接用“常用密码+Digi.com"这样组合，让长度和复杂性先保证，又容易记忆，以后有需要再慢慢改。请记录下你的密码在本子上，以备不时之需。
 
 更新系统固件需要连网，一般需要连到WiFi，请确保你知道附近的热点名称和密码，以便操作过程中输入。
 
-长按开关按钮四秒，Tachyon会进入配置模式，此时LED灯闪着黄绿色，此时在命令行中执行
+在编程配置模式下，此时LED灯闪着黄绿色，在命令行中执行
 ```
 particle tachyon setup
 ```
