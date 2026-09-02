@@ -66,6 +66,36 @@ cp ccmp25-plc.dtb /mnt/linux/ccmp25-plc.dtb
 sync
 reboot
 ```
+### 自定义overlays的编译
+上面的方法可以编译自定义板卡的设备树，如果自定义板卡之外，还要再自定义overlays，devshell的方式编译就需要进一步修改Makefile，这是因为在设备树的Makefile中，<合成产物>-dtbs的定义会编译出<合成产物>.dtb，原有Makefile的合成产物是ccmp25.dtb，它指的基本设备树是第一个文件，即ccmp25-dvk.dtb，如果我们有自定义板卡，基本设备树改为我们的名称，就要另起一个合成产物的名称。比如：
+```
+# SPDX-License-Identifier: GPL-2.0-only
+ccmp25-dtbs :=          ccmp25-dvk.dtb \
+                        ccmp25-dvk_e55rb-i-mw346-c-mipi-dsi.dtbo \
+                        ccmp25-dvk_g101evn010-lvds.dtbo \
+                        ccmp25-dvk_ov5640-mipi-csi.dtbo \
+                        ccmp25-dvk_mikroe-accel2-click.dtbo \
+                        ccmp25-dvk_mikroe-gyro-click.dtbo \
+                        ccmp25-dvk_mikroe-i2c-to-spi-click.dtbo \
+                        ccmp25-dvk_mikroe-mcp2518fd-click.dtbo \
+                        ccmp25-dvk_n25q256a-spi-nor-flash.dtbo \
+                        ccmp25-dvk_nhd-3-5-640480ef-msxp-mipi-dsi.dtbo \
+                        ccmp25-dvk_usb-3-0-typec.dtbo \
+                        ccmp25_bt.dtbo \
+                        ccmp25_wifi.dtbo
+
+# --- 检查自定义的overlay 对ccmp25-company.dtb这个base的label引用是否正确 ---
+ccmp25-company-check-dtbs :=  ccmp25-company.dtb \
+                            ccmp25-company_hdmi.dtbo \
+                            ccmp25-company_dualdisplay.dtbo \
+                            ccmp25-company_ads7846.dtbo
+
+dtb-$(CONFIG_ARCH_STM32) += \
+        ccmp25.dtb \
+        ccmp25-company-check.dtb \
+        ccmp25-mfg-functional.dtb \
+        ccmp25-mfg-functional-wb.dtb
+```
 
 ### 直接bitbake
 
