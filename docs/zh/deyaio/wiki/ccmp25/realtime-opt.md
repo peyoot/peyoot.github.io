@@ -17,9 +17,17 @@ nohz_full=1：CPU1 上无任务运行时，停止周期性 tick（即 arch_timer
 rcu_nocbs=1：RCU 回调 offload 到 CPU0，不在 CPU1 上执行。
 irqaffinity=0：所有可迁移的中断默认只发往 CPU0。
 
-重启后，再执行检查
+注：部分镜像已经在启动脚本中添加了这些设置，可在启动后检查看这些配置是否已经存在
 ```
-taskset -c 0 cyclictest -p 98 -t 5 -a 1 -m -l 100000
+cat /proc/cmdline                                   # 四个参数在不在
+cat /sys/devices/system/cpu/isolated                # 应显示 1
+cat /sys/devices/system/cpu/nohz_full               # 应显示 1
+cat /proc/irq/default_smp_affinity                  # 默认应指向 CPU0（值为 1）
+grep . /proc/irq/*/smp_affinity_list 2>/dev/null | grep -v '^.*:0$'   # 挑出没绑到 CPU0 的外设中断，手动挪走
+```
+实测实时性
+```
+taskset -c 0 cyclictest -p 98 -t 1 -a 1 -m -l 100000
 
 各参数含义：
 -a 1：把测量线程绑定到 CPU1
