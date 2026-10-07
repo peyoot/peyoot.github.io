@@ -99,6 +99,8 @@ sudo apt install clang cmake ninja-build libgtk-3-dev mesa-utils
 对于Chrome 缺失环境的缺失，可先不管它，因为本地windows有浏览器，可以后续在项目中配置launch.json实现一键调试。
 接下来可以先创建 Flutter 项目，把 Android 端框架跑通，再处理鸿蒙 HAP 的事。理由很明确：你 80% 的工作量在 Dart 共享层（状态机、题库、UI），这部分和平台完全无关，越早开始写越好。鸿蒙环境搭建涉及的 DevEco Studio 和 Flutter-OH 版本管理，可以等项目骨架稳定后再介入。
 
+### 创建Flutter项目
+
 ```
 # 创建一个名为 screen_time_manager 的 Flutter 项目
 flutter create screen_time_manager
@@ -115,11 +117,49 @@ git remote add origin https://github.com/peyoot/screen_time_manager.git
 git branch -M main
 git push -u origin main
 
-# 在 Linux 桌面端运行，快速验证环境
-flutter run -d Linux
-
 ```
 
+### 配置Flutter调试环境
+一、windows开发机上配置并启动X Server
+ 在 Linux 桌面端本可运行flutter run -d Linux，可快速验证环境，不过我们在服务器上并没显示器，所以实时查看和操作Flutter应用的UI，X11转发是比安装完整桌面环境更轻量的选择，
+ 1、下载并安装[VcXsrv](https://sourceforge.net/projects/vcxsrv/)
+ 2、 启动 X Server：
+ 安装后，运行 XLaunch，在配置向导中，务必取消勾选 "Native opengl"，并勾选 "Disable access control"。其他选项保持默认，一路点击“下一步”直到完成。
+ 3、设置 DISPLAY 环境变量：
+ 在 Windows PowerShell 中执行以下命令，将 DISPLAY 变量设置为
+ ```
+ [System.Environment]::SetEnvironmentVariable("DISPLAY", "localhost:0.0", [System.EnvironmentVariableTarget]::User)
+ ```
+二、在 VS Code 的 Remote-SSH 配置中启用 X11 转发
+按 Ctrl+Shift+P 打开命令面板，输入并选择 Remote-SSH: Open SSH Configuration File... 或是在Remote SSH的Remote Explorer下右击SSH，选择你用于连接服务器的 SSH 配置文件（通常是 C:\Users\你的用户名\.ssh\config）；
+在对应的 Host 配置块中，添加以下三行：
+```
+Host 10.10.8.249
+    HostName 10.10.8.249
+    User robin
+        IdentityFile C:\Users\rtu\.ssh\id_ed25519
+    ForwardAgent yes
+    ForwardX11 yes
+    ForwardX11Trusted yes
+```
+三、配置远程 Ubuntu 服务器的 SSH 服务
+远程服务器的 SSH 服务也需要允许 X11 转发，配置/etc/ssh/sshd_config，确保以下三行存在且没有被注释掉
+```
+X11Forwarding yes
+X11UseLocalhost no
+AllowTcpForwarding yes
+```
+然后用sudo systemctl restart sshd 重启服务。重新连接成功后，测试命令echo $DISPLAY，它应该输出 localhost:10.0 或类似的值。
+还可用xclock测试，
+```
+sudo apt install x11-apps
+xclock
+```
+成功在windows显示出界面后，就说明转发设置成功。接下来的步骤就是进入 Flutter 项目目录，运行 
+```
+flutter run -d linux
+```
+应用的窗口就会显示在你的 Windows 桌面上了。
 
 
 
