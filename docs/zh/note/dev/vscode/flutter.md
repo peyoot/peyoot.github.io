@@ -120,7 +120,13 @@ git push -u origin main
 ```
 
 ### 配置Flutter调试环境
-一、windows开发机上配置并启动X Server
+
+在远程服务器上开发App，虽然很便利，可是对调试环境可不友好。因为大多服务器并没有配置显卡，也没显示器，所以需要有个方式来测试以及把应用界面显示在本地上。根据不同目标和渲染位置，可能效果不尽相同。
+
+一、仅用电脑和远程服务器SSH环境下验证Flutter Linux桌面应用方案比较
+![Flutter远程开发](ssh-flutter-validation.png)
+以X11转发为例：
+I、windows开发机上配置并启动X Server
  在 Linux 桌面端本可运行flutter run -d Linux，可快速验证环境，不过我们在服务器上并没显示器，所以实时查看和操作Flutter应用的UI，X11转发是比安装完整桌面环境更轻量的选择，
  1、下载并安装[VcXsrv](https://sourceforge.net/projects/vcxsrv/)
  2、 启动 X Server：
@@ -130,7 +136,7 @@ git push -u origin main
  ```
  [System.Environment]::SetEnvironmentVariable("DISPLAY", "localhost:0.0", [System.EnvironmentVariableTarget]::User)
  ```
-二、在 VS Code 的 Remote-SSH 配置中启用 X11 转发
+II、在 VS Code 的 Remote-SSH 配置中启用 X11 转发
 按 Ctrl+Shift+P 打开命令面板，输入并选择 Remote-SSH: Open SSH Configuration File... 或是在Remote SSH的Remote Explorer下右击SSH，选择你用于连接服务器的 SSH 配置文件（通常是 C:\Users\你的用户名\.ssh\config）；
 在对应的 Host 配置块中，添加以下三行：
 ```
@@ -142,7 +148,7 @@ Host 10.10.8.249
     ForwardX11 yes
     ForwardX11Trusted yes
 ```
-三、配置远程 Ubuntu 服务器的 SSH 服务
+III、配置远程 Ubuntu 服务器的 SSH 服务
 远程服务器的 SSH 服务也需要允许 X11 转发，配置/etc/ssh/sshd_config，确保以下三行存在且没有被注释掉
 ```
 X11Forwarding yes
@@ -159,8 +165,43 @@ xclock
 ```
 flutter run -d linux
 ```
-应用的窗口就会显示在你的 Windows 桌面上了。
+应用的窗口就会显示在你的 Windows 桌面上了。只不过这样比较慢，还不如用web来调试：
+![X11和Web查看Flutter UI比较](x11-vs-web.png)
 
 
+二、物理机调试办法
+最方便是用无线调试而不是USB，但USB调试也需要打开，不同品牌可能略有差异
+第 1 步：在远程 Ubuntu 上确认 adb 可用
+```
+# 确认 adb 路径（通常 Flutter 会自带）
+which adb
+# 如果找不到，直接用完整路径
+~/development/flutter/bin/cache/artifacts/engine/android-x64/adb version
+```
+第 2 步：在平板上开启“无线调试”并获取配对信息
 
+以联想安卓平板为例：
+设置 → 关于平板 → 连续点击“版本号”7 次开启开发者模式。
+设置 → 系统 → 开发者选项 → 打开 “无线调试”。
+点击 “使用配对码配对设备”，记录屏幕上显示的 IP 地址、配对端口号、6 位配对码。
 
+第 3 步：在远程 Ubuntu 上执行 adb 配对和连接
+
+在远程终端里执行（把 IP 和端口换成平板屏幕上显示的）：
+```
+# 配对（注意：配对端口和连接端口是分开的）
+adb pair 平板IP:配对端口
+# 输入 6 位配对码
+
+# 配对成功后，回到无线调试主页面，查看“连接用的端口号”
+adb connect 平板IP:连接端口
+
+# 验证
+adb devices
+```
+第 4 步：验证连接后，直接运行 Flutter
+```
+flutter devices
+flutter run
+```
+远程编译后下载安装会比较久，建议设置不要自动熄屏，而是给予足够长时间，另外各种安全配置中也适当放宽，以防止安装或加载不了调试的应用。
