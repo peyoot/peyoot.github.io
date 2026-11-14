@@ -11,11 +11,11 @@
 
 ```
 sudo apt update
-sudo apt install gawk wget bison file flex git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa-dev libsdl1.2-dev libncurses-dev pylint xterm python3-subunit mesa-common-dev zstd liblz4-tool tmux
+sudo apt install gawk wget bison file flex git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa-dev libsdl1.2-dev libncurses-dev pylint xterm python3-subunit mesa-common-dev zstd liblz4-tool tmux nano
 sudo apt install python-is-python3
 ```
 
-桌面版ubuntu通常已经安装好locale，但如果是安装ubuntu server版本，还需要检查locale是否配置好。Ubuntu 22.04 默认把所有 locale 都编译成二进制放在 /usr/lib/locale/ 下，只有显式生成过才会出现。而且为了开发注释方便，我们通常也需要有中文支持，因此服务器版本需要下面配置
+桌面版ubuntu通常已经安装好locale，但如果是安装ubuntu server最小化版本，还需要检查locale是否配置好。Ubuntu 22.04 默认把所有 locale 都编译成二进制放在 /usr/lib/locale/ 下，只有显式生成过才会出现。而且为了开发注释方便，我们通常也需要有中文支持，因此服务器版本需要下面配置
 
 ```
 1、安装中文字符集
@@ -34,15 +34,37 @@ sudo update-locale LANG=en_US.UTF-8
 最好重启一下
 ```
 
+## Ubuntu 24.04额外配置
+Ubuntu 24.04 引入的一项新安全限制：默认禁止非特权用户创建 user namespace（除非有 AppArmor 配置文件放行），而 BitBake 需要用到 user namespace 来做一些沙箱隔离操作
+```
+echo 'kernel.apparmor_restrict_unprivileged_userns=0' | sudo tee /etc/sysctl.d/99-disable-userns-restriction.conf
+sudo sys
+```
+
 ## 安装repo并配置好git
 
 ```
-sudo apt install repo
-git config --global user.name  “yourname”   请用你的英文名称替换yourname
-git config --global user.email "you@email.com“  请用你的邮箱替换
-```
+# 1. 新建一个组，把你自己加进去并立即生效（组名可自定，例如 devtools）
+sudo groupadd devtools
+sudo usermod -aG devtools $USER
+newgrp devtools
 
-## 安装docker和docker-compose
+# 2. 创建 repo 文件，设好所有者、组和权限
+sudo touch /usr/local/bin/repo
+sudo chown root:devtools /usr/local/bin/repo
+sudo chmod 775 /usr/local/bin/repo      # 所有者和组可读写执行，其他人可读可执行
+
+# 3. 安装
+curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo
+
+# 4. 配置git
+git config --global user.name  "yourname"   请用你的英文名称替换yourname
+git config --global user.email "you@email.com"  请用你的邮箱替换
+```
+<!--
+<details>
+<summary style="font-size: 1.5em; font-weight: bold;">安装docker和docker-compose
+</summary>
 
 如果您打算用一套deyaio工具集来开发不同版本的DEY固件，可以用docker的方式在同一个主机上支持不同的DEY版本。新用户可以略过docker安装这一部分，直接进入下一个环节来安装dey-aio工具集。
 
@@ -55,6 +77,9 @@ docker ps    #测试docker命令是否可以使用sudo正常使用
 docker network create pvpn --subnet 172.100.100.0/24    #创建配合科学上网使用自定义网络
 ```
 
+</details>
+
+-->
 ## 用repo安装dey-aio工具集
 dey-aio-manifest的main分支持包含不同版本的DEY支持，如果只需开发特定版本，也可以用Yocto代号指定，以开发板为例：
 

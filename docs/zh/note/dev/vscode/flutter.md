@@ -205,3 +205,26 @@ flutter devices
 flutter run
 ```
 远程编译后下载安装会比较久，建议设置不要自动熄屏，而是给予足够长时间，另外各种安全配置中也适当放宽，以防止安装或加载不了调试的应用。
+
+## 编译正式发布的 APK
+1. 创建签名
+flutter run 生成的是 debug 包。正式发布需要用 flutter build 命令，但发布前必须先配置签名，否则构建会失败。
+```
+mkdir -p ~/.keystores
+keytool -genkey -v -keystore ~/.keystores/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+运行命令后，keytool 会交互式提示你输入：
+  * Keystore 密码（保护整个密钥库文件）
+  * 密钥密码（可回车默认与 keystore 密码相同）
+  * 姓名、组织单位、组织名称、城市、省份、国家代码（证书 DN 信息，可随意填写）
+查看密钥库内容：keytool -list -v -keystore ~/upload-keystore.jks
+
+2. 创建 项目根目录/key.properties 文件
+```
+storePassword=你设置的密码
+keyPassword=你设置的密码
+keyAlias=upload
+storeFile=/home/robin/.keystores/upload-keystore.jks
+```
+
+3. 修改 android/app/build.gradle.kts，引用签名配置
